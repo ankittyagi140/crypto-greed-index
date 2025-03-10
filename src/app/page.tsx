@@ -82,7 +82,7 @@ export default function Home() {
       const loadingToast = toast.loading('Fetching market data...');
       try {
         // Fetch 90 days of data to get quarterly comparison
-        const response = await fetch('https://api.alternative.me/fng/?limit=90');
+        const response = await fetch('/api/fear-greed?limit=90');
         const data = await response.json();
         
         if (data.data && data.data[0]) {

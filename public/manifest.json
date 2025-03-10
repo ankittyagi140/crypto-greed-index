@@ -1,0 +1,52 @@
+{
+  "name": "Crypto Greed Index",
+  "short_name": "Crypto Greed Index",
+  "description": "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "cryptocurrency", "utilities"],
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Crypto Greed Index Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Current Index",
+      "short_name": "Index",
+      "description": "View the current Fear & Greed Index value",
+      "url": "/",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Historical Data",
+      "short_name": "History",
+      "description": "View historical Fear & Greed Index data",
+      "url": "/#historical",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false,
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+} 

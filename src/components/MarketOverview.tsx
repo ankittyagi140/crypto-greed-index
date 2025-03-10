@@ -28,7 +28,7 @@ export default function MarketOverview() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-      const response = await fetch('https://api.coingecko.com/api/v3/global', {
+      const response = await fetch('/api/global', {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
