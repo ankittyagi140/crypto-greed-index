@@ -97,7 +97,7 @@ export default function FAQSection() {
             FAQs about Fear & Greed Index
           </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            Find out more about the Fear & Greed Index and how it's calculated before adding it to your toolset.
+            Find out more about the Fear & Greed Index and how it&rsquo;s calculated before adding it to your toolset.
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">

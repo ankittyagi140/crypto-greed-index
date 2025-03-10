@@ -33,7 +33,7 @@ export default function FearGreedMeter({
   value, 
   classification, 
   lastUpdated = 'Mar 10, 2025',
-  timestamp = Date.now() / 1000
+  // timestamp = Date.now() / 1000
 }: FearGreedMeterProps) {
   const color = getColor(value);
 

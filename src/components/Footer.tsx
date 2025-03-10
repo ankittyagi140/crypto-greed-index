@@ -2,11 +2,9 @@
 
 import Link from 'next/link';
 
-interface FooterProps {
-  updateInterval?: string;
-}
 
-export default function Footer({ updateInterval = "5 minutes" }: FooterProps) {
+
+export default function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-900 shadow-inner">
       <div className="container mx-auto px-4 py-8 max-w-6xl">

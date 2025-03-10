@@ -32,7 +32,7 @@ export default function ContactPage() {
                 Get in Touch
               </h2>
               <p className="text-gray-600 dark:text-gray-300">
-                Have questions about our Fear & Greed Index? We're here to help!
+                Have questions about our Fear & Greed Index? We&rsquo;re here to help!
               </p>
             </div>
 

@@ -1,4 +1,6 @@
-import { PieChart, Pie, Cell } from 'recharts';
+'use client';
+
+import Image from "next/image";
 
 interface GaugeChartProps {
   value: number;
@@ -64,7 +66,7 @@ export default function GaugeChart({ value, classification }: GaugeChartProps) {
 
       {/* Bitcoin logo */}
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-1 shadow">
-        <img 
+        <Image 
           src="https://static.coinstats.app/coins/1650455588819.png" 
           alt="Bitcoin Logo" 
           className="w-6 h-6"

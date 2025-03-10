@@ -66,7 +66,7 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState<FearGreedData | null>(null);
   const [historicalData, setHistoricalData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
   const [selectedRange, setSelectedRange] = useState("30");
   const [marketSentiment, setMarketSentiment] = useState<MarketSentiment | null>(null);
 
@@ -124,9 +124,9 @@ export default function Home() {
         }
         
         setLoading(false);
-      } catch (err) {
-        const errorMessage = 'Failed to fetch market data.';
-        setError(errorMessage);
+      } catch (err:any) {
+        const errorMessage = err.message ? err.message : 'Failed to fetch market data.';
+        // setError(errorMessage);
         toast.error(errorMessage, {
           id: loadingToast,
           duration: 4000,
@@ -186,22 +186,22 @@ export default function Home() {
   };
 
   // Function to get a description of the current index
-  const getIndexDescription = (classification: string) => {
-    switch (classification) {
-      case 'Extreme Fear':
-        return 'Investors are in extreme fear. This could be a buying opportunity.';
-      case 'Fear':
-        return 'Investors are fearful, which may indicate undervalued markets.';
-      case 'Neutral':
-        return 'Market sentiment is balanced.';
-      case 'Greed':
-        return 'Investors are showing greed. The market might be overvalued.';
-      case 'Extreme Greed':
-        return 'Investors are showing extreme greed. Consider this a warning sign.';
-      default:
-        return '';
-    }
-  };
+  // const getIndexDescription = (classification: string) => {
+  //   switch (classification) {
+  //     case 'Extreme Fear':
+  //       return 'Investors are in extreme fear. This could be a buying opportunity.';
+  //     case 'Fear':
+  //       return 'Investors are fearful, which may indicate undervalued markets.';
+  //     case 'Neutral':
+  //       return 'Market sentiment is balanced.';
+  //     case 'Greed':
+  //       return 'Investors are showing greed. The market might be overvalued.';
+  //     case 'Extreme Greed':
+  //       return 'Investors are showing extreme greed. Consider this a warning sign.';
+  //     default:
+  //       return '';
+  //   }
+  // };
 
 
   return (

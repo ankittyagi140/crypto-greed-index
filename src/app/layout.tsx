@@ -17,10 +17,59 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Crypto Fear & Greed Index",
-  description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates",
+  title: "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
+  description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
+  keywords: "crypto fear and greed index, cryptocurrency sentiment, market psychology, crypto market analysis, bitcoin sentiment, crypto investment tools",
+  authors: [{ name: "Crypto Greed Index" }],
+  creator: "Crypto Greed Index",
+  publisher: "Crypto Greed Index",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://www.cryptogreedindex.com'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
+    description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
+    url: 'https://www.cryptogreedindex.com',
+    siteName: 'Crypto Greed Index',
+    images: [
+      {
+        url: '/cryptogreedindex.png',
+        width: 1200,
+        height: 630,
+        alt: 'Crypto Greed Index',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
+    description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
+    images: ['/cryptogreedindex.png'],
+    creator: '@cryptogreedindex',
+  },
   icons: {
     icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/manifest.json',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -55,6 +104,21 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <ThemeInitializer />
+        <meta name="google-site-verification" content="YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI" />
+        <Script
+          id="structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebPage",
+              "name": "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
+              "description": "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates.",
+              "url": "https://www.cryptogreedindex.com",
+              "image": "https://www.cryptogreedindex.com/cryptogreedindex.png"
+            })
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -64,7 +128,7 @@ export default function RootLayout({
           <Header/>
           <main>{children}</main>
           <Footer/>
-          </Providers>
+        </Providers>
       </body>
     </html>
   );
