@@ -38,6 +38,12 @@ interface ChartData {
   classification: string;
 }
 
+interface DotProps {
+  cx?: number;
+  cy?: number;
+  value?: number;
+  index?: number;
+}
 
 interface MarketSentiment {
   now: {
@@ -124,9 +130,8 @@ export default function Home() {
         }
         
         setLoading(false);
-      } catch (err:any) {
-        const errorMessage = err.message ? err.message : 'Failed to fetch market data.';
-        // setError(errorMessage);
+      } catch (err: Error | unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch market data.';
         toast.error(errorMessage, {
           id: loadingToast,
           duration: 4000,
@@ -155,7 +160,7 @@ export default function Home() {
   };
 
   // Custom dot component for the line chart
-  const CustomDot = (props: any) => {
+  const CustomDot = (props: DotProps) => {
     const { cx, cy, value, index } = props;
     return (
       <circle 
@@ -163,14 +168,14 @@ export default function Home() {
         cx={cx} 
         cy={cy} 
         r={4} 
-        fill={getIndexColor(value)}
-        stroke={getIndexColor(value)}
+        fill={getIndexColor(value || 0)}
+        stroke={getIndexColor(value || 0)}
       />
     );
   };
 
   // Custom active dot component
-  const CustomActiveDot = (props: any) => {
+  const CustomActiveDot = (props: DotProps) => {
     const { cx, cy, value, index } = props;
     return (
       <circle 
@@ -178,7 +183,7 @@ export default function Home() {
         cx={cx} 
         cy={cy} 
         r={6} 
-        fill={getIndexColor(value)}
+        fill={getIndexColor(value || 0)}
         stroke="#FFF"
         strokeWidth={2}
       />
