@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
   description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
-  keywords: "crypto fear and greed index, cryptocurrency sentiment, market psychology, crypto market analysis, bitcoin sentiment, crypto investment tools",
+  keywords: "crypto fear and greed index, cryptocurrency sentiment, market psychology, crypto market analysis, bitcoin sentiment, crypto investment tools, What is greed and fear in crypto?, Fear and Greed Index Live, BTC fear and greed, Bitcoin fear and greed, fear and greed index today, fear and greed index today ",
   authors: [{ name: "Crypto Greed Index" }],
   creator: "Crypto Greed Index",
   publisher: "Crypto Greed Index",

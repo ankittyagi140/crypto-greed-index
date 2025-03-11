@@ -12,7 +12,7 @@ export default function Header({
   title = "Crypto Greed Index"
 }: HeaderProps) {
   return (
-    <header className="bg-white dark:bg-gray-900 shadow">
+    <header className="bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg z-101 sticky top-0">
       <div className="container mx-auto px-4 py-4 max-w-6xl flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-3">
           <div className="relative w-10 h-10">
