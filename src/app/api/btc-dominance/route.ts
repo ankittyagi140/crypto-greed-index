@@ -2,18 +2,15 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Fetch total market cap data
-    const response = await fetch(
-      'https://api.coingecko.com/api/v3/global/market_cap_chart?vs_currency=usd&days=365',
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
-        next: {
-          revalidate: 300 // Cache for 5 minutes
-        }
-      }
-    );
+    // Fetch global crypto market data
+    const response = await fetch('https://api.coingecko.com/api/v3/global', {
+      headers: {
+        'Accept': 'application/json',
+      },
+      next: {
+        revalidate: 300, // Cache for 5 minutes
+      },
+    });
 
     if (response.status === 429) {
       return NextResponse.json(
@@ -23,12 +20,12 @@ export async function GET() {
     }
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch global market data: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    
-    // Fetch BTC data
+    const globalData = await response.json();
+
+    // Fetch BTC market cap over time
     const btcResponse = await fetch(
       'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365',
       {
@@ -36,8 +33,8 @@ export async function GET() {
           'Accept': 'application/json',
         },
         next: {
-          revalidate: 300 // Cache for 5 minutes
-        }
+          revalidate: 300, // Cache for 5 minutes
+        },
       }
     );
 
@@ -55,21 +52,23 @@ export async function GET() {
     const btcData = await btcResponse.json();
 
     // Validate data structure
-    if (!data.total_market_cap || !btcData.market_caps || 
-        !Array.isArray(data.total_market_cap) || !Array.isArray(btcData.market_caps)) {
+    if (
+      !globalData.data?.total_market_cap?.usd ||
+      !btcData.market_caps ||
+      !Array.isArray(btcData.market_caps)
+    ) {
       throw new Error('Invalid data structure received from API');
     }
 
+    const totalMarketCap = globalData.data.total_market_cap.usd;
+
     // Process the data to calculate dominance
-    const dominanceData = data.total_market_cap.map((total: [number, number], index: number) => {
-      const timestamp = total[0];
-      const totalMarketCap = total[1];
-      const btcMarketCap = btcData.market_caps[index]?.[1] ?? 0;
+    const dominanceData = btcData.market_caps.map(([timestamp, btcMarketCap]: [number, number]) => {
       const dominance = btcMarketCap > 0 ? (btcMarketCap / totalMarketCap) * 100 : 0;
 
       return {
         date: new Date(timestamp).toISOString(),
-        dominance: Number(dominance.toFixed(2))
+        dominance: Number(dominance.toFixed(2)),
       };
     });
 
@@ -82,4 +81,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-} 
+}
