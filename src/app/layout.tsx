@@ -106,6 +106,18 @@ export default function RootLayout({
         <ThemeInitializer />
         <meta name="google-site-verification" content="YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI" />
         <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-W9J9F0HR2F"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-W9J9F0HR2F');
+          `}
+        </Script>
+        <Script
           id="structured-data"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
