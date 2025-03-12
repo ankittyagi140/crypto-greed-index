@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 
@@ -14,7 +15,7 @@ interface MarketData {
 export default function MarketOverview() {
   const [marketData, setMarketData] = useState<MarketData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const router = useRouter();
   const formatLargeNumber = useCallback((num: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'decimal',
@@ -102,7 +103,10 @@ export default function MarketOverview() {
   ), [marketData?.total_volume, formatLargeNumber]);
 
   const btcDominanceCard = useMemo(() => (
-    <div className="rounded-lg p-3 bg-green-50">
+    <div 
+      className="rounded-lg p-3 bg-green-50 cursor-pointer hover:bg-green-100 transition-colors" 
+      onClick={() => router.push('/btc-dominance')}
+    >
       <div className="text-gray-700 text-sm">BTC Dominance</div>
       <div className="flex items-baseline gap-2">
         <div className="text-lg font-bold text-gray-900">
@@ -113,7 +117,7 @@ export default function MarketOverview() {
         </div>
       </div>
     </div>
-  ), [marketData?.btc_dominance]);
+  ), [marketData?.btc_dominance, router]);
 
   if (isLoading) {
     return (
