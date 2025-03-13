@@ -23,7 +23,7 @@ export default function ShareButtons({ title, text, hashtags = [] }: ShareButton
   };
 
   return (
-    <div className="flex items-center gap-2 mt-2">
+    <div className="flex items-center justify-centergap-2 mt-2">
       <button
         onClick={() => handleShare('twitter')}
         className="p-2 text-blue-400 hover:text-blue-600 dark:text-blue-300 dark:hover:text-blue-400 transition-colors cursor-pointer"
