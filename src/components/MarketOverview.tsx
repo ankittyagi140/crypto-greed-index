@@ -8,6 +8,7 @@ interface MarketData {
   total_market_cap: number;
   total_volume: number;
   btc_dominance: number;
+  eth_dominance: number;
   market_cap_change_percentage_24h: number;
   volume_change_percentage_24h: number;
 }
@@ -50,6 +51,7 @@ export default function MarketOverview() {
           total_market_cap: data.data.total_market_cap.usd,
           total_volume: data.data.total_volume.usd,
           btc_dominance: data.data.market_cap_percentage.btc,
+          eth_dominance: data.data.market_cap_percentage.eth,
           market_cap_change_percentage_24h: data.data.market_cap_change_percentage_24h_usd,
           volume_change_percentage_24h: data.data.market_cap_change_percentage_24h_usd
         });
@@ -119,11 +121,28 @@ export default function MarketOverview() {
     </div>
   ), [marketData?.btc_dominance, router]);
 
+  const ethDominanceCard = useMemo(() => (
+    <div 
+      className="rounded-lg p-3 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors" 
+      onClick={() => router.push('/eth-dominance')}
+    >
+      <div className="text-gray-700 text-sm">ETH Dominance</div>
+      <div className="flex items-baseline gap-2">
+        <div className="text-lg font-bold text-gray-900">
+          {(marketData?.eth_dominance || 0).toFixed(1)}%
+        </div>
+        <div className="text-sm font-medium text-green-500">
+          ▲ 0.15%
+        </div>
+      </div>
+    </div>
+  ), [marketData?.eth_dominance, router]);
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-3 max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="rounded-lg p-3 animate-pulse bg-gray-100 dark:bg-gray-800 h-20" />
           ))}
         </div>
@@ -135,10 +154,11 @@ export default function MarketOverview() {
 
   return (
     <div className="container mx-auto px-4 py-3 max-w-6xl">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {marketCapCard}
         {volumeCard}
         {btcDominanceCard}
+        {ethDominanceCard}
       </div>
     </div>
   );
