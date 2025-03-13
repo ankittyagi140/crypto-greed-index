@@ -15,12 +15,32 @@ interface ETHDominanceProps {
 
 interface TooltipProps {
   active?: boolean;
-  payload?: Array<{
+ payload?: Array<{
     value: number;
     dataKey: string;
   }>;
   label?: string;
 }
+
+const CurrentDominance = ({ value }: { value: number }) => {
+  // Calculate the change in dominance (for demo using a fixed value, you might want to calculate this from your data)
+  const change = 0.15; // This should be calculated from your data
+  const isPositive = change >= 0;
+
+  return (
+    <div className={`${isPositive ? 'bg-green-50 dark:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/30'} rounded-lg p-4 mb-6 max-w-xs mx-auto border ${isPositive ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800'} text-center`}>
+      <div className={`${isPositive ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'} text-sm font-medium`}>Current ETH Dominance</div>
+      <div className="flex items-baseline gap-2 justify-center">
+        <div className={`text-2xl font-bold ${isPositive ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}`}>
+          {value.toFixed(1)}%
+        </div>
+        <div className={`text-sm font-medium ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          {isPositive ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
@@ -55,6 +75,9 @@ export default function ETHDominance({ data, isDetailPage = false }: ETHDominanc
     return days <= parseInt(selectedRange);
   });
 
+  // Get current dominance value (latest data point)
+  const currentDominance = data[data.length - 1]?.dominance || 0;
+
   // Calculate min and max values for better Y-axis scaling
   const minDominance = Math.floor(Math.min(...filteredData.map(d => d.dominance)));
   const maxDominance = Math.ceil(Math.max(...filteredData.map(d => d.dominance)));
@@ -73,6 +96,7 @@ export default function ETHDominance({ data, isDetailPage = false }: ETHDominanc
       }`}
       onClick={handleClick}
     >
+      {isDetailPage && <CurrentDominance value={currentDominance} />}
       <div className="mb-6 flex flex-col gap-2 items-center">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
           Ethereum Market Dominance
@@ -91,7 +115,7 @@ export default function ETHDominance({ data, isDetailPage = false }: ETHDominanc
         />
       </div>
       
-      <div className="h-[400px]">
+      <div style={{ width: '100%', height: isDetailPage ? '400px' : '200px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={filteredData}>
             <defs>

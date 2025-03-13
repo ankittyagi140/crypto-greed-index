@@ -1,19 +1,7 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const timeRange = searchParams.get('timeRange') || 'yearly'; // Default to yearly
-
-    // Map time ranges to days
-    const daysMap: { [key: string]: number } = {
-      weekly: 7,
-      monthly: 30,
-      yearly: 365
-    };
-
-    const days = daysMap[timeRange] || 365;
-
     // Fetch global crypto market data
     const response = await fetch('https://api.coingecko.com/api/v3/global', {
       headers: {
@@ -39,7 +27,7 @@ export async function GET(request: Request) {
 
     // Fetch ETH market cap over time
     const ethResponse = await fetch(
-      `https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=${days}`,
+      'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=365',
       {
         headers: {
           'Accept': 'application/json',

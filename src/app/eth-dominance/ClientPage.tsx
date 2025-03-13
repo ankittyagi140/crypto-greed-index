@@ -14,45 +14,45 @@ export default function ClientPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    const loadingToast = toast.loading('Fetching ETH dominance data...', {
-      position: 'top-right',
-    });
-    try {
-      const response = await fetch('/api/eth-dominance');
-      const result = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error('Rate limit exceeded. Please try again in a few minutes.');
-        }
-        throw new Error(result.error || 'Failed to fetch ETH dominance data');
-      }
-
-      if (!result.data || !Array.isArray(result.data)) {
-        throw new Error('Invalid data received from server');
-      }
-
-      setData(result.data);
-      setError(null);
-      toast.success('Data updated successfully', { 
-        id: loadingToast,
-        duration: 3000,
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load ETH dominance data';
-      setError(errorMessage);
-      toast.error(errorMessage, { 
-        id: loadingToast,
-        duration: 4000,
-      });
-      console.error('Error fetching ETH dominance data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      const loadingToast = toast.loading('Fetching ETH dominance data...', {
+        position: 'top-right',
+      });
+      try {
+        const response = await fetch('/api/eth-dominance');
+        const result = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error('Rate limit exceeded. Please try again in a few minutes.');
+          }
+          throw new Error(result.error || 'Failed to fetch ETH dominance data');
+        }
+
+        if (!result.data || !Array.isArray(result.data)) {
+          throw new Error('Invalid data received from server');
+        }
+
+        setData(result.data);
+        setError(null);
+        toast.success('Data updated successfully', { 
+          id: loadingToast,
+          duration: 3000,
+        });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load ETH dominance data';
+        setError(errorMessage);
+        toast.error(errorMessage, { 
+          id: loadingToast,
+          duration: 4000,
+        });
+        console.error('Error fetching ETH dominance data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     // Initial fetch
     fetchData();
 
@@ -107,6 +107,7 @@ export default function ClientPage() {
           },
         }}
       />
+      
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <div className="text-center mb-8">
@@ -129,12 +130,7 @@ export default function ClientPage() {
               </button>
             </div>
           ) : (
-            data.length > 0 && (
-              <ETHDominance 
-                data={data} 
-                isDetailPage={true}
-              />
-            )
+            data.length > 0 && <ETHDominance data={data} isDetailPage={true} />
           )}
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -143,7 +139,7 @@ export default function ClientPage() {
             </h2>
             <div className="space-y-4 text-gray-600 dark:text-gray-300">
               <p>
-                Ethereum dominance represents Ethereum&apos;s market capitalization as a percentage of the total cryptocurrency market capitalization. This metric is crucial for understanding Ethereum&apos;s relative strength and influence in the crypto market, particularly in the DeFi and smart contract sectors.
+                Ethereum dominance represents Ethereum&apos;s market capitalization as a percentage of the total cryptocurrency market capitalization. This metric is crucial for understanding Ethereum&apos;s relative strength and influence in the crypto market.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
@@ -151,21 +147,21 @@ export default function ClientPage() {
                     High Dominance Implications
                   </h3>
                   <ul className="list-disc list-inside space-y-2">
-                    <li>Strong DeFi ecosystem growth</li>
+                    <li>Strong Ethereum ecosystem</li>
+                    <li>DeFi and NFT market growth</li>
                     <li>Smart contract platform leadership</li>
-                    <li>Network effect strength</li>
-                    <li>Developer activity</li>
+                    <li>Institutional adoption</li>
                   </ul>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                    Market Impact
+                    Low Dominance Implications
                   </h3>
                   <ul className="list-disc list-inside space-y-2">
-                    <li>DeFi protocol growth</li>
-                    <li>Layer 2 adoption</li>
-                    <li>NFT market activity</li>
-                    <li>Smart contract innovation</li>
+                    <li>Alternative L1 competition</li>
+                    <li>Market diversification</li>
+                    <li>Layer 2 solution growth</li>
+                    <li>Scaling challenges</li>
                   </ul>
                 </div>
               </div>

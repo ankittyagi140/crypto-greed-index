@@ -267,24 +267,7 @@ export default function Home() {
     );
   };
 
-  // Function to get a description of the current index
-  // const getIndexDescription = (classification: string) => {
-  //   switch (classification) {
-  //     case 'Extreme Fear':
-  //       return 'Investors are in extreme fear. This could be a buying opportunity.';
-  //     case 'Fear':
-  //       return 'Investors are fearful, which may indicate undervalued markets.';
-  //     case 'Neutral':
-  //       return 'Market sentiment is balanced.';
-  //     case 'Greed':
-  //       return 'Investors are showing greed. The market might be overvalued.';
-  //     case 'Extreme Greed':
-  //       return 'Investors are showing extreme greed. Consider this a warning sign.';
-  //     default:
-  //       return '';
-  //   }
-  // };
-
+ 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">

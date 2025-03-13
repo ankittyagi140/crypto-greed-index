@@ -22,6 +22,28 @@ interface TooltipProps {
   label?: string;
 }
 
+const CurrentDominance = ({ value, data }: { value: number; data: { date: string; dominance: number }[] }) => {
+  // Calculate the actual change in dominance from yesterday's value
+  const currentIndex = data.length - 1;
+  const previousIndex = currentIndex - 1;
+  const change = previousIndex >= 0 ? value - data[previousIndex].dominance : 0;
+  const isPositive = change >= 0;
+
+  return (
+    <div className={`${isPositive ? 'bg-green-100 dark:bg-green-900/40' : 'bg-red-100 dark:bg-red-900/40'} rounded-lg p-4 mb-6 max-w-xs mx-auto border ${isPositive ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800'}`}>
+      <div className={`${isPositive ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'} text-sm font-medium mb-1`}>Current BTC Dominance</div>
+      <div className="flex items-baseline gap-2 justify-center">
+        <div className={`text-2xl font-bold ${isPositive ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}`}>
+          {value.toFixed(1)}%
+        </div>
+        <div className={`text-sm font-medium ${isPositive ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
+          {isPositive ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
@@ -55,6 +77,9 @@ export default function BTCDominance({ data, isDetailPage = false }: BTCDominanc
     return days <= parseInt(selectedRange);
   });
 
+  // Get current dominance value (latest data point)
+  const currentDominance = data[data.length - 1]?.dominance || 0;
+
   // Calculate min and max values for better Y-axis scaling
   const minDominance = Math.floor(Math.min(...filteredData.map(d => d.dominance)));
   const maxDominance = Math.ceil(Math.max(...filteredData.map(d => d.dominance)));
@@ -73,6 +98,7 @@ export default function BTCDominance({ data, isDetailPage = false }: BTCDominanc
       }`}
       onClick={handleClick}
     >
+      {isDetailPage && <CurrentDominance value={currentDominance} data={data} />}
       <div className="mb-6 flex flex-col gap-2 items-center">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
           Bitcoin Market Dominance
