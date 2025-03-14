@@ -14,28 +14,30 @@ import {
   FAQSkeleton
 } from '@/components/ChartSkeletons';
 
+import TopCoins from '@/components/TopCoins';
+
 // Lazy load components with custom loading states
-const MarketOverview = dynamic(() => import('../components/MarketOverview'), {
+const MarketOverview = dynamic(() => import('@/components/MarketOverview'), {
   loading: () => <div className="animate-pulse bg-gray-100 dark:bg-gray-800 h-20"></div>,
   ssr: false
 });
 
-const TimeRangeSelector = dynamic(() => import('../components/TimeRangeSelector'));
-const FGIScore = dynamic(() => import('../components/FGIScore'));
-const FearGreedMeter = dynamic(() => import('../components/FearGreedMeter'));
+const TimeRangeSelector = dynamic(() => import('@/components/TimeRangeSelector'));
+const FGIScore = dynamic(() => import('@/components/FGIScore'));
+const FearGreedMeter = dynamic(() => import('@/components/FearGreedMeter'));
 
 // Lazy load chart components with custom loading states
-const BTCComparison = dynamic(() => import('../components/BTCComparison'), {
+const BTCComparison = dynamic(() => import('@/components/BTCComparison'), {
   loading: () => <BTCComparisonSkeleton />,
   ssr: false
 });
 
-const SocialSentiment = dynamic(() => import('../components/SocialSentiment'), {
+const SocialSentiment = dynamic(() => import('@/components/SocialSentiment'), {
   loading: () => <SocialSentimentSkeleton />,
   ssr: false
 });
 
-const FAQSection = dynamic(() => import('../components/FAQSection'), {
+const FAQSection = dynamic(() => import('@/components/FAQSection'), {
   loading: () => <FAQSkeleton />,
   ssr: false
 });
@@ -311,8 +313,8 @@ export default function Home() {
           },
         }}
       />
-      <MarketOverview />
       <main className="container mx-auto px-4 py-8 max-w-6xl">
+        <MarketOverview />
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
             Crypto Fear & Greed Index
@@ -486,10 +488,17 @@ export default function Home() {
           <BTCComparison data={btcComparisonData} />
         </LazyChartSection>
 
-        {/* FAQ Section */}
-        <LazyChartSection>
+        <div className="mt-12 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 text-center">
+            Top Cryptocurrencies
+          </h2>
+          <TopCoins />
+        </div>
+         {/* FAQ Section */}
+         <LazyChartSection>
           <FAQSection />
         </LazyChartSection>
+
       </main>
     </div>
   );

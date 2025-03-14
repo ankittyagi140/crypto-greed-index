@@ -149,7 +149,7 @@ export default function MarketOverview() {
            `24h Volume: ${formatLargeNumber(marketData.total_volume)}\n` +
            `BTC Dominance: ${marketData.btc_dominance.toFixed(1)}%\n` +
            `ETH Dominance: ${marketData.eth_dominance.toFixed(1)}%`;
-  }, [marketData]);
+  }, [marketData, formatLargeNumber]);
 
   if (isLoading) {
     return (

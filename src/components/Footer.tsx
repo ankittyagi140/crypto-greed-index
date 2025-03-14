@@ -1,14 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-
-
+import { FaTwitter, FaInstagram } from 'react-icons/fa';
 
 export default function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-900 shadow-inner">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">About</h3>
             <ul className="space-y-2">
@@ -39,6 +38,30 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Follow Us</h3>
+            <div className="flex items-center space-x-4">
+              <a
+                href="https://x.com/CryptoGreedIndx"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-blue-400 dark:text-gray-400 dark:hover:text-blue-300 transition-colors"
+                aria-label="Follow us on Twitter"
+              >
+                <FaTwitter className="w-6 h-6" />
+              </a>
+              <a
+                href="https://www.instagram.com/crtptogreedindex/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400 transition-colors"
+                aria-label="Follow us on Instagram"
+              >
+                <FaInstagram className="w-6 h-6" />
+              </a>
+            </div>
           </div>
         </div>
         
