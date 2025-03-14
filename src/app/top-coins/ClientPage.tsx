@@ -244,7 +244,7 @@ export default function ClientPage() {
             className={`px-4 py-2 rounded-md ${
               currentPage === 1
                 ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-[#048f04] text-white hover:bg-blue-600'
             }`}
             aria-label="Previous page"
           >
@@ -258,7 +258,7 @@ export default function ClientPage() {
                 onClick={() => paginate(index + 1)}
                 className={`px-4 py-2 rounded-md ${
                   currentPage === index + 1
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-[#048f04] text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
                 aria-label={`Page ${index + 1}`}
@@ -275,7 +275,7 @@ export default function ClientPage() {
             className={`px-4 py-2 rounded-md ${
               currentPage === totalPages
                 ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-[#048f04] text-white hover:bg-blue-600'
             }`}
             aria-label="Next page"
           >

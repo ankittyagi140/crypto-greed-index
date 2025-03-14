@@ -13,6 +13,7 @@ export default function Header({
   title = "Crypto Greed Index"
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   return (
     <div className="sticky top-0 z-50">
@@ -54,6 +55,43 @@ export default function Header({
               </svg>
               <span>About Us</span>
             </Link>
+            <div className="relative">
+              <button 
+                onClick={() => setIsAnalysisOpen(!isAnalysisOpen)}
+                className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors cursor-pointer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                </svg>
+                <span>Analysis</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-4 h-4 transition-transform ${isAnalysisOpen ? 'rotate-180' : ''}`}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+              <div className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 transition-all duration-200 ${isAnalysisOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+                <Link 
+                  href="/btc-dominance" 
+                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  onClick={() => setIsAnalysisOpen(false)}
+                >
+                  BTC Dominance
+                </Link>
+                <Link 
+                  href="/eth-dominance" 
+                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  onClick={() => setIsAnalysisOpen(false)}
+                >
+                  ETH Dominance
+                </Link>
+                <Link 
+                  href="/altcoin-dominance" 
+                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  onClick={() => setIsAnalysisOpen(false)}
+                >
+                  Altcoin Dominance
+                </Link>
+              </div>
+            </div>
             <ThemeToggle />
           </nav>
 
@@ -84,7 +122,7 @@ export default function Header({
       {/* Mobile Navigation Menu */}
       <div
         className={`bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg md:hidden overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-64' : 'max-h-0'
+          isMobileMenuOpen ? 'max-h-96' : 'max-h-0'
         }`}
       >
         <nav className="container mx-auto px-4 py-4 max-w-6xl flex flex-col space-y-4">
@@ -108,6 +146,39 @@ export default function Header({
             </svg>
             <span>About Us</span>
           </Link>
+          <div className="space-y-2">
+            <div className="text-gray-600 dark:text-gray-300 font-medium px-2 dark:hover:text-white transition-colors ">Analysis</div>
+            <Link 
+              href="/btc-dominance" 
+              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+              </svg>
+              <span>BTC Dominance</span>
+            </Link>
+            <Link 
+              href="/eth-dominance" 
+              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+              </svg>
+              <span>ETH Dominance</span>
+            </Link>
+            <Link 
+              href="/altcoin-dominance" 
+              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+              </svg>
+              <span>Altcoin Dominance</span>
+            </Link>
+          </div>
           <div className="flex items-center justify-center pt-2 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-300">
               <span>Theme</span>

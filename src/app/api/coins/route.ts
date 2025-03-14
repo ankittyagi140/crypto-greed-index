@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 
+// Mark this route as dynamic to allow using searchParams
+export const dynamic = 'force-dynamic';
+
 export const revalidate = 300; // Cache for 5 minutes
 
 export async function GET(request: NextRequest) {

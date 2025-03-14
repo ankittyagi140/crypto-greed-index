@@ -142,6 +142,27 @@ export default function MarketOverview() {
     </div>
   ), [marketData?.eth_dominance, router]);
 
+  const altcoinDominanceCard = useMemo(() => {
+    if (!marketData) return null;
+    const altcoinDominance = 100 - (marketData.btc_dominance + marketData.eth_dominance);
+    return (
+      <div 
+        className="rounded-lg p-2 sm:p-3 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors" 
+        onClick={() => router.push('/altcoin-dominance')}
+      >
+        <div className="text-gray-700 text-xs sm:text-sm">Altcoin Dominance</div>
+        <div className="flex items-baseline gap-1 sm:gap-2">
+          <div className="text-base sm:text-lg font-bold text-gray-900">
+            {altcoinDominance.toFixed(1)}%
+          </div>
+          <div className="text-xs sm:text-sm font-medium text-blue-500">
+            View Chart →
+          </div>
+        </div>
+      </div>
+    );
+  }, [marketData, router]);
+
   const shareText = useMemo(() => {
     if (!marketData) return '';
     return `📊 Crypto Market Overview\n` +
@@ -167,11 +188,12 @@ export default function MarketOverview() {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 max-w-6xl">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4">
         {marketCapCard}
         {volumeCard}
         {btcDominanceCard}
         {ethDominanceCard}
+        {altcoinDominanceCard}
       </div>
       <ShareButtons 
         title="Crypto Market Overview"
