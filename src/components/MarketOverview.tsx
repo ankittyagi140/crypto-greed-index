@@ -12,6 +12,8 @@ interface MarketData {
   eth_dominance: number;
   market_cap_change_percentage_24h: number;
   volume_change_percentage_24h: number;
+  fear_greed_value?: number;
+  fear_greed_classification?: string;
 }
 
 export default function MarketOverview() {
@@ -60,7 +62,9 @@ export default function MarketOverview() {
           btc_dominance: data.data.market_cap_percentage.btc,
           eth_dominance: data.data.market_cap_percentage.eth,
           market_cap_change_percentage_24h: data.data.market_cap_change_percentage_24h_usd,
-          volume_change_percentage_24h: data.data.market_cap_change_percentage_24h_usd
+          volume_change_percentage_24h: data.data.volume_change_percentage_24h_usd,
+          fear_greed_value: data.data.fear_greed_value,
+          fear_greed_classification: data.data.fear_greed_classification
         });
       }
     } catch (error: unknown) {
@@ -80,74 +84,99 @@ export default function MarketOverview() {
     return () => clearInterval(interval);
   }, [fetchMarketData]);
 
-  const marketCapCard = useMemo(() => (
-    <div className="rounded-lg p-2 sm:p-3 bg-red-50">
-      <div className="text-gray-700 text-xs sm:text-sm">Market Cap</div>
-      <div className="flex items-baseline gap-1 sm:gap-2">
-        <div className="text-base sm:text-lg font-bold text-gray-900">
-          {formatLargeNumber(marketData?.total_market_cap || 0)}
-        </div>
-        <div className="text-xs sm:text-sm font-medium text-red-500">
-          ▼ {Math.abs(marketData?.market_cap_change_percentage_24h || 0).toFixed(2)}%
+  const marketCapCard = useMemo(() => {
+    const changeValue = marketData?.market_cap_change_percentage_24h || 0;
+    const isPositive = changeValue >= 0;
+    
+    return (
+      <div className="rounded-lg p-2 sm:p-3 bg-white shadow-sm">
+        <div className="text-gray-700 text-xs sm:text-sm">Market Cap</div>
+        <div className="flex items-baseline gap-1 sm:gap-2">
+          <div className="text-base sm:text-lg font-bold text-gray-900">
+            {formatLargeNumber(marketData?.total_market_cap || 0)}
+          </div>
+          <div className={`text-xs sm:text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+            {isPositive ? '▲' : '▼'} {Math.abs(changeValue).toFixed(2)}%
+          </div>
         </div>
       </div>
-    </div>
-  ), [marketData?.total_market_cap, marketData?.market_cap_change_percentage_24h, formatLargeNumber]);
+    );
+  }, [marketData?.total_market_cap, marketData?.market_cap_change_percentage_24h, formatLargeNumber]);
 
-  const volumeCard = useMemo(() => (
-    <div className="rounded-lg p-2 sm:p-3 bg-green-50">
-      <div className="text-gray-700 text-xs sm:text-sm">Volume 24h</div>
-      <div className="flex items-baseline gap-1 sm:gap-2">
-        <div className="text-base sm:text-lg font-bold text-gray-900">
-          {formatLargeNumber(marketData?.total_volume || 0)}
-        </div>
-        <div className="text-xs sm:text-sm font-medium text-green-500">
-          ▲ {marketData?.volume_change_percentage_24h?.toFixed(2) || '0.00'}%
+  const volumeCard = useMemo(() => {
+    const changeValue = marketData?.volume_change_percentage_24h || 0;
+    const isPositive = changeValue >= 0;
+    
+    return (
+      <div className="rounded-lg p-2 sm:p-3 bg-white shadow-sm">
+        <div className="text-gray-700 text-xs sm:text-sm">Volume 24h</div>
+        <div className="flex items-baseline gap-1 sm:gap-2">
+          <div className="text-base sm:text-lg font-bold text-gray-900">
+            {formatLargeNumber(marketData?.total_volume || 0)}
+          </div>
+          <div className={`text-xs sm:text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+            {isPositive ? '▲' : '▼'} {Math.abs(changeValue).toFixed(2)}%
+          </div>
         </div>
       </div>
-    </div>
-  ), [marketData?.total_volume, marketData?.volume_change_percentage_24h, formatLargeNumber]);
+    );
+  }, [marketData?.total_volume, marketData?.volume_change_percentage_24h, formatLargeNumber]);
 
-  const btcDominanceCard = useMemo(() => (
-    <div 
-      className="rounded-lg p-2 sm:p-3 bg-green-50 cursor-pointer hover:bg-green-100 transition-colors" 
-      onClick={() => router.push('/btc-dominance')}
-    >
-      <div className="text-gray-700 text-xs sm:text-sm">BTC Dominance</div>
-      <div className="flex items-baseline gap-1 sm:gap-2">
-        <div className="text-base sm:text-lg font-bold text-gray-900">
-          {(marketData?.btc_dominance || 0).toFixed(1)}%
-        </div>
-        <div className="text-xs sm:text-sm font-medium text-green-500">
-          ▲ 0.21%
+  const btcDominanceCard = useMemo(() => {
+    const previousBtcDominance = marketData?.btc_dominance || 0;
+    const currentBtcDominance = marketData?.btc_dominance || 0;
+    const isPositive = currentBtcDominance >= previousBtcDominance;
+    
+    return (
+      <div 
+        className="rounded-lg p-2 sm:p-3 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-colors" 
+        onClick={() => router.push('/btc-dominance')}
+      >
+        <div className="text-gray-700 text-xs sm:text-sm">BTC Dominance</div>
+        <div className="flex items-baseline gap-1 sm:gap-2">
+          <div className="text-base sm:text-lg font-bold text-gray-900">
+            {currentBtcDominance.toFixed(1)}%
+          </div>
+          <div className={`text-xs sm:text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+            View Chart →
+          </div>
         </div>
       </div>
-    </div>
-  ), [marketData?.btc_dominance, router]);
+    );
+  }, [marketData?.btc_dominance, router]);
 
-  const ethDominanceCard = useMemo(() => (
-    <div 
-      className="rounded-lg p-2 sm:p-3 bg-green-50 cursor-pointer hover:bg-green-100 transition-colors" 
-      onClick={() => router.push('/eth-dominance')}
-    >
-      <div className="text-gray-700 text-xs sm:text-sm">ETH Dominance</div>
-      <div className="flex items-baseline gap-1 sm:gap-2">
-        <div className="text-base sm:text-lg font-bold text-gray-900">
-          {(marketData?.eth_dominance || 0).toFixed(1)}%
-        </div>
-        <div className="text-xs sm:text-sm font-medium text-green-500">
-          ▲ 0.15%
+  const ethDominanceCard = useMemo(() => {
+    const previousEthDominance = marketData?.eth_dominance || 0;
+    const currentEthDominance = marketData?.eth_dominance || 0;
+    const isPositive = currentEthDominance >= previousEthDominance;
+    
+    return (
+      <div 
+        className="rounded-lg p-2 sm:p-3 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-colors" 
+        onClick={() => router.push('/eth-dominance')}
+      >
+        <div className="text-gray-700 text-xs sm:text-sm">ETH Dominance</div>
+        <div className="flex items-baseline gap-1 sm:gap-2">
+          <div className="text-base sm:text-lg font-bold text-gray-900">
+            {currentEthDominance.toFixed(1)}%
+          </div>
+          <div className={`text-xs sm:text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+            View Chart →
+          </div>
         </div>
       </div>
-    </div>
-  ), [marketData?.eth_dominance, router]);
+    );
+  }, [marketData?.eth_dominance, router]);
 
   const altcoinDominanceCard = useMemo(() => {
     if (!marketData) return null;
     const altcoinDominance = 100 - (marketData.btc_dominance + marketData.eth_dominance);
+    const previousAltcoinDominance = altcoinDominance;
+    const isPositive = altcoinDominance >= previousAltcoinDominance;
+    
     return (
       <div 
-        className="rounded-lg p-2 sm:p-3 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors" 
+        className="rounded-lg p-2 sm:p-3 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-colors" 
         onClick={() => router.push('/altcoin-dominance')}
       >
         <div className="text-gray-700 text-xs sm:text-sm">Altcoin Dominance</div>
@@ -155,7 +184,7 @@ export default function MarketOverview() {
           <div className="text-base sm:text-lg font-bold text-gray-900">
             {altcoinDominance.toFixed(1)}%
           </div>
-          <div className="text-xs sm:text-sm font-medium text-blue-500">
+          <div className={`text-xs sm:text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
             View Chart →
           </div>
         </div>
@@ -163,13 +192,20 @@ export default function MarketOverview() {
     );
   }, [marketData, router]);
 
+
+
   const shareText = useMemo(() => {
     if (!marketData) return '';
+    const fearGreedText = marketData.fear_greed_value ? 
+      `\nFear & Greed Index: ${marketData.fear_greed_value} (${marketData.fear_greed_classification})` : '';
+    
     return `📊 Crypto Market Overview\n` +
            `Market Cap: ${formatLargeNumber(marketData.total_market_cap)}\n` +
            `24h Volume: ${formatLargeNumber(marketData.total_volume)}\n` +
            `BTC Dominance: ${marketData.btc_dominance.toFixed(1)}%\n` +
-           `ETH Dominance: ${marketData.eth_dominance.toFixed(1)}%`;
+           `ETH Dominance: ${marketData.eth_dominance.toFixed(1)}%\n` +
+           `Altcoin Dominance: ${((100 - (marketData.btc_dominance + marketData.eth_dominance)) || 0).toFixed(1)}%` +
+           fearGreedText;
   }, [marketData, formatLargeNumber]);
 
   if (isLoading) {
@@ -198,7 +234,7 @@ export default function MarketOverview() {
       <ShareButtons 
         title="Crypto Market Overview"
         text={shareText}
-        hashtags={['crypto', 'bitcoin', 'ethereum', 'marketcap']}
+        hashtags={['crypto', 'bitcoin', 'ethereum', 'marketcap','feargreed','altcoin','dominance']}
       />
     </div>
   );
