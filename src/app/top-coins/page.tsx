@@ -8,7 +8,7 @@ import ClientPage from './ClientPage';
 export const metadata: Metadata = {
   title: "Top 100 Cryptocurrencies by Market Cap | Real-time Crypto Rankings",
   description: "Track the top 100 cryptocurrencies by market capitalization. Get real-time prices, 24h changes, volume, and market cap data for the leading digital assets.",
-  keywords: "top cryptocurrencies, crypto market cap, cryptocurrency rankings, bitcoin price, ethereum price, crypto chart,crypto prices live, top 100 crypto, cryptocurrency market, digital assets, crypto trading, live crypto charts",
+  keywords: "top 100 cryptocurrencies, crypto market cap, cryptocurrency rankings, bitcoin price, ethereum price, crypto chart,crypto prices live, top 100 crypto, cryptocurrency market, digital assets, crypto trading, live crypto charts",
   openGraph: {
     title: "Top 100 Cryptocurrencies by Market Cap | Real-time Crypto Rankings",
     description: "Track the top 100 cryptocurrencies by market capitalization. Get real-time prices, 24h changes, volume, and market cap data for the leading digital assets.",

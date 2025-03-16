@@ -221,7 +221,7 @@ export default function ClientPage() {
                       {coin.price_change_percentage_24h >= 0 ? '▲' : '▼'} {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
-                      ${formatLargeNumber(coin.total_volume)}
+                      {formatLargeNumber(coin.total_volume)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
                       {formatLargeNumber(coin.circulating_supply)} {coin.symbol.toUpperCase()}

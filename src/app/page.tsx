@@ -15,6 +15,8 @@ import {
 } from '@/components/ChartSkeletons';
 
 import TopCoins from '@/components/TopCoins';
+import FearGreedIndicator from '@/components/FearGreedIndicator';
+import MarketSentimentBarChart from '@/components/MarketSentimentBarChart';
 
 // Lazy load components with custom loading states
 const MarketOverview = dynamic(() => import('@/components/MarketOverview'), {
@@ -23,8 +25,6 @@ const MarketOverview = dynamic(() => import('@/components/MarketOverview'), {
 });
 
 const TimeRangeSelector = dynamic(() => import('@/components/TimeRangeSelector'));
-const FGIScore = dynamic(() => import('@/components/FGIScore'));
-const FearGreedMeter = dynamic(() => import('@/components/FearGreedMeter'));
 
 // Lazy load chart components with custom loading states
 const BTCComparison = dynamic(() => import('@/components/BTCComparison'), {
@@ -329,7 +329,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left column - Fear & Greed Meter */}
               <div className="flex flex-col items-center justify-center">
-                <FearGreedMeter
+                <FearGreedIndicator
                   value={parseInt(currentIndex.value)}
                   classification={currentIndex.value_classification}
                   lastUpdated={new Date(currentIndex.timestamp * 1000).toLocaleDateString('en-US', {
@@ -344,30 +344,31 @@ export default function Home() {
               {/* Right column - Market Sentiment */}
               {marketSentiment && (
                 <div className="flex flex-col justify-center">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-6">Market Sentiment</h3>
-                  <div className="space-y-4">
-                    <FGIScore
-                      title="Now"
-                      value={parseInt(marketSentiment.now.value)}
-                      classification={marketSentiment.now.value_classification}
-                    />
-                    <FGIScore
-                      title="Yesterday"
-                      value={parseInt(marketSentiment.yesterday.value)}
-                      classification={marketSentiment.yesterday.value_classification}
-                    />
-                    <FGIScore
-                      title="Last Week"
-                      value={parseInt(marketSentiment.lastWeek.value)}
-                      classification={marketSentiment.lastWeek.value_classification}
-                    />
-                    <FGIScore
-                      title="Last Month"
-                      value={parseInt(marketSentiment.lastMonth.value)}
-                      classification={marketSentiment.lastMonth.value_classification}
-                    />
-                 
-                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 text-center dark:text-white mb-6">Market Sentiment</h3>
+                  <MarketSentimentBarChart 
+                    data={[
+                      {
+                        title: "Now",
+                        value: parseInt(marketSentiment.now.value),
+                        classification: marketSentiment.now.value_classification
+                      },
+                      {
+                        title: "Yesterday",
+                        value: parseInt(marketSentiment.yesterday.value),
+                        classification: marketSentiment.yesterday.value_classification
+                      },
+                      {
+                        title: "Last Week",
+                        value: parseInt(marketSentiment.lastWeek.value),
+                        classification: marketSentiment.lastWeek.value_classification
+                      },
+                      {
+                        title: "Last Month",
+                        value: parseInt(marketSentiment.lastMonth.value),
+                        classification: marketSentiment.lastMonth.value_classification
+                      }
+                    ]}
+                  />
                 </div>
               )}
             </div>
@@ -490,7 +491,7 @@ export default function Home() {
 
         <div className="mt-12 mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 text-center">
-            Top Cryptocurrencies
+            Top 10 Cryptocurrencies
           </h2>
           <TopCoins />
         </div>

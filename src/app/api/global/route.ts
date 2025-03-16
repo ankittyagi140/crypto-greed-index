@@ -50,12 +50,14 @@ export async function GET() {
 
     let fearGreedValue = undefined;
     let fearGreedClassification = undefined;
+    let fearGreedTimestamp = undefined;
 
     if (fearGreedResponse.ok) {
       const fearGreedData = await fearGreedResponse.json();
       if (fearGreedData.data?.[0]) {
         fearGreedValue = parseInt(fearGreedData.data[0].value);
         fearGreedClassification = fearGreedData.data[0].value_classification;
+        fearGreedTimestamp = fearGreedData.data[0].timestamp;
       }
     }
 
@@ -66,7 +68,8 @@ export async function GET() {
         ...currentData.data,
         volume_change_percentage_24h_usd: Number(volumeChangePercentage.toFixed(2)),
         fear_greed_value: fearGreedValue,
-        fear_greed_classification: fearGreedClassification
+        fear_greed_classification: fearGreedClassification,
+        fear_greed_timestamp: fearGreedTimestamp
       }
     };
 
