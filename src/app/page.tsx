@@ -313,62 +313,69 @@ export default function Home() {
           },
         }}
       />
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
-        <MarketOverview />
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+      <main className="container mx-auto px-4 py-12 max-w-7xl">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4 tracking-tight">
             Crypto Fear & Greed Index
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-base max-w-2xl mx-auto">
-            A powerful tool that measures market sentiment, helping you make informed investment decisions
+          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+            Make informed investment decisions by understanding market sentiment through our comprehensive analysis tools
           </p>
         </div>
+
+        <MarketOverview />
         
         {currentIndex && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               {/* Left column - Fear & Greed Meter */}
-              <div className="flex flex-col items-center justify-center">
-                <FearGreedIndicator
-                  value={parseInt(currentIndex.value)}
-                  classification={currentIndex.value_classification}
-                  lastUpdated={new Date(currentIndex.timestamp * 1000).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                  timestamp={currentIndex.timestamp}
-                />
+              <div className="flex flex-col items-center">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6 text-center">Current Market Sentiment</h2>
+                <div className="w-full max-w-[300px]">
+                  <FearGreedIndicator
+                    value={parseInt(currentIndex.value)}
+                    classification={currentIndex.value_classification}
+                    lastUpdated={new Date(currentIndex.timestamp * 1000).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                    timestamp={currentIndex.timestamp}
+                  />
+                </div>
               </div>
               
               {/* Right column - Market Sentiment */}
               {marketSentiment && (
-                <div className="flex flex-col justify-center">
-                  <h3 className="text-lg font-semibold text-gray-800 text-center dark:text-white mb-6">Market Sentiment</h3>
-                  <MarketSentimentBarChart 
-                    data={[
-                      {
-                        title: "Now",
-                        value: parseInt(marketSentiment.now.value),
-                        classification: marketSentiment.now.value_classification
-                      },
-                      {
-                        title: "Yesterday",
-                        value: parseInt(marketSentiment.yesterday.value),
-                        classification: marketSentiment.yesterday.value_classification
-                      },
-                      {
-                        title: "Last Week",
-                        value: parseInt(marketSentiment.lastWeek.value),
-                        classification: marketSentiment.lastWeek.value_classification
-                      },
-                      {
-                        title: "Last Month",
-                        value: parseInt(marketSentiment.lastMonth.value),
-                        classification: marketSentiment.lastMonth.value_classification
-                      }
-                    ]}
-                  />
+                <div className="flex flex-col items-center">
+                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6 text-center">Sentiment Timeline</h2>
+                  <div className="w-full max-w-[300px]">
+                    <MarketSentimentBarChart 
+                      data={[
+                        {
+                          title: "Now",
+                          value: parseInt(marketSentiment.now.value),
+                          classification: marketSentiment.now.value_classification
+                        },
+                        {
+                          title: "Yesterday",
+                          value: parseInt(marketSentiment.yesterday.value),
+                          classification: marketSentiment.yesterday.value_classification
+                        },
+                        {
+                          title: "Last Week",
+                          value: parseInt(marketSentiment.lastWeek.value),
+                          classification: marketSentiment.lastWeek.value_classification
+                        },
+                        {
+                          title: "Last Month",
+                          value: parseInt(marketSentiment.lastMonth.value),
+                          classification: marketSentiment.lastMonth.value_classification
+                        }
+                      ]}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -377,13 +384,13 @@ export default function Home() {
         
         {/* Historical Chart Section */}
         <LazyChartSection placeholder={<HistoricalChartSkeleton />}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-12">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3 text-center">
                 Historical Trend Analysis
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 text-sm text-center">
-                Track the evolution of market sentiment over time
+              <p className="text-gray-600 dark:text-gray-300 text-base text-center max-w-2xl mx-auto">
+                Track how market sentiment has evolved over time and identify patterns in investor behavior
               </p>
             </div>
             
@@ -392,7 +399,7 @@ export default function Home() {
               onRangeChange={(range) => setSelectedRange(range)}
             />
             
-            <div className="h-[400px] mt-6">
+            <div className="h-[400px] mt-8">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={historicalData}
@@ -449,27 +456,27 @@ export default function Home() {
               </ResponsiveContainer>
             </div>
             
-            <div className="mt-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-3 text-center">Index Zones</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs">
-                <div className="p-2 rounded bg-[#E74C3C] text-white">
-                  <div>0-25</div>
+            <div className="mt-8 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6">
+              <h3 className="text-base font-semibold text-gray-800 dark:text-white mb-4 text-center">Index Zones Explained</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-sm">
+                <div className="p-3 rounded-lg bg-[#E74C3C] text-white shadow-sm">
+                  <div className="font-medium">0-25</div>
                   <div>Extreme Fear</div>
                 </div>
-                <div className="p-2 rounded bg-[#E67E22] text-white">
-                  <div>26-45</div>
+                <div className="p-3 rounded-lg bg-[#E67E22] text-white shadow-sm">
+                  <div className="font-medium">26-45</div>
                   <div>Fear</div>
                 </div>
-                <div className="p-2 rounded bg-[#F1C40F] text-white">
-                  <div>46-55</div>
+                <div className="p-3 rounded-lg bg-[#F1C40F] text-white shadow-sm">
+                  <div className="font-medium">46-55</div>
                   <div>Neutral</div>
                 </div>
-                <div className="p-2 rounded bg-[#2ECC71] text-white">
-                  <div>56-75</div>
+                <div className="p-3 rounded-lg bg-[#2ECC71] text-white shadow-sm">
+                  <div className="font-medium">56-75</div>
                   <div>Greed</div>
                 </div>
-                <div className="p-2 rounded bg-[#27AE60] text-white">
-                  <div>76-100</div>
+                <div className="p-3 rounded-lg bg-[#27AE60] text-white shadow-sm">
+                  <div className="font-medium">76-100</div>
                   <div>Extreme Greed</div>
                 </div>
               </div>
@@ -480,26 +487,33 @@ export default function Home() {
         {/* Social Sentiment Analysis */}
         <LazyChartSection>
           {socialSentimentData.length > 0 && (
-            <SocialSentiment data={socialSentimentData} />
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+              <SocialSentiment data={socialSentimentData} />
+            </div>
           )}
         </LazyChartSection>
 
         {/* BTC Comparison */}
         <LazyChartSection>
-          <BTCComparison data={btcComparisonData} />
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+            <BTCComparison data={btcComparisonData} />
+          </div>
         </LazyChartSection>
 
-        <div className="mt-12 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 text-center">
-            Top 10 Cryptocurrencies
+        {/* Top Cryptocurrencies Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+            Top Cryptocurrencies
           </h2>
           <TopCoins />
         </div>
-         {/* FAQ Section */}
-         <LazyChartSection>
-          <FAQSection />
-        </LazyChartSection>
 
+        {/* FAQ Section */}
+        <LazyChartSection>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
+            <FAQSection />
+          </div>
+        </LazyChartSection>
       </main>
     </div>
   );
