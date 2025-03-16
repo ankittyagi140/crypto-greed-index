@@ -503,7 +503,7 @@ export default function Home() {
         {/* Top Cryptocurrencies Section */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
-            Top Cryptocurrencies
+            Top 10 Cryptocurrencies
           </h2>
           <TopCoins />
         </div>
