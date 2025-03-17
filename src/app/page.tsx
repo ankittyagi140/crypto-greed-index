@@ -296,7 +296,7 @@ export default function Home() {
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
                   <div className="flex flex-col items-center">
                     <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
-                      Current Crypto Fear & Greed Indicator
+                      Crypto Fear and Greed Index today
                     </h2>
                     <GaugeIndicator 
                       value={parseInt(currentIndex.value)} 
