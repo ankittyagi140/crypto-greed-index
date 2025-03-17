@@ -192,8 +192,6 @@ export default function MarketOverview() {
     );
   }, [marketData, router]);
 
-
-
   const shareText = useMemo(() => {
     if (!marketData) return '';
     const fearGreedText = marketData.fear_greed_value ? 
@@ -224,6 +222,12 @@ export default function MarketOverview() {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 max-w-6xl">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Crypto Market Overview</h2>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Real-time performance of the global cryptocurrency market
+        </p>
+      </div>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4">
         {marketCapCard}
         {volumeCard}

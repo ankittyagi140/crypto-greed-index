@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-900 shadow-inner">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">About</h3>
             <ul className="space-y-2">
@@ -19,6 +19,43 @@ export default function Footer() {
               <li>
                 <Link href="/contact" className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
                   Contact Us
+                </Link>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Analysis</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/btc-dominance" className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
+                  BTC Dominance
+                </Link>
+              </li>
+              <li>
+                <Link href="/eth-dominance" className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
+                  ETH Dominance
+                </Link>
+              </li>
+              <li>
+                <Link href="/altcoin-dominance" className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
+                  Altcoin Dominance
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Markets</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/global-markets" className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
+                  Global Markets
+                </Link>
+              </li>
+              <li>
+                <Link href="/us-markets" className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
+                  US Markets
                 </Link>
               </li>
             </ul>
