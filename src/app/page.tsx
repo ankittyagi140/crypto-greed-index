@@ -15,8 +15,9 @@ import {
 } from '@/components/ChartSkeletons';
 
 import TopCoins from '@/components/TopCoins';
-import FearGreedIndicator from '@/components/FearGreedIndicator';
-import MarketSentimentBarChart from '@/components/MarketSentimentBarChart';
+import GaugeIndicator from '@/components/GaugeIndicator';
+import TypewriterText from '@/components/TypewriterText';
+import Last30DaysChart from '@/components/Last30DaysChart';
 
 // Lazy load components with custom loading states
 const MarketOverview = dynamic(() => import('@/components/MarketOverview'), {
@@ -61,28 +62,7 @@ interface DotProps {
   index?: number;
 }
 
-interface MarketSentiment {
-  now: {
-    value: string;
-    value_classification: string;
-  };
-  yesterday: {
-    value: string;
-    value_classification: string;
-  };
-  lastWeek: {
-    value: string;
-    value_classification: string;
-  };
-  lastMonth: {
-    value: string;
-    value_classification: string;
-  };
-  lastQuarter: {
-    value: string;
-    value_classification: string;
-  };
-}
+
 
 interface BTCData {
   date: string;
@@ -117,7 +97,6 @@ export default function Home() {
   const [historicalData, setHistoricalData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRange, setSelectedRange] = useState('30');
-  const [marketSentiment, setMarketSentiment] = useState<MarketSentiment | null>(null);
   const [btcComparisonData, setBtcComparisonData] = useState<BTCData[]>([]);
   const [socialSentimentData, setSocialSentimentData] = useState<SentimentDataPoint[]>([]);
 
@@ -146,30 +125,7 @@ export default function Home() {
 
         if (fgiData.data && fgiData.data[0]) {
           setCurrentIndex(fgiData.data[0]);
-          
-          // Set market sentiment data
-          setMarketSentiment({
-            now: {
-              value: fgiData.data[0].value,
-              value_classification: fgiData.data[0].value_classification
-            },
-            yesterday: {
-              value: fgiData.data[1]?.value || fgiData.data[0].value,
-              value_classification: fgiData.data[1]?.value_classification || fgiData.data[0].value_classification
-            },
-            lastWeek: {
-              value: fgiData.data[7]?.value || fgiData.data[0].value,
-              value_classification: fgiData.data[7]?.value_classification || fgiData.data[0].value_classification
-            },
-            lastMonth: {
-              value: fgiData.data[30]?.value || fgiData.data[0].value,
-              value_classification: fgiData.data[30]?.value_classification || fgiData.data[0].value_classification
-            },
-            lastQuarter: {
-              value: fgiData.data[89]?.value || fgiData.data[0].value,
-              value_classification: fgiData.data[89]?.value_classification || fgiData.data[0].value_classification
-            }
-          });
+                 
 
           // Format data for charts
           const formattedData = fgiData.data
@@ -317,7 +273,12 @@ export default function Home() {
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4 tracking-tight">
-            Crypto Fear & Greed Index
+            <TypewriterText 
+              text="Crypto Fear & Greed Index"
+              speed={50}
+              delay={500}
+              restartInterval={5000}
+            />
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
             Make informed investment decisions by understanding market sentiment through our comprehensive analysis tools
@@ -327,193 +288,170 @@ export default function Home() {
         <MarketOverview />
         
         {currentIndex && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* Left column - Fear & Greed Meter */}
-              <div className="flex flex-col items-center">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6 text-center">Current Market Sentiment</h2>
-                <div className="w-full max-w-[300px]">
-                  <FearGreedIndicator
-                    value={parseInt(currentIndex.value)}
-                    classification={currentIndex.value_classification}
-                    lastUpdated={new Date(currentIndex.timestamp * 1000).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                    timestamp={currentIndex.timestamp}
-                  />
-                </div>
-              </div>
-              
-              {/* Right column - Market Sentiment */}
-              {marketSentiment && (
-                <div className="flex flex-col items-center">
-                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6 text-center">Sentiment Timeline</h2>
-                  <div className="w-full max-w-[300px]">
-                    <MarketSentimentBarChart 
-                      data={[
-                        {
-                          title: "Now",
-                          value: parseInt(marketSentiment.now.value),
-                          classification: marketSentiment.now.value_classification
-                        },
-                        {
-                          title: "Yesterday",
-                          value: parseInt(marketSentiment.yesterday.value),
-                          classification: marketSentiment.yesterday.value_classification
-                        },
-                        {
-                          title: "Last Week",
-                          value: parseInt(marketSentiment.lastWeek.value),
-                          classification: marketSentiment.lastWeek.value_classification
-                        },
-                        {
-                          title: "Last Month",
-                          value: parseInt(marketSentiment.lastMonth.value),
-                          classification: marketSentiment.lastMonth.value_classification
-                        }
-                      ]}
+          <div className="container mx-auto px-4 py-8">
+            <div className="max-w-6xl mx-auto">
+              {/* Main content */}
+              <div className="space-y-12">
+                {/* Gauge Indicator Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+                  <div className="flex flex-col items-center">
+                    <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+                      Current Crypto Fear & Greed Indicator
+                    </h2>
+                    <GaugeIndicator 
+                      value={parseInt(currentIndex.value)} 
+                      classification={currentIndex.value_classification}
                     />
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center">
+                      Last updated: {new Date(currentIndex.timestamp * 1000).toLocaleString()}
+                    </p>
                   </div>
                 </div>
-              )}
+
+                
+                {/* Add the Last 30 Days Chart in a new section */}
+                <div className="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+                  {historicalData.length > 0 && (
+                    <Last30DaysChart data={historicalData} />
+                  )}
+                </div>
+                
+                {/* Historical Chart Section */}
+                <LazyChartSection placeholder={<HistoricalChartSkeleton />}>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+                    <div className="mb-8">
+                      <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3 text-center">
+                        Historical Trend Analysis
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-300 text-base text-center max-w-2xl mx-auto">
+                        Track how market sentiment has evolved over time and identify patterns in investor behavior
+                      </p>
+                    </div>
+                    
+                    <TimeRangeSelector
+                      selectedRange={selectedRange}
+                      onRangeChange={(range) => setSelectedRange(range)}
+                    />
+                    
+                    <div className="h-[400px] mt-8">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                          data={historicalData}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                          <XAxis 
+                            dataKey="date" 
+                            tick={{ fontSize: 12 }}
+                            interval="preserveEnd"
+                            padding={{ left: 20, right: 20 }}
+                          />
+                          <YAxis 
+                            domain={[0, 100]}
+                            tick={{ fontSize: 12 }}
+                            padding={{ top: 20, bottom: 20 }}
+                          />
+                          <Tooltip 
+                            formatter={(value: number) => [
+                              `${value} (${historicalData.find(d => d.value === value)?.classification || ''})`,
+                              'Index Value'
+                            ]}
+                            labelFormatter={(label) => `Date: ${label}`}
+                            contentStyle={{ 
+                              backgroundColor: '#fff',
+                              border: 'none',
+                              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                              borderRadius: '8px',
+                              padding: '12px'
+                            }}
+                            itemStyle={{ color: '#666' }}
+                          />
+                          <Legend 
+                            wrapperStyle={{
+                              paddingTop: '20px'
+                            }}
+                          />
+                          {/* Reference areas for different zones */}
+                          <ReferenceLine y={25} stroke="#E74C3C" strokeDasharray="3 3" />
+                          <ReferenceLine y={45} stroke="#E67E22" strokeDasharray="3 3" />
+                          <ReferenceLine y={55} stroke="#F1C40F" strokeDasharray="3 3" />
+                          <ReferenceLine y={75} stroke="#2ECC71" strokeDasharray="3 3" />
+                          <Line
+                            type="monotone"
+                            dataKey="value"
+                            name="Fear & Greed Index"
+                            stroke="#666"
+                            strokeWidth={2}
+                            dot={CustomDot}
+                            activeDot={CustomActiveDot}
+                            connectNulls
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                    
+                    <div className="mt-8 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6">
+                      <h3 className="text-base font-semibold text-gray-800 dark:text-white mb-4 text-center">Index Zones Explained</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-sm">
+                        <div className="p-3 rounded-lg bg-[#E74C3C] text-white shadow-sm">
+                          <div className="font-medium">0-25</div>
+                          <div>Extreme Fear</div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-[#E67E22] text-white shadow-sm">
+                          <div className="font-medium">26-45</div>
+                          <div>Fear</div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-[#F1C40F] text-white shadow-sm">
+                          <div className="font-medium">46-55</div>
+                          <div>Neutral</div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-[#2ECC71] text-white shadow-sm">
+                          <div className="font-medium">56-75</div>
+                          <div>Greed</div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-[#27AE60] text-white shadow-sm">
+                          <div className="font-medium">76-100</div>
+                          <div>Extreme Greed</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </LazyChartSection>
+
+                {/* Social Sentiment Analysis */}
+                <LazyChartSection>
+                  {socialSentimentData.length > 0 && (
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+                      <SocialSentiment data={socialSentimentData} />
+                    </div>
+                  )}
+                </LazyChartSection>
+
+                {/* BTC Comparison */}
+                <LazyChartSection>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+                    <BTCComparison data={btcComparisonData} />
+                  </div>
+                </LazyChartSection>
+
+                {/* Top Cryptocurrencies Section */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+                  <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+                    Top 10 Cryptocurrencies
+                  </h2>
+                  <TopCoins />
+                </div>
+
+                {/* FAQ Section */}
+                <LazyChartSection>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
+                    <FAQSection />
+                  </div>
+                </LazyChartSection>
+              </div>
             </div>
           </div>
         )}
-        
-        {/* Historical Chart Section */}
-        <LazyChartSection placeholder={<HistoricalChartSkeleton />}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3 text-center">
-                Historical Trend Analysis
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 text-base text-center max-w-2xl mx-auto">
-                Track how market sentiment has evolved over time and identify patterns in investor behavior
-              </p>
-            </div>
-            
-            <TimeRangeSelector
-              selectedRange={selectedRange}
-              onRangeChange={(range) => setSelectedRange(range)}
-            />
-            
-            <div className="h-[400px] mt-8">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={historicalData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{ fontSize: 12 }}
-                    interval="preserveEnd"
-                    padding={{ left: 20, right: 20 }}
-                  />
-                  <YAxis 
-                    domain={[0, 100]}
-                    tick={{ fontSize: 12 }}
-                    padding={{ top: 20, bottom: 20 }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [
-                      `${value} (${historicalData.find(d => d.value === value)?.classification || ''})`,
-                      'Index Value'
-                    ]}
-                    labelFormatter={(label) => `Date: ${label}`}
-                    contentStyle={{ 
-                      backgroundColor: '#fff',
-                      border: 'none',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                      borderRadius: '8px',
-                      padding: '12px'
-                    }}
-                    itemStyle={{ color: '#666' }}
-                  />
-                  <Legend 
-                    wrapperStyle={{
-                      paddingTop: '20px'
-                    }}
-                  />
-                  {/* Reference areas for different zones */}
-                  <ReferenceLine y={25} stroke="#E74C3C" strokeDasharray="3 3" />
-                  <ReferenceLine y={45} stroke="#E67E22" strokeDasharray="3 3" />
-                  <ReferenceLine y={55} stroke="#F1C40F" strokeDasharray="3 3" />
-                  <ReferenceLine y={75} stroke="#2ECC71" strokeDasharray="3 3" />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    name="Fear & Greed Index"
-                    stroke="#666"
-                    strokeWidth={2}
-                    dot={CustomDot}
-                    activeDot={CustomActiveDot}
-                    connectNulls
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            
-            <div className="mt-8 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6">
-              <h3 className="text-base font-semibold text-gray-800 dark:text-white mb-4 text-center">Index Zones Explained</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-sm">
-                <div className="p-3 rounded-lg bg-[#E74C3C] text-white shadow-sm">
-                  <div className="font-medium">0-25</div>
-                  <div>Extreme Fear</div>
-                </div>
-                <div className="p-3 rounded-lg bg-[#E67E22] text-white shadow-sm">
-                  <div className="font-medium">26-45</div>
-                  <div>Fear</div>
-                </div>
-                <div className="p-3 rounded-lg bg-[#F1C40F] text-white shadow-sm">
-                  <div className="font-medium">46-55</div>
-                  <div>Neutral</div>
-                </div>
-                <div className="p-3 rounded-lg bg-[#2ECC71] text-white shadow-sm">
-                  <div className="font-medium">56-75</div>
-                  <div>Greed</div>
-                </div>
-                <div className="p-3 rounded-lg bg-[#27AE60] text-white shadow-sm">
-                  <div className="font-medium">76-100</div>
-                  <div>Extreme Greed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </LazyChartSection>
-
-        {/* Social Sentiment Analysis */}
-        <LazyChartSection>
-          {socialSentimentData.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-              <SocialSentiment data={socialSentimentData} />
-            </div>
-          )}
-        </LazyChartSection>
-
-        {/* BTC Comparison */}
-        <LazyChartSection>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-            <BTCComparison data={btcComparisonData} />
-          </div>
-        </LazyChartSection>
-
-        {/* Top Cryptocurrencies Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
-            Top 10 Cryptocurrencies
-          </h2>
-          <TopCoins />
-        </div>
-
-        {/* FAQ Section */}
-        <LazyChartSection>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
-            <FAQSection />
-          </div>
-        </LazyChartSection>
       </main>
     </div>
   );
