@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
 
 interface MarketIndex {
   symbol: string;
@@ -13,6 +15,8 @@ interface MarketIndex {
   ytdChange: number;
   high52Week: number;
   low52Week: number;
+  historicalData?: { date: string; value: number; }[];
+  regularMarketTime?: Date;
 }
 
 export default function USMarketOverview() {
@@ -65,43 +69,90 @@ export default function USMarketOverview() {
     }
   }, []);
 
-  const IndexCard = ({ index }: { index: MarketIndex }) => (
-    <div 
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md transition-all duration-200 hover:translate-y-[-2px]"
-      onClick={() => router.push(getRouteForSymbol(index.symbol))}
-    >
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{index.name}</h3>
-      <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-        <div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">
-            {index.price.toFixed(2)}
+  const IndexCard = ({ index }: { index: MarketIndex }) => {
+    // Get current time in UTC
+    const now = new Date();
+    const marketClosed = !index.regularMarketTime || 
+      (now.getTime() - new Date(index.regularMarketTime).getTime()) > 15 * 60 * 1000;
+
+    const formattedTime = index.regularMarketTime 
+      ? new Date(index.regularMarketTime).toLocaleTimeString(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        })
+      : '';
+
+    return (
+      <article 
+        className="relative bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-all duration-200 cursor-pointer"
+        onClick={() => router.push(getRouteForSymbol(index.symbol))}
+        aria-label={`${index.name} Market Index`}
+      >
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                {index.name}
+              </h3>
+              {marketClosed && (
+                <span className="px-2 py-0.5 text-xs font-medium bg-gray-900 text-white rounded">
+                  CLOSED
+                </span>
+              )}
+            </div>
           </div>
-          <div className={`text-sm font-medium ${index.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {index.change >= 0 ? '+' : ''}{index.change.toFixed(2)} ({index.changePercent.toFixed(2)}%)
-          </div>
-        </div>
-        <div className="space-y-2">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-medium">YTD:</span>{' '}
-            <span className={index.ytdChange >= 0 ? 'text-green-600' : 'text-red-600'}>
-              {index.ytdChange >= 0 ? '+' : ''}{index.ytdChange.toFixed(2)}%
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {index.price.toLocaleString()}
+          </p>
+          <div className={`flex items-center ${index.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {index.change >= 0 ? (
+              <ArrowUpIcon className="h-4 w-4 mr-1" />
+            ) : (
+              <ArrowDownIcon className="h-4 w-4 mr-1" />
+            )}
+            <span className="text-sm font-medium">
+              {index.change >= 0 ? '+' : ''}{index.change.toFixed(2)} ({index.changePercent.toFixed(2)}%)
             </span>
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-medium">52W High:</span> {index.high52Week.toFixed(2)}
+          {formattedTime && (
+            <p className="text-xs text-gray-500 mt-1">
+              As of {formattedTime}
+            </p>
+          )}
+          <div className="flex justify-between mt-4">
+            <div>
+              <p className="text-xs text-gray-500">YTD</p>
+              <p className={`text-sm font-medium ${index.ytdChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {index.ytdChange.toFixed(2)}%
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Volume</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {(index.volume / 1000000).toFixed(1)}M
+              </p>
+            </div>
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-medium">52W Low:</span> {index.low52Week.toFixed(2)}
-          </div>
-          {index.volume > 0 && (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-medium">Volume:</span> {(index.volume / 1e6).toFixed(2)}M
+          {index.historicalData && index.historicalData.length > 0 && (
+            <div className="absolute top-4 right-4 w-24 h-12 opacity-25">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={index.historicalData}>
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke={index.change >= 0 ? '#22c55e' : '#ef4444'}
+                    strokeWidth={1.5}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           )}
         </div>
-      </div>
-    </div>
-  );
+      </article>
+    );
+  };
 
   useEffect(() => {
     const intervalId = setInterval(fetchIndices, 60000);

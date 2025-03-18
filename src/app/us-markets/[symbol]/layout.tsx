@@ -11,7 +11,7 @@ const indexInfo = {
     description: 'The NASDAQ Composite is a stock market index that includes almost all stocks listed on the NASDAQ stock market.',
     symbol: '^IXIC'
   },
-  dowJones: {
+  'dow-jones': {
     name: 'Dow Jones Industrial Average',
     description: 'The Dow Jones Industrial Average, or simply the Dow, is a stock market index that tracks 30 large, publicly-owned blue-chip companies trading on the New York Stock Exchange and the NASDAQ.',
     symbol: '^DJI'
@@ -21,7 +21,7 @@ const indexInfo = {
     description: 'The Russell 2000 Index is a small-cap stock market index of the smallest 2,000 stocks in the Russell 3000 Index.',
     symbol: '^RUT'
   },
-  dollarIndex: {
+  'dollar-index': {
     name: 'US Dollar Index',
     description: 'The US Dollar Index (DXY) measures the value of the United States dollar relative to a basket of foreign currencies.',
     symbol: 'DX-Y.NYB'
@@ -38,26 +38,33 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
   if (!index) {
     return {
-      title: 'Market Not Found | Crypto Greed Index',
-      description: 'The requested market index could not be found.'
+      title: 'Market Index Not Found',
+      description: 'The requested market index could not be found.',
+      robots: 'noindex'
     };
   }
 
+  const title = `${index.name} - Live Market Data, Charts & Analysis`;
+  const description = `${index.description} Get real-time ${index.name} price, technical indicators, market movers, and comprehensive market analysis.`;
+
   return {
-    title: `${index.name} Market Data | Crypto Greed Index`,
-    description: index.description,
+    title,
+    description,
     openGraph: {
-      title: `${index.name} Market Data | Crypto Greed Index`,
-      description: index.description,
+      title,
+      description,
       type: 'website',
       locale: 'en_US',
-      siteName: 'Crypto Greed Index',
+      siteName: 'US Market Indices',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${index.name} Market Data | Crypto Greed Index`,
-      description: index.description,
+      title,
+      description,
     },
+    alternates: {
+      canonical: `https://www.cryptogreedindex.com/us-markets/${symbol}`
+    }
   };
 }
 

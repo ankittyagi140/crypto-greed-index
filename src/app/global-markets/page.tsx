@@ -34,6 +34,23 @@ interface RegionData {
   [region: string]: IndexData[];
 }
 
+interface MarketHours {
+  start: number;
+  end: number;
+}
+
+interface AsianMarketHours {
+  'Japan': MarketHours;
+  'China': MarketHours;
+  'Hong Kong': MarketHours;
+  'South Korea': MarketHours;
+  'Australia': MarketHours;
+  'India': MarketHours;
+  'Singapore': MarketHours;
+  'Indonesia': MarketHours;
+  'Taiwan': MarketHours;
+}
+
 const REGION_ICONS = {
   'Asia Pacific': GlobeAsiaAustraliaIcon,
   'Americas': GlobeAmericasIcon,
@@ -41,16 +58,56 @@ const REGION_ICONS = {
   'Middle East & Africa': SunIcon,
 };
 
+const MARKET_HOURS = {
+  'Asia Pacific': {
+    // Hours in UTC
+    open: {
+      'Japan': { start: 0, end: 6 }, // 9:00-15:00 JST
+      'China': { start: 1.5, end: 7 }, // 9:30-15:00 CST
+      'Hong Kong': { start: 1.5, end: 8 }, // 9:30-16:00 HKT
+      'South Korea': { start: 0, end: 6 }, // 9:00-15:00 KST
+      'Australia': { start: 0, end: 6 }, // 10:00-16:00 AEST
+      'India': { start: 3.5, end: 10 }, // 9:15-15:30 IST
+      'Singapore': { start: 1, end: 9 }, // 9:00-17:00 SGT
+      'Indonesia': { start: 1.5, end: 9 }, // 9:30-16:00 WIB
+      'Taiwan': { start: 1, end: 5.5 }, // 9:00-13:30 TST
+    } as AsianMarketHours
+  }
+} as const;
+
 const IndexCard = ({ data }: { data: IndexData }) => {
   const { currentStats, historicalData, name, country } = data;
   
-  // Check if market is closed (more than 15 minutes since last update)
-  const isMarketClosed = currentStats.regularMarketTime && 
-    (new Date().getTime() - new Date(currentStats.regularMarketTime).getTime()) > 15 * 60 * 1000;
+  // Get current time in UTC
+  const now = new Date();
+  const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
 
-  const cardBackground = isMarketClosed 
-    ? 'bg-gray-100 dark:bg-gray-900' 
-    : 'bg-white dark:bg-gray-800';
+  // Check if market is closed based on trading hours and last update
+  const isMarketClosed = () => {
+    // If no recent update (more than 30 minutes), consider it closed
+    if (!currentStats.regularMarketTime || 
+        (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 30 * 60 * 1000) {
+      return true;
+    }
+
+    // Check Asian market hours
+    const asianMarketHours = MARKET_HOURS['Asia Pacific'].open;
+    const asianCountry = country as keyof AsianMarketHours;
+    if (asianCountry in asianMarketHours) {
+      const hours = asianMarketHours[asianCountry];
+      // Handle cases where market spans across UTC day boundary
+      if (hours.start > hours.end) {
+        return !(utcHours >= hours.start || utcHours <= hours.end);
+      }
+      return !(utcHours >= hours.start && utcHours <= hours.end);
+    }
+
+    // For other markets, use the 15-minute rule
+    return (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 15 * 60 * 1000;
+  };
+
+  const marketClosed = isMarketClosed();
+  
 
   const formattedTime = currentStats.regularMarketTime 
     ? new Date(currentStats.regularMarketTime).toLocaleTimeString(undefined, {
@@ -61,7 +118,7 @@ const IndexCard = ({ data }: { data: IndexData }) => {
     : '';
 
   return (
-    <article className={`${cardBackground} rounded-xl shadow-lg p-4 sm:p-6 transition-colors duration-200`} aria-label={`${name} Market Index from ${country}`}>
+    <article className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-200" aria-label={`${name} Market Index from ${country}`}>
       <div className="flex flex-col h-full">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -69,9 +126,9 @@ const IndexCard = ({ data }: { data: IndexData }) => {
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 {name}
               </h3>
-              {isMarketClosed && (
-                <span className="px-2 py-1 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded" role="status">
-                  Closed
+              {marketClosed && (
+                <span className="px-3 py-1 text-xs font-medium bg-gray-900 text-white rounded-full">
+                  CLOSED
                 </span>
               )}
             </div>
@@ -107,7 +164,7 @@ const IndexCard = ({ data }: { data: IndexData }) => {
                   stroke={currentStats.change >= 0 ? '#22c55e' : '#ef4444'}
                   strokeWidth={2}
                   dot={false}
-                  opacity={isMarketClosed ? 0.6 : 1}
+                  opacity={marketClosed ? 0.6 : 1}
                 />
               </LineChart>
             </ResponsiveContainer>

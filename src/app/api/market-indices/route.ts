@@ -11,6 +11,13 @@ interface MarketIndex {
   ytdChange: number;
   high52Week: number;
   low52Week: number;
+  historicalData: { date: string; value: number; }[];
+  regularMarketTime?: Date;
+}
+
+interface YahooHistoricalPrice {
+  date: Date;
+  close: number;
 }
 
 const INDICES = {
@@ -28,7 +35,7 @@ export async function GET() {
       Promise.all(
         symbols.map(symbol =>
           yahooFinance.historical(symbol, {
-            period1: new Date(new Date().getFullYear(), 0, 1), // Start of current year
+            period1: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // Last 5 days
             period2: new Date(),
             interval: '1d'
           })
@@ -41,7 +48,15 @@ export async function GET() {
     }
 
     const indices: MarketIndex[] = quotes.map((quote, index) => {
-      const yearStartData = historical[index][0];
+      // Get historical data for the chart
+      const chartData = (historical[index] as YahooHistoricalPrice[])
+        .map(item => ({
+          date: item.date.toISOString(),
+          value: item.close
+        }));
+
+      // Calculate YTD change using the current price and first historical price
+      const yearStartData = historical[index][0] as YahooHistoricalPrice;
       const currentPrice = quote.regularMarketPrice || 0;
       const yearStartPrice = yearStartData?.close || currentPrice;
       const ytdChange = ((currentPrice - yearStartPrice) / yearStartPrice) * 100;
@@ -55,7 +70,9 @@ export async function GET() {
         volume: quote.regularMarketVolume || 0,
         ytdChange,
         high52Week: quote.fiftyTwoWeekHigh || 0,
-        low52Week: quote.fiftyTwoWeekLow || 0
+        low52Week: quote.fiftyTwoWeekLow || 0,
+        historicalData: chartData,
+        regularMarketTime: quote.regularMarketTime ? new Date(Number(quote.regularMarketTime) * 1000) : undefined
       };
     }).filter(index => index.price > 0);
 

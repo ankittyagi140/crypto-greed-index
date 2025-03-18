@@ -17,9 +17,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Crypto Fear and Greed Index today | Real-time Market Sentiment Analysis",
-  description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
-  keywords: "crypto fear and greed index, cryptocurrency sentiment, market psychology, crypto market analysis, bitcoin sentiment, crypto investment tools, What is greed and fear in crypto?, Fear and Greed Index Live, BTC fear and greed, Bitcoin fear and greed, fear and greed index today, fear and greed index today, btcd, fear & greed index, fear greed index, dominance ",
+  title: "Crypto Fear & Greed Index Today | Bitcoin Market Sentiment Analysis",
+  description: "Make smarter crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
+  keywords: [
+    "crypto fear and greed index",
+    "bitcoin fear and greed index",
+    "cryptocurrency sentiment",
+    "bitcoin market sentiment",
+    "crypto market analysis",
+    "btc fear and greed",
+    "crypto trading signals",
+    "bitcoin market psychology",
+    "cryptocurrency trading tools",
+    "bitcoin dominance",
+    "market sentiment indicator",
+    "crypto market mood",
+    "bitcoin trading signals",
+    "crypto market trends",
+    "crypto fear and greed index today",
+    "fear and greed index today",
+    "BTCD"
+  ].join(", "),
   authors: [{ name: "Crypto Greed Index" }],
   creator: "Crypto Greed Index",
   publisher: "Crypto Greed Index",
@@ -33,8 +51,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
-    description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
+    title: "Crypto Fear & Greed Index | Live Bitcoin Market Sentiment",
+    description: "Make better crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
     url: 'https://www.cryptogreedindex.com',
     siteName: 'Crypto Greed Index',
     images: [
@@ -42,7 +60,7 @@ export const metadata: Metadata = {
         url: '/cryptogreedindex.png',
         width: 1200,
         height: 630,
-        alt: 'Crypto Greed Index',
+        alt: 'Crypto Fear & Greed Index - Live Market Sentiment',
       },
     ],
     locale: 'en_US',
@@ -50,8 +68,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
-    description: "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
+    title: "Crypto Fear & Greed Index | Live Bitcoin Market Sentiment",
+    description: "Make better crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
     images: ['/cryptogreedindex.png'],
     creator: '@cryptogreedindex',
   },
@@ -70,6 +88,9 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
+  },
+  verification: {
+    google: 'YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI',
   },
 };
 
