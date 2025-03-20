@@ -17,7 +17,8 @@ import {
 import TopCoins from '@/components/TopCoins';
 import GaugeIndicator from '@/components/GaugeIndicator';
 import TypewriterText from '@/components/TypewriterText';
-import Last30DaysChart from '@/components/Last30DaysChart';
+import FearAndGreedChart from '@/components/FearAndGreedChart';
+
 
 // Lazy load components with custom loading states
 const MarketOverview = dynamic(() => import('@/components/MarketOverview'), {
@@ -307,14 +308,7 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-
-                
-                {/* Add the Last 30 Days Chart in a new section */}
-                <div className="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-                  {historicalData.length > 0 && (
-                    <Last30DaysChart data={historicalData} />
-                  )}
-                </div>
+               <FearAndGreedChart />
                 
                 {/* Historical Chart Section */}
                 <LazyChartSection placeholder={<HistoricalChartSkeleton />}>

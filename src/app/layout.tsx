@@ -38,9 +38,9 @@ export const metadata: Metadata = {
     "fear and greed index today",
     "BTCD"
   ].join(", "),
-  authors: [{ name: "Crypto Greed Index" }],
-  creator: "Crypto Greed Index",
-  publisher: "Crypto Greed Index",
+  authors: [{ name: "Cryptogreedindex.com" }],
+  creator: "Cryptogreedindex.com",
+  publisher: "Cryptogreedindex.com",
   formatDetection: {
     email: false,
     address: false,
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title: "Crypto Fear & Greed Index | Live Bitcoin Market Sentiment",
     description: "Make better crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
     url: 'https://www.cryptogreedindex.com',
-    siteName: 'Crypto Greed Index',
+    siteName: 'Cryptogreedindex.com',
     images: [
       {
         url: '/cryptogreedindex.png',

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: "Top 100 Cryptocurrencies by Market Cap | Real-time Crypto Rankings",
     description: "Track the top 100 cryptocurrencies by market capitalization. Get real-time prices, 24h changes, volume, and market cap data for the leading digital assets.",
     url: 'https://www.cryptogreedindex.com/top-coins',
-    siteName: 'Crypto Greed Index',
+    siteName: 'Cryptogreedindex.com',
     images: [
       {
         url: '/cryptogreedindex.png',

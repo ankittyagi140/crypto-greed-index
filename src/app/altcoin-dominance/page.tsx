@@ -9,13 +9,13 @@ export const metadata: Metadata = {
     title: 'Altcoin Dominance Chart | Crypto Market Analysis',
     description: 'Track altcoin dominance trends and market share analysis. Compare altcoin market cap against total crypto market cap to understand market dynamics.',
     url: 'https://cryptofeargreedindex.com/altcoin-dominance',
-    siteName: 'Crypto Fear & Greed Index',
+    siteName: 'Cryptogreedindex.com',
     images: [
       {
         url: 'https://cryptofeargreedindex.com/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Crypto Fear & Greed Index',
+        alt: 'Cryptogreedindex.com',
       },
     ],
     locale: 'en_US',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: 'Altcoin Dominance Chart | Crypto Market Analysis',
     description: 'Track altcoin dominance trends and market share analysis. Compare altcoin market cap against total crypto market cap to understand market dynamics.',
     images: ['https://cryptofeargreedindex.com/og-image.png'],
-    creator: '@cryptofeargreed',
+    creator: 'Cryptogreedindex.com',
   },
 };
 

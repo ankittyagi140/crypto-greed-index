@@ -12,7 +12,7 @@ export default function StructuredData() {
       temporalCoverage: `${new Date().getFullYear()}/P1Y`,
       creator: {
         '@type': 'Organization',
-        name: 'Market Analysis Platform'
+        name: 'Cryptogreedindex.com'
       }
     }
   };

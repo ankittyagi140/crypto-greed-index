@@ -108,11 +108,11 @@ const GaugeIndicator: React.FC<GaugeIndicatorProps> = ({ value, classification }
         </PieChart>
 
         {/* Scale markers */}
-        <div className="absolute top-[85%] left-[10%] text-base font-medium text-gray-600">0</div>
-        <div className="absolute top-[40%] left-[20%] text-base font-medium text-gray-600">25</div>
-        <div className="absolute top-[15%] left-[50%] -translate-x-1/2 text-base font-medium text-gray-600">50</div>
-        <div className="absolute top-[40%] right-[20%] text-base font-medium text-gray-600">75</div>
-        <div className="absolute top-[85%] right-[10%] text-base font-medium text-gray-600">100</div>
+        <div className="absolute top-[85%] left-[17%] text-base font-medium text-gray-600">0</div>
+        <div className="absolute top-[40%] left-[25%] text-base font-medium text-gray-600">25</div>
+        <div className="absolute top-[20%] left-[50%] -translate-x-1/2 text-base font-medium text-gray-600">50</div>
+        <div className="absolute top-[40%] right-[25%] text-base font-medium text-gray-600">75</div>
+        <div className="absolute top-[85%] right-[15%] text-base font-medium text-gray-600">100</div>
       </div>
 
       {/* Current value and classification */}

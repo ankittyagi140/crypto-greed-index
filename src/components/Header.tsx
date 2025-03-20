@@ -10,7 +10,7 @@ interface HeaderProps {
 }
 
 export default function Header({ 
-  title = "Crypto Greed Index"
+  title = "CryptogreedIndex.com"
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'analysis' | 'markets' | null>(null);
@@ -22,19 +22,19 @@ export default function Header({
   return (
     <div className="sticky top-0 z-50">
       <header className="bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg">
-        <div className="container mx-auto px-4 py-4 max-w-6xl flex justify-between items-center">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3">
             <div className="relative w-10 h-10">
               <Image
                 src="/cryptogreedindex.png"
-                alt="Crypto Greed Index"
+                alt="CryptogreedIndex.com"
                 width={40}
                 height={40}
                 className="object-contain"
                 priority
               />
             </div>
-            <h1 className="text-xl font-bold text-[#048f04] dark:text-white">
+            <h1 className="text-l font-bold text-[#048f04] dark:text-white">
               {title}
             </h1>
           </Link>
@@ -50,15 +50,6 @@ export default function Header({
               </svg>
               <span>Home</span>
             </Link>
-            <Link 
-              href="/about" 
-              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-              </svg>
-              <span>About Us</span>
-            </Link>
             <div className="relative">
               <button 
                 onClick={() => handleDropdownClick('analysis')}
@@ -73,6 +64,13 @@ export default function Header({
                 </svg>
               </button>
               <div className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 transition-all duration-200 ${activeDropdown === 'analysis' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+              <Link 
+                  href="/top-coins" 
+                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  onClick={() => setActiveDropdown(null)}
+                >
+                  Top Cryptocurrencies
+                </Link>
                 <Link 
                   href="/btc-dominance" 
                   className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"

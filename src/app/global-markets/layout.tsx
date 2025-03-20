@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Track real-time performance of major stock indices from Asia Pacific, Europe, Americas, Middle East & Africa. Get live market data, trends, and historical charts.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'Market Analysis Platform',
+    siteName: 'Cryptogreedindex.com',
   },
   twitter: {
     card: 'summary_large_image',

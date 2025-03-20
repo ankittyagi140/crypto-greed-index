@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       description,
       type: 'website',
       locale: 'en_US',
-      siteName: 'US Market Indices',
+      siteName: 'cryptogreedindex.com',
     },
     twitter: {
       card: 'summary_large_image',

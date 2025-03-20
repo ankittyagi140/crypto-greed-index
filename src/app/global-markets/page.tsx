@@ -51,6 +51,37 @@ interface AsianMarketHours {
   'Taiwan': MarketHours;
 }
 
+interface EuropeanMarketHours {
+  'United Kingdom': MarketHours;
+  'Germany': MarketHours;
+  'France': MarketHours;
+  'Eurozone': MarketHours;
+  'Spain': MarketHours;
+  'Italy': MarketHours;
+  'Netherlands': MarketHours;
+  'Switzerland': MarketHours;
+  'Sweden': MarketHours;
+  'Russia': MarketHours;
+}
+
+interface AmericasMarketHours {
+  'Brazil': MarketHours;
+  'Mexico': MarketHours;
+  'Canada': MarketHours;
+  'Argentina': MarketHours;
+  'Chile': MarketHours;
+  'Colombia': MarketHours;
+}
+
+interface MiddleEastAfricaMarketHours {
+  'Saudi Arabia': MarketHours;
+  'Israel': MarketHours;
+  'Qatar': MarketHours;
+  'UAE': MarketHours;
+  'Egypt': MarketHours;
+  'South Africa': MarketHours;
+}
+
 const REGION_ICONS = {
   'Asia Pacific': GlobeAsiaAustraliaIcon,
   'Americas': GlobeAmericasIcon,
@@ -72,6 +103,40 @@ const MARKET_HOURS = {
       'Indonesia': { start: 1.5, end: 9 }, // 9:30-16:00 WIB
       'Taiwan': { start: 1, end: 5.5 }, // 9:00-13:30 TST
     } as AsianMarketHours
+  },
+  'Europe': {
+    open: {
+      'United Kingdom': { start: 8, end: 16.5 }, // 8:00-16:30 GMT/BST
+      'Germany': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'France': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'Eurozone': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'Spain': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'Italy': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'Netherlands': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'Switzerland': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'Sweden': { start: 7, end: 15.5 }, // 9:00-17:30 CET
+      'Russia': { start: 7, end: 15.5 }, // 10:00-18:30 MSK
+    } as EuropeanMarketHours
+  },
+  'Americas': {
+    open: {
+      'Brazil': { start: 13, end: 20 }, // 10:00-17:00 BRT
+      'Mexico': { start: 14.5, end: 21 }, // 8:30-15:00 CDT
+      'Canada': { start: 13.5, end: 20 }, // 9:30-16:00 EDT
+      'Argentina': { start: 14, end: 21 }, // 11:00-18:00 ART
+      'Chile': { start: 13, end: 21 }, // 9:00-17:00 CLT
+      'Colombia': { start: 14, end: 21 }, // 9:00-16:00 COT
+    } as AmericasMarketHours
+  },
+  'Middle East & Africa': {
+    open: {
+      'Saudi Arabia': { start: 7, end: 13 }, // 10:00-16:00 AST
+      'Israel': { start: 7, end: 14.5 }, // 9:00-16:30 IST
+      'Qatar': { start: 7, end: 13 }, // 10:00-16:00 AST
+      'UAE': { start: 6, end: 12 }, // 10:00-16:00 GST
+      'Egypt': { start: 8, end: 14.5 }, // 10:00-16:30 EET
+      'South Africa': { start: 7, end: 15 }, // 9:00-17:00 SAST
+    } as MiddleEastAfricaMarketHours
   }
 } as const;
 
@@ -84,21 +149,45 @@ const IndexCard = ({ data }: { data: IndexData }) => {
 
   // Check if market is closed based on trading hours and last update
   const isMarketClosed = () => {
-    // If no recent update (more than 30 minutes), consider it closed
+    // If no recent update (more than 15 minutes), consider it closed
     if (!currentStats.regularMarketTime || 
-        (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 30 * 60 * 1000) {
+        (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 15 * 60 * 1000) {
       return true;
     }
 
     // Check Asian market hours
-    const asianMarketHours = MARKET_HOURS['Asia Pacific'].open;
+    const asianMarketHours = MARKET_HOURS['Asia Pacific']?.open;
     const asianCountry = country as keyof AsianMarketHours;
-    if (asianCountry in asianMarketHours) {
+    if (asianMarketHours && asianCountry in asianMarketHours) {
       const hours = asianMarketHours[asianCountry];
       // Handle cases where market spans across UTC day boundary
       if (hours.start > hours.end) {
         return !(utcHours >= hours.start || utcHours <= hours.end);
       }
+      return !(utcHours >= hours.start && utcHours <= hours.end);
+    }
+
+    // Check European market hours
+    const europeanMarketHours = MARKET_HOURS['Europe']?.open;
+    const europeanCountry = country as keyof EuropeanMarketHours;
+    if (europeanMarketHours && europeanCountry in europeanMarketHours) {
+      const hours = europeanMarketHours[europeanCountry];
+      return !(utcHours >= hours.start && utcHours <= hours.end);
+    }
+
+    // Check Americas market hours
+    const americasMarketHours = MARKET_HOURS['Americas']?.open;
+    const americasCountry = country as keyof AmericasMarketHours;
+    if (americasMarketHours && americasCountry in americasMarketHours) {
+      const hours = americasMarketHours[americasCountry];
+      return !(utcHours >= hours.start && utcHours <= hours.end);
+    }
+
+    // Check Middle East & Africa market hours
+    const meaMarketHours = MARKET_HOURS['Middle East & Africa']?.open;
+    const meaCountry = country as keyof MiddleEastAfricaMarketHours;
+    if (meaMarketHours && meaCountry in meaMarketHours) {
+      const hours = meaMarketHours[meaCountry];
       return !(utcHours >= hours.start && utcHours <= hours.end);
     }
 
