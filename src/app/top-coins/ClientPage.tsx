@@ -6,6 +6,7 @@ import { formatLargeNumber } from '@/lib/utils';
 import { toast, Toaster } from 'react-hot-toast';
 import Script from 'next/script';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
+import ResponsivePagination from '@/components/ResponsivePagination';
 
 interface Coin {
   id: string;
@@ -346,44 +347,11 @@ export default function ClientPage() {
         </div>
         {/* Pagination */}
         <div className="flex justify-center items-center space-x-2 py-4">
-          <button
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-md ${currentPage === 1
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-[#048f04] text-white hover:bg-blue-600 cursor-pointer'
-              }`}
-            aria-label="Previous page"
-          >
-            Previous
-          </button>
-          <div className="flex space-x-1">
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => paginate(index + 1)}
-                className={`px-4 py-2 rounded-md ${currentPage === index + 1
-                    ? 'bg-[#048f04] text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
-                  }`}
-                aria-label={`Page ${index + 1}`}
-                aria-current={currentPage === index + 1 ? 'page' : undefined}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => paginate(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-md ${currentPage === totalPages
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-[#048f04] text-white hover:bg-blue-600 cursor-pointer'
-              }`}
-            aria-label="Next page"
-          >
-            Next
-          </button>
+          <ResponsivePagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
     </>
