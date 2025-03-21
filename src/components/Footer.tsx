@@ -47,6 +47,11 @@ export default function Footer() {
                   Top 100 Crypto
                 </Link>
               </li>
+              <li>
+                <Link href="/social-sentiments-btc" className="text-gray-600 dark:text-gray-300 hover:text-[#048f04] dark:hover:text-white transition-colors">
+                  Social Sentiments & BTC
+                </Link>
+              </li>
             </ul>
           </div>
 

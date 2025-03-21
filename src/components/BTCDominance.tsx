@@ -31,7 +31,7 @@ const CurrentDominance = ({ value, data }: { value: number; data: { date: string
 
   return (
     <div className={`${isPositive ? 'bg-green-100 dark:bg-green-900/40' : 'bg-red-100 dark:bg-red-900/40'} rounded-lg p-4 mb-6 max-w-xs mx-auto border ${isPositive ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800'}`}>
-      <div className={`${isPositive ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'} text-sm font-medium mb-1`}>Current BTC Dominance</div>
+      <div className={`${isPositive ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'} text-sm font-medium mb-1 text-center`}>Current BTC Dominance</div>
       <div className="flex items-baseline gap-2 justify-center">
         <div className={`text-2xl font-bold ${isPositive ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}`}>
           {value.toFixed(1)}%

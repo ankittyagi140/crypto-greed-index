@@ -273,7 +273,6 @@ const FearAndGreedChart = () => {
       title: {
         display: true,
         text: [
-          'Bitcoin Fear & Greed Index vs Price',
           data.timeRange ? 
             `${format(new Date(data.timeRange.start), 'MMM d, yyyy')} - ${format(new Date(data.timeRange.end), 'MMM d, yyyy')}` :
             ''
@@ -312,9 +311,9 @@ const FearAndGreedChart = () => {
 
   return (
     <div ref={containerRef} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-      <div className="flex items-center gap-2 mb-2 sm:mb-4">
+      <div className="flex items-center gap-2 mb-2 sm:mb-4 justify-center">
         <Image src="/bitcoin.svg" alt="Bitcoin" className="w-5 h-5 sm:w-6 sm:h-6" height={24} width={24}/>
-        <h2 className="text-base sm:text-lg font-semibold">Fear & Greed Index</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white text-center">BTC Fear & Greed Index vs Price</h2>
       </div>
       <div className="w-full h-[300px] sm:h-[400px]">
         <Chart type="bar" data={chartDataForChartJS} options={options} />

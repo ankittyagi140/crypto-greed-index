@@ -9,7 +9,6 @@ import HomeSkeleton from '@/components/HomeSkeleton';
 import LazyChartSection from '@/components/LazyChartSection';
 import {
   HistoricalChartSkeleton,
-  SocialSentimentSkeleton,
   BTCComparisonSkeleton,
   FAQSkeleton
 } from '@/components/ChartSkeletons';
@@ -31,11 +30,6 @@ const TimeRangeSelector = dynamic(() => import('@/components/TimeRangeSelector')
 // Lazy load chart components with custom loading states
 const BTCComparison = dynamic(() => import('@/components/BTCComparison'), {
   loading: () => <BTCComparisonSkeleton />,
-  ssr: false
-});
-
-const SocialSentiment = dynamic(() => import('@/components/SocialSentiment'), {
-  loading: () => <SocialSentimentSkeleton />,
   ssr: false
 });
 
@@ -63,43 +57,18 @@ interface DotProps {
   index?: number;
 }
 
-
-
 interface BTCData {
   date: string;
   fgi: number;
   btcPrice: number;
   fgiClassification: string;
 }
-
-interface SocialPlatformData {
-  sentiment: number;
-  volume: number;
-  positiveCount?: number;
-  negativeCount?: number;
-}
-
-interface SentimentDataPoint {
-  date: string;
-  btcPrice: number;
-  btcPriceMin: number;
-  btcPriceMax: number;
-  twitter: SocialPlatformData;
-  reddit: SocialPlatformData;
-  telegram: SocialPlatformData;
-  aggregate: {
-    sentiment: number;
-    volume: number;
-  };
-}
-
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState<FearGreedData | null>(null);
   const [historicalData, setHistoricalData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRange, setSelectedRange] = useState('30');
   const [btcComparisonData, setBtcComparisonData] = useState<BTCData[]>([]);
-  const [socialSentimentData, setSocialSentimentData] = useState<SentimentDataPoint[]>([]);
 
   useEffect(() => {
     // Function to fetch all data
@@ -107,27 +76,18 @@ export default function Home() {
       const loadingToast = toast.loading('Fetching market data...');
       try {
         // Fetch all data in parallel
-        const [fgiResponse, btcResponse, socialResponse] = await Promise.all([
+        const [fgiResponse, btcResponse] = await Promise.all([
           fetch('/api/fear-greed?limit=90'),
           fetch('/api/bitcoin-price?days=90'),
-          fetch('/api/social-sentiment?days=365')
         ]);
-
-        const [fgiData, btcData, socialData] = await Promise.all([
+        const [fgiData, btcData] = await Promise.all([
           fgiResponse.json(),
           btcResponse.json(),
-          socialResponse.json()
         ]);
-
-        // Set social sentiment data directly since it now includes proper BTC price data
-        if (socialData.success && Array.isArray(socialData.data)) {
-          setSocialSentimentData(socialData.data);
-        }
 
         if (fgiData.data && fgiData.data[0]) {
           setCurrentIndex(fgiData.data[0]);
                  
-
           // Format data for charts
           const formattedData = fgiData.data
             .slice(0, parseInt(selectedRange))
@@ -155,7 +115,6 @@ export default function Home() {
               })
               .reverse()
               .filter((item: BTCData) => item.btcPrice !== null);
-
             setBtcComparisonData(combinedData);
           }
 
@@ -285,9 +244,7 @@ export default function Home() {
             Make informed investment decisions by understanding market sentiment through our comprehensive analysis tools
           </p>
         </div>
-
         <MarketOverview />
-        
         {currentIndex && (
           <div className="container mx-auto px-4 py-8">
             <div className="max-w-6xl mx-auto">
@@ -296,7 +253,7 @@ export default function Home() {
                 {/* Gauge Indicator Section */}
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
                   <div className="flex flex-col items-center">
-                    <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+                    <h2 className="text-2xl font-semibold text-gray-800 dark:text-white text-center">
                       Crypto Fear and Greed Index today
                     </h2>
                     <GaugeIndicator 
@@ -315,7 +272,7 @@ export default function Home() {
                   <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
                     <div className="mb-8">
                       <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3 text-center">
-                        Historical Trend Analysis
+                        Fear & Greed Historical Trend Analysis
                       </h2>
                       <p className="text-gray-600 dark:text-gray-300 text-base text-center max-w-2xl mx-auto">
                         Track how market sentiment has evolved over time and identify patterns in investor behavior
@@ -410,15 +367,6 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </LazyChartSection>
-
-                {/* Social Sentiment Analysis */}
-                <LazyChartSection>
-                  {socialSentimentData.length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-                      <SocialSentiment data={socialSentimentData} />
-                    </div>
-                  )}
                 </LazyChartSection>
 
                 {/* BTC Comparison */}
