@@ -350,7 +350,7 @@ export default function ClientPage() {
           <ResponsivePagination 
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={paginate}
           />
         </div>
       </div>
