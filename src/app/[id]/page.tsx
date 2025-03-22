@@ -48,16 +48,6 @@ export default async function CoinPage({ params }: Props) {
               "@type": "WebPage",
               "@id": `https://www.cryptogreedindex.com/${id}`
             },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.5",
-              "reviewCount": "1000"
-            },
-            "offers": {
-              "@type": "Offer",
-              "priceCurrency": "USD",
-              "availability": "https://schema.org/InStock"
-            }
           })
         }}
       />

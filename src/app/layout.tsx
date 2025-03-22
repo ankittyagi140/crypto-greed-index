@@ -146,11 +146,104 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Crypto Fear & Greed Index",
+              "url": "https://www.cryptogreedindex.com",
+              "description": "Real-time cryptocurrency market sentiment analysis and Fear & Greed Index tracking",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://www.cryptogreedindex.com/search?q={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+        <Script
+          id="organization-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "CryptoGreedIndex",
+              "url": "https://www.cryptogreedindex.com",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.cryptogreedindex.com/cryptogreedindex.png",
+                "width": 1200,
+                "height": 630,
+                "caption": "Crypto Fear & Greed Index Logo"
+              },
+              "sameAs": [
+                "https://twitter.com/cryptogreedindex"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "url": "https://www.cryptogreedindex.com/contact"
+              }
+            })
+          }}
+        />
+        <Script
+          id="webpage-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
               "@type": "WebPage",
               "name": "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
-              "description": "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates.",
+              "description": "Make smarter crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
               "url": "https://www.cryptogreedindex.com",
-              "image": "https://www.cryptogreedindex.com/cryptogreedindex.png"
+              "image": "https://www.cryptogreedindex.com/cryptogreedindex.png",
+              "author": {
+                "@type": "Organization",
+                "name": "CryptoGreedIndex",
+                "url": "https://www.cryptogreedindex.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "CryptoGreedIndex",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.cryptogreedindex.com/cryptogreedindex.png"
+                }
+              },
+              "mainEntity": {
+                "@type": "DataVisualization",
+                "name": "Crypto Fear & Greed Index",
+                "description": "Real-time cryptocurrency market sentiment indicator",
+                "dataType": "Financial Data",
+                "temporalCoverage": "Real-time",
+                "updateFrequency": "PT5M",
+                "variableMeasured": "Market Sentiment",
+                "measurementTechnique": "Multi-factor Analysis",
+                "about": {
+                  "@type": "Thing",
+                  "name": "Cryptocurrency Market",
+                  "description": "The overall cryptocurrency market sentiment and psychology"
+                }
+              },
+              "inLanguage": "en-US",
+              "isAccessibleForFree": true,
+              "license": "https://www.cryptogreedindex.com/terms",
+              "keywords": "crypto fear and greed index, bitcoin fear and greed index, cryptocurrency sentiment, bitcoin market sentiment, crypto market analysis",
+              "dateModified": new Date().toISOString(),
+              "datePublished": "2024-01-01T00:00:00Z",
+              "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://www.cryptogreedindex.com"
+                  }
+                ]
+              }
             })
           }}
         />
