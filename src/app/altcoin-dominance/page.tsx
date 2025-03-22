@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import ClientPage from './ClientPage';
 
 export const metadata: Metadata = {
-  title: 'Altcoin Dominance Chart | Crypto Market Analysis',
-  description: 'Track altcoin dominance trends and market share analysis. Compare altcoin market cap against total crypto market cap to understand market dynamics.',
+  title: 'Altcoin Dominance | Crypto Market Analysis',
+  description: 'Track altcoin market dominance and understand the shifting dynamics of the cryptocurrency market.',
   keywords: ['altcoin dominance', 'crypto market analysis', 'altcoin market share', 'cryptocurrency market trends', 'altcoin market cap ,altcoin dominance chart'],
   openGraph: {
     title: 'Altcoin Dominance Chart | Crypto Market Analysis',
@@ -30,6 +30,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AltcoinDominancePage() {
+export default function Page() {
   return <ClientPage />;
 } 

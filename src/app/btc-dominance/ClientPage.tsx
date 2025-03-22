@@ -1,6 +1,7 @@
 'use client';
 
 import BTCDominance from '@/components/BTCDominance';
+import BitcoinMetrics from '@/components/BitcoinMetrics';
 import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 
@@ -66,8 +67,74 @@ export default function ClientPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <div className="animate-pulse bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 h-[500px]" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header Skeleton */}
+          <div className="text-center mb-8">
+            <div className="h-10 w-3/4 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-4"></div>
+            <div className="h-6 w-2/3 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto"></div>
+          </div>
+
+          {/* Main Content Grid Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 sm:gap-6 lg:gap-8">
+            {/* Left Panel Skeleton */}
+            <div className="w-full lg:col-span-7 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+              <div className="animate-pulse">
+                {/* Current BTC Dominance Box */}
+                <div className="w-48 h-24 mx-auto bg-gray-100 dark:bg-gray-700 rounded-lg mb-6"></div>
+                
+                {/* Time Range Selector */}
+                <div className="flex justify-center gap-4 mb-8">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="h-8 w-20 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                  ))}
+                </div>
+
+                {/* Chart Area */}
+                <div className="h-[300px] bg-gray-100 dark:bg-gray-700 rounded-lg"></div>
+              </div>
+            </div>
+
+            {/* Right Panel Skeleton */}
+            <div className="w-full lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+              <div className="animate-pulse space-y-4">
+                <div className="h-6 w-3/4 bg-gray-100 dark:bg-gray-700 rounded mb-6"></div>
+                
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-1 gap-4">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                      <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+                      <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Understanding BTC Dominance Section Skeleton */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <div className="animate-pulse">
+              <div className="h-8 w-1/2 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+              <div className="space-y-4 mb-8">
+                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {[1, 2].map((i) => (
+                  <div key={i} className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                    <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-600 rounded mb-4"></div>
+                    <div className="space-y-3">
+                      {[1, 2, 3, 4].map((j) => (
+                        <div key={j} className="h-4 w-5/6 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -107,13 +174,14 @@ export default function ClientPage() {
           },
         }}
       />
+      
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-4">
               Bitcoin Market Dominance Analysis
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+            <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg max-w-3xl mx-auto">
               Track Bitcoin&apos;s influence in the cryptocurrency market through its dominance metrics
             </p>
           </div>
@@ -129,34 +197,41 @@ export default function ClientPage() {
               </button>
             </div>
           ) : (
-            data.length > 0 && <BTCDominance data={data} isDetailPage={true} />
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 sm:gap-6 lg:gap-8">
+              <div className="w-full lg:col-span-7 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                {data.length > 0 && <BTCDominance data={data} isDetailPage={true} />}
+              </div>
+              <div className="w-full lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                <BitcoinMetrics isDetailPage={true} />
+              </div>
+            </div>
           )}
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-white mb-4">
               Understanding BTC Dominance
             </h2>
             <div className="space-y-4 text-gray-600 dark:text-gray-300">
-              <p>
+              <p className="text-base sm:text-lg">
                 Bitcoin dominance represents Bitcoin&apos;s market capitalization as a percentage of the total cryptocurrency market capitalization. This metric is crucial for understanding Bitcoin&apos;s relative strength and influence in the crypto market.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
                     High Dominance Implications
                   </h3>
-                  <ul className="list-disc list-inside space-y-2">
+                  <ul className="list-disc list-inside space-y-2 text-base sm:text-lg">
                     <li>Strong Bitcoin market position</li>
                     <li>Reduced altcoin market share</li>
                     <li>Potential consolidation phase</li>
                     <li>Traditional market confidence</li>
                   </ul>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
                     Low Dominance Implications
                   </h3>
-                  <ul className="list-disc list-inside space-y-2">
+                  <ul className="list-disc list-inside space-y-2 text-base sm:text-lg">
                     <li>Altcoin season potential</li>
                     <li>Market diversification</li>
                     <li>Increased market maturity</li>
