@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import MarketMovers from '@/components/MarketMovers';
 import USMarketOverview from '@/components/USMarketOverview';
 import TopCompaniesByMarketCap from '@/components/TopCompaniesByMarketCap';

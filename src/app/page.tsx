@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Line, ReferenceLine } from 'recharts';
 import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import HomeSkeleton from '@/components/HomeSkeleton';
 import LazyChartSection from '@/components/LazyChartSection';

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { formatLargeNumber } from '@/lib/utils';
-import { toast, Toaster } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import Script from 'next/script';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
 import ResponsivePagination from '@/components/ResponsivePagination';

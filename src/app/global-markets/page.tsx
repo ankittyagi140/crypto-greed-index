@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { 
   ArrowUpIcon, 
   ArrowDownIcon, 

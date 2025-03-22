@@ -4,8 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { formatNumber, formatDate } from '@/lib/utils';
-import Link from 'next/link';
-import { ArrowLeft, TrendingUp, TrendingDown, Users, Code, Coins, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Users, Code, Link as LinkIcon } from 'lucide-react';
 import Script from 'next/script';
 import { Toaster, toast } from 'react-hot-toast';
 
@@ -260,10 +259,6 @@ export default function ClientPage({ id }: Props) {
       </div>
     );
   }
-
-  const getPriceChangeIcon = (change: number) => {
-    return change >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />;
-  };
 
   return (
     <>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import LazyChartSection from "@/components/LazyChartSection"
 import { SocialSentimentSkeleton } from "@/components/ChartSkeletons";
 import dynamic from "next/dynamic";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 interface SocialPlatformData {
     sentiment: number;
