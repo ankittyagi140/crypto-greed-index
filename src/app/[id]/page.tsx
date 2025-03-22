@@ -7,29 +7,29 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const {id} = await params;
+  const { id } = await params;
   return {
     title: `${id} Details | ${id} Live Charts`,
     description: `Detailed information about ${id} cryptocurrency including price, market data, and technical analysis.`,
     keywords: `${id} details, ${id} price, ${id} market data, ${id} technical analysis`,
-  openGraph: {
-    title: `${id} Details | Crypto Live Charts`,
-    description: `Detailed information about ${id} cryptocurrency including price, market data, and technical analysis.`,
-    type: 'website',
-    images: ['/cryptogreedindex.png'],
-    url: `https://www.cryptogreedindex.com/coin/${id}`,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${id} Details | ${id} Live Charts`,
-    description: `Detailed information about ${id} cryptocurrency including price, market data, and technical analysis.`,
-    images: ['/cryptogreedindex.png'],
-  }
+    openGraph: {
+      title: `${id} Details | Crypto Live Charts`,
+      description: `Detailed information about ${id} cryptocurrency including price, market data, and technical analysis.`,
+      type: 'website',
+      images: ['/cryptogreedindex.png'],
+      url: `https://www.cryptogreedindex.com/${id}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${id} Details | ${id} Live Charts`,
+      description: `Detailed information about ${id} cryptocurrency including price, market data, and technical analysis.`,
+      images: ['/cryptogreedindex.png'],
+    }
   };
 }
 
 export default async function CoinPage({ params }: Props) {
-    const {id }= await params;
+  const { id } = await params;
   return (
     <>
       <Script
@@ -42,11 +42,11 @@ export default async function CoinPage({ params }: Props) {
             "name": id,
             "symbol": id,
             "description": `Detailed information about ${id} cryptocurrency including price, market data, and technical analysis.`,
-            "url": `https://www.cryptogreedindex.com/coin/${id}`,
+            "url": `https://www.cryptogreedindex.com/${id}`,
             "image": `https://assets.coingecko.com/coins/images/1/${id}.png`,
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": `https://www.cryptogreedindex.com/coin/${id}`
+              "@id": `https://www.cryptogreedindex.com/${id}`
             },
             "aggregateRating": {
               "@type": "AggregateRating",

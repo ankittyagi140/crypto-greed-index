@@ -76,7 +76,7 @@ export default function ClientPage() {
   };
 
   const handleCoinClick = (coinId: string) => {
-    router.push(`/coin/${coinId}`);
+    router.push(`/${coinId}`);
   };
 
   // Generate structured data for SEO

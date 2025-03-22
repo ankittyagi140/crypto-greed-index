@@ -7,11 +7,13 @@ import { formatNumber, formatDate } from '@/lib/utils';
 import { ArrowLeft, TrendingUp, TrendingDown, Users, Code, Link as LinkIcon } from 'lucide-react';
 import Script from 'next/script';
 import { Toaster, toast } from 'react-hot-toast';
+import Link from 'next/link';
 
 interface CoinData {
   id: string;
   symbol: string;
   name: string;
+  image: string;
   currentPrice: number;
   marketCap: number;
   marketCapRank: number;
@@ -89,7 +91,7 @@ export default function ClientPage({ id }: Props) {
         position: 'top-right',
       });
       try {
-        const response = await fetch(`/api/coin/${id}`);
+        const response = await fetch(`/api/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch coin data');
         }
@@ -253,7 +255,7 @@ export default function ClientPage({ id }: Props) {
             Coin not found
           </h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            The requested coin could not be found.
+            The requested coin could not be found. Go back to the <Link href="/top-coins" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">top coins</Link> page.
           </p>
         </div>
       </div>
@@ -306,8 +308,8 @@ export default function ClientPage({ id }: Props) {
         {/* Header Section */}
         <div className="mb-6 sm:mb-8">
           <button
-            onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4"
+            onClick={() => router.push('/top-coins')}
+            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4 cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
@@ -326,7 +328,7 @@ export default function ClientPage({ id }: Props) {
                 <button
                   key={range}
                   onClick={() => setTimeRange(range as typeof timeRange)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                     timeRange === range
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
