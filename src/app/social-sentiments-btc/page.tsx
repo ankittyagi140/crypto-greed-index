@@ -78,37 +78,6 @@ const SocialSentimentsBTC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-            <Toaster
-                position="top-right"
-                toastOptions={{
-                    success: {
-                        style: {
-                            background: '#10B981',
-                            color: 'white',
-                        },
-                        iconTheme: {
-                            primary: 'white',
-                            secondary: '#10B981',
-                        },
-                    },
-                    error: {
-                        style: {
-                            background: '#EF4444',
-                            color: 'white',
-                        },
-                        iconTheme: {
-                            primary: 'white',
-                            secondary: '#EF4444',
-                        },
-                    },
-                    loading: {
-                        style: {
-                            background: '#3B82F6',
-                            color: 'white',
-                        },
-                    },
-                }}
-            />
             <main className="container mx-auto px-4 py-8 max-w-6xl">
                 <LazyChartSection>
                     {socialSentimentData.length > 0 && (

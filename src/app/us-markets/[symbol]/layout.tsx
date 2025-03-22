@@ -56,6 +56,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       type: 'website',
       locale: 'en_US',
       siteName: 'cryptogreedindex.com',
+      url: `https://www.cryptogreedindex.com/us-markets/${symbol}`,
     },
     twitter: {
       card: 'summary_large_image',

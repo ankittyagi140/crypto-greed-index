@@ -291,7 +291,7 @@ const RegionSection = ({ title, data }: { title: string; data: IndexData[] }) =>
           {title}
         </h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {data.map((index) => (
           <IndexCard key={index.key} data={index} />
         ))}
@@ -374,39 +374,7 @@ export default function GlobalMarkets() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        gutter={8}
-        toastOptions={{
-          duration: 5000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            style: {
-              background: '#059669',
-              color: '#fff',
-            },
-          },
-          error: {
-            duration: 4000,
-            style: {
-              background: '#DC2626',
-              color: '#fff',
-            },
-          },
-          loading: {
-            style: {
-              background: '#2563EB',
-              color: '#fff',
-            },
-          },
-        }}
-      />
-      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
+      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-8xl">
         <header className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4">
             Global Markets Today

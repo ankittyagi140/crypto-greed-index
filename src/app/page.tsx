@@ -13,7 +13,7 @@ import {
   FAQSkeleton
 } from '@/components/ChartSkeletons';
 
-import TopCoins from '@/components/TopCoins';
+// import TopCoins from '@/components/TopCoins';
 import GaugeIndicator from '@/components/GaugeIndicator';
 import TypewriterText from '@/components/TypewriterText';
 import FearAndGreedChart from '@/components/FearAndGreedChart';
@@ -198,38 +198,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          success: {
-            style: {
-              background: '#10B981',
-              color: 'white',
-            },
-            iconTheme: {
-              primary: 'white',
-              secondary: '#10B981',
-            },
-          },
-          error: {
-            style: {
-              background: '#EF4444',
-              color: 'white',
-            },
-            iconTheme: {
-              primary: 'white',
-              secondary: '#EF4444',
-            },
-          },
-          loading: {
-            style: {
-              background: '#3B82F6',
-              color: 'white',
-            },
-          },
-        }}
-      />
-      <main className="container mx-auto px-4 py-12 max-w-7xl">
+      <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4 tracking-tight">
@@ -376,13 +345,13 @@ export default function Home() {
                   </div>
                 </LazyChartSection>
 
-                {/* Top Cryptocurrencies Section */}
+                {/* Top Cryptocurrencies Section
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
                   <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
                     Top 10 Cryptocurrencies
                   </h2>
                   <TopCoins />
-                </div>
+                </div> */}
 
                 {/* FAQ Section */}
                 <LazyChartSection>
@@ -394,7 +363,7 @@ export default function Home() {
             </div>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

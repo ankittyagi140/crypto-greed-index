@@ -7,6 +7,7 @@ import { toast, Toaster } from 'react-hot-toast';
 import Script from 'next/script';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
 import ResponsivePagination from '@/components/ResponsivePagination';
+import { useRouter } from 'next/navigation';
 
 interface Coin {
   id: string;
@@ -32,6 +33,7 @@ export default function ClientPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const coinsPerPage = 100;
   const totalPages = 10; // 100 coins total / 20 coins per page
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -73,9 +75,9 @@ export default function ClientPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // const handleCoinClick = (coinId: string) => {
-  //   router.push(`/${coinId}`);
-  // };
+  const handleCoinClick = (coinId: string) => {
+    router.push(`/coin/${coinId}`);
+  };
 
   // Generate structured data for SEO
   const structuredData = {
@@ -193,39 +195,6 @@ export default function ClientPage() {
 
   return (
     <>
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        gutter={8}
-        toastOptions={{
-          duration: 5000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            style: {
-              background: '#059669',
-              color: '#fff',
-            },
-          },
-          error: {
-            duration: 4000,
-            style: {
-              background: '#DC2626',
-              color: '#fff',
-            },
-          },
-          loading: {
-            style: {
-              background: '#2563EB',
-              color: '#fff',
-            },
-          },
-        }}
-      />
-
       <Script
         id="structured-data"
         type="application/ld+json"
@@ -278,8 +247,8 @@ export default function ClientPage() {
                 {coins?.map((coin) => (
                   <tr 
                     key={coin.id} 
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" 
-                    // onClick={() => handleCoinClick(coin.id)}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" 
+                    onClick={() => handleCoinClick(coin.id)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {coin.market_cap_rank}

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Toaster, toast } from 'react-hot-toast';
 import { useParams } from 'next/navigation';
 import MarketMovers from '@/components/MarketMovers';
 import Script from 'next/script';
@@ -142,8 +141,19 @@ export default function IndexDetail() {
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
   // Calculate technical indicators
+  const calculateEMA = useCallback((prices: number[], period: number): number => {
+    const multiplier = 2 / (period + 1);
+    let ema = prices[0];
+    prices.forEach(price => {
+      ema = (price - ema) * multiplier + ema;
+    });
+    return ema;
+  }, []);
+
   const calculateIndicators = useCallback((data: HistoricalData[]) => {
-    if (!data.length) return null;
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return null;
+    }
 
     const prices = data.map(d => d.value);
     const length = prices.length;
@@ -165,9 +175,9 @@ export default function IndexDetail() {
     const changes = prices.slice(1).map((price, i) => price - prices[i]);
     const gains = changes.filter(change => change > 0);
     const losses = changes.filter(change => change < 0).map(loss => Math.abs(loss));
-    const avgGain = gains.reduce((a, b) => a + b, 0) / 14;
-    const avgLoss = losses.reduce((a, b) => a + b, 0) / 14;
-    const rs = avgGain / avgLoss;
+    const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / 14 : 0;
+    const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / 14 : 0;
+    const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
     const rsi = 100 - (100 / (1 + rs));
 
     // Calculate Bollinger Bands (20-period SMA with 2 standard deviations)
@@ -239,61 +249,42 @@ export default function IndexDetail() {
       atr,
       obv
     };
-  }, []);
-
-  const calculateEMA = useCallback((prices: number[], period: number): number => {
-    const multiplier = 2 / (period + 1);
-    let ema = prices[0];
-    prices.forEach(price => {
-      ema = (price - ema) * multiplier + ema;
-    });
-    return ema;
-  }, []);
-
-  const fetchData = useCallback(async () => {
-    if (!index) return;
-
-    const loadingToast = toast.loading(`Fetching ${index.name} data...`, {
-      position: 'top-right',
-    });
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/us-markets/${index.symbol}`);
-      const result = await response.json();
-      
-      if (result.success && result.data) {
-        const indicators = calculateIndicators(result.data.historicalData);
-        setTechnicalIndicators(indicators);
-        setCurrentStats(result.data.currentStats);
-        setHistoricalData(result.data.historicalData);
-        toast.success(`${index.name} market data updated`, {
-          id: loadingToast,
-          duration: 3000,
-        });
-      } else {
-        console.error('Invalid market data:', result);
-      }
-
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : `Failed to load ${index.name} market data`;
-      console.error('Error fetching data:', error);
-      toast.error(errorMessage, {
-        id: loadingToast,
-        duration: 4000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [index, calculateIndicators]);
+  }, [calculateEMA]);
 
   useEffect(() => {
-    const intervalId = setInterval(fetchData, 300000); // 5 minutes
-    fetchData();
-    return () => {
-      clearInterval(intervalId);
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/us-markets/${symbol}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch market data');
+        }
+        const data = await response.json();
+        
+        if (isMounted) {
+          setHistoricalData(data.historicalData);
+          setCurrentStats(data.currentStats);
+          setTechnicalIndicators(calculateIndicators(data.historicalData));
+          setLastUpdated(new Date().toLocaleTimeString());
+          setLoading(false);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error('Error fetching data:', error);
+          setLoading(false);
+        }
+      }
     };
-  }, [fetchData]);
+
+    fetchData();
+    const interval = setInterval(fetchData, 60000); // Update every minute
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [symbol, calculateIndicators]);
 
   const TechnicalIndicatorCard = ({ title, value, description }: { title: string; value: number | null; description?: string }) => (
     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
@@ -311,48 +302,69 @@ export default function IndexDetail() {
 
   // Generate structured data for SEO
   const generateStructuredData = () => {
-    if (!currentStats.price) return null;
+    if (!currentStats || !currentStats.price || !index) return null;
 
-    return {
+    const structuredData = {
       '@context': 'https://schema.org',
       '@type': 'FinancialProduct',
       name: index.name,
       description: index.description,
-      url: window.location.href,
+      url: typeof window !== 'undefined' ? window.location.href : '',
       dateModified: new Date().toISOString(),
       price: {
         '@type': 'MonetaryAmount',
         currency: 'USD',
         value: currentStats.price
       },
-      additionalProperty: [
-        {
-          '@type': 'PropertyValue',
-          name: 'Change',
-          value: currentStats.change
-        },
-        {
-          '@type': 'PropertyValue',
-          name: 'Change Percentage',
-          value: currentStats.changePercent
-        },
-        {
-          '@type': 'PropertyValue',
-          name: '52 Week High',
-          value: currentStats.high52Week
-        },
-        {
-          '@type': 'PropertyValue',
-          name: '52 Week Low',
-          value: currentStats.low52Week
-        },
-        {
-          '@type': 'PropertyValue',
-          name: 'Trading Volume',
-          value: currentStats.volume
-        }
-      ]
+      additionalProperty: [] as Array<{
+        '@type': string;
+        name: string;
+        value: number | null;
+      }>
     };
+
+    // Only add properties that have values
+    if (currentStats.change !== null) {
+      structuredData.additionalProperty.push({
+        '@type': 'PropertyValue',
+        name: 'Change',
+        value: currentStats.change
+      });
+    }
+
+    if (currentStats.changePercent !== null) {
+      structuredData.additionalProperty.push({
+        '@type': 'PropertyValue',
+        name: 'Change Percentage',
+        value: currentStats.changePercent
+      });
+    }
+
+    if (currentStats.high52Week !== null) {
+      structuredData.additionalProperty.push({
+        '@type': 'PropertyValue',
+        name: '52 Week High',
+        value: currentStats.high52Week
+      });
+    }
+
+    if (currentStats.low52Week !== null) {
+      structuredData.additionalProperty.push({
+        '@type': 'PropertyValue',
+        name: '52 Week Low',
+        value: currentStats.low52Week
+      });
+    }
+
+    if (currentStats.volume !== null) {
+      structuredData.additionalProperty.push({
+        '@type': 'PropertyValue',
+        name: 'Trading Volume',
+        value: currentStats.volume
+      });
+    }
+
+    return structuredData;
   };
 
   if (loading || !index) {
@@ -379,38 +391,6 @@ export default function IndexDetail() {
         </Script>
       )}
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <Toaster
-          position="top-right"
-          reverseOrder={false}
-          gutter={8}
-          toastOptions={{
-            duration: 5000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              style: {
-                background: '#059669',
-                color: '#fff',
-              },
-            },
-            error: {
-              duration: 4000,
-              style: {
-                background: '#DC2626',
-                color: '#fff',
-              },
-            },
-            loading: {
-              style: {
-                background: '#2563EB',
-                color: '#fff',
-              },
-            },
-          }}
-        />
         <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
           {/* Header Section */}
           <header className="text-center mb-8 sm:mb-12">
@@ -431,7 +411,7 @@ export default function IndexDetail() {
               <article className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                 <h2 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">Current Price</h2>
                 <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
-                  ${currentStats.price?.toLocaleString() ?? 'Loading...'}
+                  ${currentStats?.price?.toLocaleString() ?? 'Loading...'}
                 </div>
                 {currentStats.change !== null && currentStats.changePercent !== null && (
                   <div className={`flex items-center text-base sm:text-lg mt-1 ${currentStats.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>

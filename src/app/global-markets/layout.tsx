@@ -11,11 +11,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     siteName: 'Cryptogreedindex.com',
+    url: 'https://www.cryptogreedindex.com/global-markets',
+    images: [
+      {
+        url: '/cryptogreedindex.png',
+        width: 1200,
+        height: 630,
+        alt: 'Global Markets Today - Real-time Stock Indices Worldwide',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Global Markets Today - Real-time Stock Indices Worldwide',
     description: 'Track real-time performance of major stock indices from Asia Pacific, Europe, Americas, Middle East & Africa.',
+    images: ['/cryptogreedindex.png'],
   },
 };
 

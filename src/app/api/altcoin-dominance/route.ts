@@ -3,12 +3,6 @@ import { NextResponse } from 'next/server';
 // Mark this route as dynamic to allow using searchParams
 export const dynamic = 'force-dynamic';
 
-// interface MarketCapPercentage {
-//   btc: number;
-//   eth: number;
-//   [key: string]: number;
-// }
-
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 
 export async function GET() {

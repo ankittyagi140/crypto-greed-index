@@ -3,7 +3,7 @@
 import ETHDominance from '@/components/ETHDominance';
 import EthereumMetrics from '@/components/EthereumMetrics';
 import { useEffect, useState } from 'react';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 interface DominanceData {
   date: string;
@@ -142,39 +142,6 @@ export default function ClientPage() {
 
   return (
     <>
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        gutter={8}
-        toastOptions={{
-          duration: 5000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            style: {
-              background: '#059669',
-              color: '#fff',
-            },
-          },
-          error: {
-            duration: 4000,
-            style: {
-              background: '#DC2626',
-              color: '#fff',
-            },
-          },
-          loading: {
-            style: {
-              background: '#2563EB',
-              color: '#fff',
-            },
-          },
-        }}
-      />
-      
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center mb-8">

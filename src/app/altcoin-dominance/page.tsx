@@ -4,7 +4,14 @@ import ClientPage from './ClientPage';
 export const metadata: Metadata = {
   title: 'Altcoin Dominance | Crypto Market Analysis',
   description: 'Track altcoin market dominance and understand the shifting dynamics of the cryptocurrency market.',
-  keywords: ['altcoin dominance', 'crypto market analysis', 'altcoin market share', 'cryptocurrency market trends', 'altcoin market cap ,altcoin dominance chart'],
+  keywords: [
+    'altcoin dominance',
+    'crypto market analysis',
+    'altcoin market share',
+    'cryptocurrency market trends',
+    'altcoin market cap',
+    'altcoin dominance chart'
+  ],  
   openGraph: {
     title: 'Altcoin Dominance Chart | Crypto Market Analysis',
     description: 'Track altcoin dominance trends and market share analysis. Compare altcoin market cap against total crypto market cap to understand market dynamics.',
@@ -12,10 +19,10 @@ export const metadata: Metadata = {
     siteName: 'Cryptogreedindex.com',
     images: [
       {
-        url: 'https://cryptofeargreedindex.com/og-image.png',
+        url: '/cryptogreedindex.png',
         width: 1200,
         height: 630,
-        alt: 'Cryptogreedindex.com',
+        alt: 'Altcoin Dominance | Crypto Market Analysis',
       },
     ],
     locale: 'en_US',
@@ -25,7 +32,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Altcoin Dominance Chart | Crypto Market Analysis',
     description: 'Track altcoin dominance trends and market share analysis. Compare altcoin market cap against total crypto market cap to understand market dynamics.',
-    images: ['https://cryptofeargreedindex.com/og-image.png'],
+    images: ['/cryptogreedindex.png'],
     creator: 'Cryptogreedindex.com',
   },
 };

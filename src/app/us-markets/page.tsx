@@ -91,38 +91,6 @@ export default function USMarkets() {
           <MarketMovers index="sp500" />
         </div>
       </div>
-       <Toaster
-          position="top-right"
-          reverseOrder={false}
-          gutter={8}
-          toastOptions={{
-            duration: 5000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              style: {
-                background: '#059669',
-                color: '#fff',
-              },
-            },
-            error: {
-              duration: 4000,
-              style: {
-                background: '#DC2626',
-                color: '#fff',
-              },
-            },
-            loading: {
-              style: {
-                background: '#2563EB',
-                color: '#fff',
-              },
-            },
-          }}
-        />
     </div>
   );
 }
