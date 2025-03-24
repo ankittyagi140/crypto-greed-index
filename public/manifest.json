@@ -1,6 +1,6 @@
 {
-  "name": "Crypto Greed Index",
-  "short_name": "Crypto Greed Index",
+  "name": "Cryptogreedindex.com",
+  "short_name": "cryptogreedindex.com",
   "description": "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates. Make informed investment decisions based on market psychology and sentiment analysis.",
   "start_url": "/",
   "display": "standalone",
@@ -21,27 +21,27 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["finance", "cryptocurrency", "utilities"],
+  "categories": ["finance", "cryptocurrency", "investing"],
   "screenshots": [
     {
       "src": "/cryptogreedindex.png",
       "sizes": "1280x720",
       "type": "image/png",
       "platform": "wide",
-      "label": "Crypto Greed Index Dashboard"
+      "label": "cryptogreedindex.com"
     }
   ],
   "shortcuts": [
     {
-      "name": "Current Index",
-      "short_name": "Index",
+      "name": "Cryptogreedindex.com",
+      "short_name": "cryptogreedindex.com",
       "description": "View the current Fear & Greed Index value",
       "url": "/",
       "icons": [{ "src": "/cryptogreedindex.png", "sizes": "96x96" }]
     },
     {
-      "name": "Historical Data",
-      "short_name": "History",
+      "name": "cryptogreedindex.com",
+      "short_name": "cryptogreedindex.com",
       "description": "View historical Fear & Greed Index data",
       "url": "/#historical",
       "icons": [{ "src": "/cryptogreedindex.png", "sizes": "96x96" }]
