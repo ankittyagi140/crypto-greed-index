@@ -241,6 +241,9 @@ export default function ClientPage() {
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Circulating Supply
                   </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Market Cap
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -304,6 +307,9 @@ export default function ClientPage() {
                     <td className='px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white'>${coin?.ath?.toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
                       {formatLargeNumber(coin.circulating_supply)} {coin.symbol.toUpperCase()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
+                      {formatLargeNumber(coin.market_cap)}
                     </td>
                   </tr>
                 ))}

@@ -1,35 +1,19 @@
 // pages/index.js
 'use client'
-import { useState, useEffect } from 'react';
-import { Line, ReferenceLine } from 'recharts';
-import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import HomeSkeleton from '@/components/HomeSkeleton';
+// import HomeSkeleton from '@/components/HomeSkeleton';
 import LazyChartSection from '@/components/LazyChartSection';
-import {
-  HistoricalChartSkeleton,
-  BTCComparisonSkeleton,
-  FAQSkeleton
-} from '@/components/ChartSkeletons';
-
-// import TopCoins from '@/components/TopCoins';
+import { FAQSkeleton } from '@/components/ChartSkeletons';
 import GaugeIndicator from '@/components/GaugeIndicator';
-import TypewriterText from '@/components/TypewriterText';
 import FearAndGreedChart from '@/components/FearAndGreedChart';
-
+import Link from 'next/link';
+import HistoricalValues from '@/components/HistoricalValues';
 
 // Lazy load components with custom loading states
 const MarketOverview = dynamic(() => import('@/components/MarketOverview'), {
   loading: () => <div className="animate-pulse bg-gray-100 dark:bg-gray-800 h-20"></div>,
-  ssr: false
-});
-
-const TimeRangeSelector = dynamic(() => import('@/components/TimeRangeSelector'));
-
-// Lazy load chart components with custom loading states
-const BTCComparison = dynamic(() => import('@/components/BTCComparison'), {
-  loading: () => <BTCComparisonSkeleton />,
   ssr: false
 });
 
@@ -44,325 +28,212 @@ interface FearGreedData {
   timestamp: number;
 }
 
-interface ChartData {
-  date: string;
-  value: number;
-  classification: string;
+interface HistoricalData {
+  now: FearGreedData;
+  yesterday: FearGreedData;
+  lastWeek: FearGreedData;
+  lastMonth: FearGreedData;
 }
 
-interface DotProps {
-  cx?: number;
-  cy?: number;
-  value?: number;
-  index?: number;
-}
+// Separate data fetching component to allow static content to render immediately
+function FearGreedDataSection({ onDataLoaded, onHistoricalDataLoaded }: { 
+  onDataLoaded: (data: FearGreedData) => void;
+  onHistoricalDataLoaded: (data: HistoricalData) => void;
+}) {
+  const fetchData = useCallback(async () => {
+    const loadingToast = toast.loading('Fetching market data...');
+    try {
+      const [currentResponse, historicalResponse] = await Promise.all([
+        fetch('/api/fear-greed?limit=1', {
+          headers: {
+            'Cache-Control': 'no-store',
+            'Pragma': 'no-cache'
+          }
+        }),
+        fetch('/api/fear-greed/historical', {
+          headers: {
+            'Cache-Control': 'no-store',
+            'Pragma': 'no-cache'
+          }
+        })
+      ]);
 
-interface BTCData {
-  date: string;
-  fgi: number;
-  btcPrice: number;
-  fgiClassification: string;
-}
-export default function Home() {
-  const [currentIndex, setCurrentIndex] = useState<FearGreedData | null>(null);
-  const [historicalData, setHistoricalData] = useState<ChartData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedRange, setSelectedRange] = useState('30');
-  const [btcComparisonData, setBtcComparisonData] = useState<BTCData[]>([]);
+      const [currentData, historicalData] = await Promise.all([
+        currentResponse.json(),
+        historicalResponse.json()
+      ]);
+
+      if (currentData.data && currentData.data[0]) {
+        onDataLoaded(currentData.data[0]);
+        onHistoricalDataLoaded(historicalData);
+        
+        toast.success('Market data updated', {
+          id: loadingToast,
+          duration: 2000,
+        });
+      }
+    } catch (err: Error | unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch market data.';
+      toast.error(errorMessage, {
+        id: loadingToast,
+        duration: 4000,
+      });
+    }
+  }, [onDataLoaded, onHistoricalDataLoaded]);
 
   useEffect(() => {
-    // Function to fetch all data
-    const fetchData = async () => {
-      const loadingToast = toast.loading('Fetching market data...');
-      try {
-        // Fetch all data in parallel
-        const [fgiResponse, btcResponse] = await Promise.all([
-          fetch('/api/fear-greed?limit=90'),
-          fetch('/api/bitcoin-price?days=90'),
-        ]);
-        const [fgiData, btcData] = await Promise.all([
-          fgiResponse.json(),
-          btcResponse.json(),
-        ]);
-
-        if (fgiData.data && fgiData.data[0]) {
-          setCurrentIndex(fgiData.data[0]);
-                 
-          // Format data for charts
-          const formattedData = fgiData.data
-            .slice(0, parseInt(selectedRange))
-            .map((item: FearGreedData) => ({
-              date: new Date(item.timestamp * 1000).toLocaleDateString(),
-              value: parseInt(item.value),
-              classification: item.value_classification
-            }))
-            .reverse();
-          
-          setHistoricalData(formattedData);
-
-          // Prepare combined BTC and FGI data
-          if (btcData.prices) {
-            const combinedData = fgiData.data
-              .slice(0, 90)
-              .map((fgiItem: FearGreedData, index: number) => {
-                const btcPrice = btcData.prices[index] ? btcData.prices[index][1] : null;
-                return {
-                  date: new Date(fgiItem.timestamp * 1000).toLocaleDateString(),
-                  fgi: parseInt(fgiItem.value),
-                  btcPrice: btcPrice,
-                  fgiClassification: fgiItem.value_classification
-                };
-              })
-              .reverse()
-              .filter((item: BTCData) => item.btcPrice !== null);
-            setBtcComparisonData(combinedData);
-          }
-
-          toast.success('Market data updated', {
-            id: loadingToast,
-            duration: 2000,
-          });
-        }
-        
-        setLoading(false);
-      } catch (err: Error | unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch market data.';
-        toast.error(errorMessage, {
-          id: loadingToast,
-          duration: 4000,
-        });
-        setLoading(false);
+    // Handle page visibility changes
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchData();
       }
     };
+
+    // Handle page show events (bfcache restoration)
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        // Page was restored from bfcache
+        fetchData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
 
     // Initial fetch
     fetchData();
 
-    // Set up interval for real-time updates (every 5 minutes)
+    // Set up interval for periodic updates
     const interval = setInterval(fetchData, 5 * 60 * 1000);
 
-    // Clean up on unmount
-    return () => clearInterval(interval);
-  }, [selectedRange]);
+    // Cleanup
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+      clearInterval(interval);
+    };
+  }, [fetchData]);
 
-  // Function to determine the color based on the index value
-  const getIndexColor = (value: number) => {
-    if (value >= 0 && value <= 25) return '#E74C3C'; // Extreme Fear (Red)
-    if (value > 25 && value <= 45) return '#E67E22'; // Fear (Orange)
-    if (value > 45 && value <= 55) return '#F1C40F'; // Neutral (Yellow)
-    if (value > 55 && value <= 75) return '#2ECC71'; // Greed (Green)
-    return '#27AE60'; // Extreme Greed (Dark Green)
+  return null;
+}
+
+export default function Home() {
+  const [currentIndex, setCurrentIndex] = useState<FearGreedData | null>(null);
+  const [historicalData, setHistoricalData] = useState<HistoricalData | null>(null);
+
+  const formatHistoricalData = (data: FearGreedData | null, historical: HistoricalData | null) => {
+    if (!data || !historical) return [];
+    
+    return [
+      { label: 'Now', value: data.value, classification: data.value_classification },
+      { label: 'Yesterday', value: historical.yesterday.value, classification: historical.yesterday.value_classification },
+      { label: 'Last week', value: historical.lastWeek.value, classification: historical.lastWeek.value_classification },
+      { label: 'Last month', value: historical.lastMonth.value, classification: historical.lastMonth.value_classification }
+    ];
   };
 
-  // Custom dot component for the line chart
-  const CustomDot = (props: DotProps) => {
-    const { cx, cy, value, index } = props;
-    return (
-      <circle 
-        key={`dot-${index}`}
-        cx={cx} 
-        cy={cy} 
-        r={4} 
-        fill={getIndexColor(value || 0)}
-        stroke={getIndexColor(value || 0)}
-      />
-    );
-  };
-
-  // Custom active dot component
-  const CustomActiveDot = (props: DotProps) => {
-    const { cx, cy, value, index } = props;
-    return (
-      <circle 
-        key={`active-dot-${index}`}
-        cx={cx} 
-        cy={cy} 
-        r={6} 
-        fill={getIndexColor(value || 0)}
-        stroke="#FFF"
-        strokeWidth={2}
-      />
-    );
-  };
-
- 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <main className="container mx-auto px-4 py-8">
-          <HomeSkeleton />
-        </main>
-      </div>
-    );
-  }
+  // Add event listener for page unload to cleanup resources
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4 tracking-tight">
-            <TypewriterText 
-              text="Crypto Fear & Greed Index"
-              speed={50}
-              delay={500}
-              restartInterval={5000}
-            />
+      {/* Main container with fixed dimensions */}
+      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header Section - Fixed height to prevent shifts */}
+        <div className="text-center h-[120px] sm:h-[140px] mb-8 sm:mb-4 flex flex-col justify-center">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4 tracking-tight">
+            Crypto Fear & Greed Index
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-xl sm:max-w-2xl lg:max-w-3xl mx-auto leading-relaxed">
             Make informed investment decisions by understanding market sentiment through our comprehensive analysis tools
           </p>
         </div>
-        <MarketOverview />
-        {currentIndex && (
-          <div className="container mx-auto px-4 py-8">
-            <div className="max-w-6xl mx-auto">
-              {/* Main content */}
-              <div className="space-y-12">
-                {/* Gauge Indicator Section */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+
+       
+
+        {/* Start Data Fetching in Background */}
+        <FearGreedDataSection onDataLoaded={setCurrentIndex} onHistoricalDataLoaded={setHistoricalData} />
+
+        {/* Gauge Section - Fixed dimensions */}
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="space-y-8 sm:space-y-12">
+              <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 transition-all duration-300 hover:shadow-xl min-h-[500px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="flex flex-col items-center">
-                    <h2 className="text-2xl font-semibold text-gray-800 dark:text-white text-center">
+                    <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white text-center mb-4 sm:mb-6">
                       Crypto Fear and Greed Index today
                     </h2>
-                    <GaugeIndicator 
-                      value={parseInt(currentIndex.value)} 
-                      classification={currentIndex.value_classification}
-                    />
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center">
-                      Last updated: {new Date(currentIndex.timestamp * 1000).toLocaleString()}
-                    </p>
+                    
+                    <div className="w-full flex items-center justify-center">
+                      {currentIndex ? (
+                        <>
+                          <div className="w-full flex flex-col items-center">
+                            <GaugeIndicator 
+                              value={parseInt(currentIndex.value)} 
+                              classification={currentIndex.value_classification}
+                            />
+                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-3 sm:mt-4 text-center">
+                              Last updated: {new Date(currentIndex.timestamp * 1000).toLocaleString()}
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="w-full max-w-md animate-pulse">
+                          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-full mb-4"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-center">
+                    <div className="w-full max-w-md">
+                      {currentIndex && historicalData ? (
+                        <HistoricalValues data={formatHistoricalData(currentIndex, historicalData)} />
+                      ) : (
+                        <div className="animate-pulse space-y-4 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                          {[...Array(4)].map((_, i) => (
+                            <div key={i} className="flex items-center justify-between">
+                              <div className="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                              <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-               <FearAndGreedChart />
-                
-                {/* Historical Chart Section */}
-                <LazyChartSection placeholder={<HistoricalChartSkeleton />}>
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-                    <div className="mb-8">
-                      <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3 text-center">
-                        Fear & Greed Historical Trend Analysis
-                      </h2>
-                      <p className="text-gray-600 dark:text-gray-300 text-base text-center max-w-2xl mx-auto">
-                        Track how market sentiment has evolved over time and identify patterns in investor behavior
-                      </p>
-                    </div>
-                    
-                    <TimeRangeSelector
-                      selectedRange={selectedRange}
-                      onRangeChange={(range) => setSelectedRange(range)}
-                    />
-                    
-                    <div className="h-[400px] mt-8">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart
-                          data={historicalData}
-                          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                          <XAxis 
-                            dataKey="date" 
-                            tick={{ fontSize: 12 }}
-                            interval="preserveEnd"
-                            padding={{ left: 20, right: 20 }}
-                          />
-                          <YAxis 
-                            domain={[0, 100]}
-                            tick={{ fontSize: 12 }}
-                            padding={{ top: 20, bottom: 20 }}
-                          />
-                          <Tooltip 
-                            formatter={(value: number) => [
-                              `${value} (${historicalData.find(d => d.value === value)?.classification || ''})`,
-                              'Index Value'
-                            ]}
-                            labelFormatter={(label) => `Date: ${label}`}
-                            contentStyle={{ 
-                              backgroundColor: '#fff',
-                              border: 'none',
-                              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                              borderRadius: '8px',
-                              padding: '12px'
-                            }}
-                            itemStyle={{ color: '#666' }}
-                          />
-                          <Legend 
-                            wrapperStyle={{
-                              paddingTop: '20px'
-                            }}
-                          />
-                          {/* Reference areas for different zones */}
-                          <ReferenceLine y={25} stroke="#E74C3C" strokeDasharray="3 3" />
-                          <ReferenceLine y={45} stroke="#E67E22" strokeDasharray="3 3" />
-                          <ReferenceLine y={55} stroke="#F1C40F" strokeDasharray="3 3" />
-                          <ReferenceLine y={75} stroke="#2ECC71" strokeDasharray="3 3" />
-                          <Line
-                            type="monotone"
-                            dataKey="value"
-                            name="Fear & Greed Index"
-                            stroke="#666"
-                            strokeWidth={2}
-                            dot={CustomDot}
-                            activeDot={CustomActiveDot}
-                            connectNulls
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                    
-                    <div className="mt-8 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6">
-                      <h3 className="text-base font-semibold text-gray-800 dark:text-white mb-4 text-center">Index Zones Explained</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-sm">
-                        <div className="p-3 rounded-lg bg-[#E74C3C] text-white shadow-sm">
-                          <div className="font-medium">0-25</div>
-                          <div>Extreme Fear</div>
-                        </div>
-                        <div className="p-3 rounded-lg bg-[#E67E22] text-white shadow-sm">
-                          <div className="font-medium">26-45</div>
-                          <div>Fear</div>
-                        </div>
-                        <div className="p-3 rounded-lg bg-[#F1C40F] text-white shadow-sm">
-                          <div className="font-medium">46-55</div>
-                          <div>Neutral</div>
-                        </div>
-                        <div className="p-3 rounded-lg bg-[#2ECC71] text-white shadow-sm">
-                          <div className="font-medium">56-75</div>
-                          <div>Greed</div>
-                        </div>
-                        <div className="p-3 rounded-lg bg-[#27AE60] text-white shadow-sm">
-                          <div className="font-medium">76-100</div>
-                          <div>Extreme Greed</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </LazyChartSection>
 
-                {/* BTC Comparison */}
+                <div className="mt-6 text-center">
+                  <Link 
+                    href="/fear-greed-vs-btc"
+                    className="mt-4 sm:mt-6 text-sm sm:text-base text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors flex items-center gap-1 justify-center"
+                  >
+                    View Historical Analysis & BTC Comparison
+                    <span className="inline-block transform translate-y-px">→</span>
+                  </Link>
+                </div>
+              </div>
+
+ {/* Market Overview - Fixed height container */}
+ <div className="min-h-[100px] mb-8">
+          <MarketOverview />
+        </div>
+              {/* Charts - Fixed height container */}
+              <div className="min-h-[400px]">
+                <FearAndGreedChart />
+              </div>
+              
+              {/* FAQ Section - Fixed height container */}
+              <div className="min-h-[300px]">
                 <LazyChartSection>
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-                    <BTCComparison data={btcComparisonData} />
-                  </div>
-                </LazyChartSection>
-
-                {/* Top Cryptocurrencies Section
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-                  <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
-                    Top 10 Cryptocurrencies
-                  </h2>
-                  <TopCoins />
-                </div> */}
-
-                {/* FAQ Section */}
-                <LazyChartSection>
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
-                    <FAQSection />
-                  </div>
+                  <FAQSection />
                 </LazyChartSection>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

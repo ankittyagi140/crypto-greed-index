@@ -6,7 +6,8 @@ const US_MARKET_INDICES = [
   'sp500',
   'nasdaq',
   'dow-jones',
-  'russell2000'
+  'russell2000',
+  'dollar-index',  
 ] as const;
 
 const PAGES = {
@@ -14,6 +15,21 @@ const PAGES = {
     path: '',
     priority: 1,
     changeFrequency: 'daily' as const,
+  },
+  FEAR_GREED_VS_BTC: {
+    path: 'fear-greed-vs-btc',
+    priority: 1,
+    changeFrequency: 'daily' as const,
+  },
+  SOCIAL_SENTIMENTS_BTC: {
+    path: 'social-sentiments-btc',
+    priority: 1,
+    changeFrequency: 'daily' as const,
+  },
+  DONATE: {
+    path: 'donate',
+    priority: 0.8,
+    changeFrequency: 'monthly' as const,
   },
   US_MARKETS: {
     path: 'us-markets',

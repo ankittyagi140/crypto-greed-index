@@ -13,7 +13,7 @@ export default function TimeRangeSelector({ selectedRange, onRangeChange }: Time
   ];
 
   return (
-    <div className="w-full max-w-[500px] px-2 sm:px-4">
+    <div className="w-full max-w-[500px] px-2 sm:px-4 mx-auto">
       <div className="grid grid-cols-5 sm:inline-flex bg-gray-100 dark:bg-gray-700/50 rounded-lg p-0.5 sm:p-1 gap-0.5 sm:gap-1">
         {ranges.map(({ value, label, fullLabel }) => (
           <button
@@ -21,7 +21,7 @@ export default function TimeRangeSelector({ selectedRange, onRangeChange }: Time
             onClick={() => onRangeChange(value)}
             className={`
               px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium 
-              transition-all duration-200 whitespace-nowrap
+              transition-all duration-200 whitespace-nowrap cursor-pointer
               ${selectedRange === value
                 ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm transform scale-[1.02]'
                 : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'

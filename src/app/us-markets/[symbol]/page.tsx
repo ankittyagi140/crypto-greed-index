@@ -5,7 +5,8 @@ import { Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 import { useParams } from 'next/navigation';
 import MarketMovers from '@/components/MarketMovers';
 import Script from 'next/script';
-
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 const indexInfo = {
   'sp500': {
@@ -148,6 +149,7 @@ export default function IndexDetail() {
   });
   const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const router = useRouter();
 
   // Calculate technical indicators
   const calculateEMA = useCallback((prices: number[], period: number): number => {
@@ -265,6 +267,9 @@ export default function IndexDetail() {
       try {
         setLoading(true);
         setError(null);
+        const loadingToast = toast.loading('Fetching market data...', {
+          position: 'top-right',
+        });
         const response = await fetch(`/api/us-markets/${symbol}?timeRange=${timeRange}`);
         const result = await response.json();
 
@@ -280,9 +285,18 @@ export default function IndexDetail() {
         // Calculate technical indicators after setting historical data
         const indicators = calculateIndicators(historicalData);
         setTechnicalIndicators(indicators);
+
+        toast.success('Market data updated', {
+          id: loadingToast,
+          duration: 2000,
+        });
       } catch (err) {
         console.error('Error fetching market data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch market data');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch market data';
+        setError(errorMessage);
+        toast.error(errorMessage, {
+          duration: 4000,
+        });
       } finally {
         setLoading(false);
       }
@@ -290,6 +304,9 @@ export default function IndexDetail() {
 
     if (symbol) {
       fetchData();
+      // Set up interval for periodic updates
+      const interval = setInterval(fetchData, 5 * 60 * 1000); // Refresh every 5 minutes
+      return () => clearInterval(interval);
     }
   }, [symbol, calculateIndicators, timeRange]);
 
@@ -374,11 +391,6 @@ export default function IndexDetail() {
     return structuredData;
   };
 
-  // if (loading) {
-  //   return (
-     
-  //   );
-  // }
 
   if (error) {
     return (
@@ -423,7 +435,7 @@ export default function IndexDetail() {
           <header className="text-center mb-8 sm:mb-12">
             <div className="flex items-center justify-start mb-4">
               <button
-                onClick={() => window.history.back()}
+                onClick={() => router.push('/us-markets')}
                 className="flex justify-start text-gray-600 dark:text-gray-400 hover:text-[#048f04] dark:hover:text-white transition-colors cursor-pointer"
               >
                 <svg

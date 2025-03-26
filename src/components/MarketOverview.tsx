@@ -208,7 +208,7 @@ export default function MarketOverview() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 max-w-6xl">
+      <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 max-w-7xl">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="rounded-lg p-2 sm:p-3 animate-pulse bg-gray-100 dark:bg-gray-800 h-16 sm:h-20" />
@@ -221,7 +221,7 @@ export default function MarketOverview() {
   if (!marketData) return null;
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 max-w-6xl">
+    <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 max-w-7xl">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Crypto Market Overview</h2>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
