@@ -1,98 +1,59 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 import Providers from '../components/Providers';
 import Script from 'next/script';
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Toaster } from 'react-hot-toast';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  colorScheme: 'dark light',
+};
 
 export const metadata: Metadata = {
-  title: "Crypto Fear & Greed Index Today | Bitcoin Market Sentiment Analysis",
-  description: "Make smarter crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
-  keywords: [
-    "crypto fear and greed index",
-    "bitcoin fear and greed index",
-    "cryptocurrency sentiment",
-    "bitcoin market sentiment",
-    "crypto market analysis",
-    "btc fear and greed",
-    "crypto trading signals",
-    "bitcoin market psychology",
-    "cryptocurrency trading tools",
-    "bitcoin dominance",
-    "market sentiment indicator",
-    "crypto market mood",
-    "bitcoin trading signals",
-    "crypto market trends",
-    "crypto fear and greed index today",
-    "fear and greed index today",
-    "BTCD"
-  ].join(", "),
-  authors: [{ name: "Cryptogreedindex.com" }],
-  creator: "Cryptogreedindex.com",
-  publisher: "Cryptogreedindex.com",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  metadataBase: new URL('https://www.cryptogreedindex.com'),
-  alternates: {
-    canonical: '/',
-  },
+  title: 'Crypto Fear & Greed Index',
+  description: 'Track market sentiment with the Crypto Fear & Greed Index. Make informed investment decisions with real-time market analysis.',
+  keywords: 'crypto fear and greed index, cryptocurrency market sentiment, bitcoin market analysis, crypto market trends',
+  authors: [{ name: 'Crypto Fear & Greed Index' }],
+  creator: 'Crypto Fear & Greed Index',
+  publisher: 'Crypto Fear & Greed Index',
+  robots: 'index, follow',
   openGraph: {
-    title: "Crypto Fear & Greed Index | Live Bitcoin Market Sentiment",
-    description: "Make better crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
-    url: 'https://www.cryptogreedindex.com',
-    siteName: 'Cryptogreedindex.com',
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://cryptofearandgreedindex.com',
+    siteName: 'Crypto Fear & Greed Index',
+    title: 'Crypto Fear & Greed Index',
+    description: 'Track market sentiment with the Crypto Fear & Greed Index. Make informed investment decisions with real-time market analysis.',
     images: [
       {
-        url: '/cryptogreedindex.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Crypto Fear & Greed Index - Live Market Sentiment',
+        alt: 'Crypto Fear & Greed Index',
       },
     ],
-    locale: 'en_US',
-    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Crypto Fear & Greed Index | Live Bitcoin Market Sentiment",
-    description: "Make better crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
-    images: ['/cryptogreedindex.png'],
-    creator: '@cryptogreedindex',
+    title: 'Crypto Fear & Greed Index',
+    description: 'Track market sentiment with the Crypto Fear & Greed Index. Make informed investment decisions with real-time market analysis.',
+    images: ['/og-image.jpg'],
+    creator: '@cryptofeargreed',
   },
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
-  manifest: '/manifest.json',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: 'YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI',
-  },
+  manifest: '/site.webmanifest',
 };
 
 function ThemeInitializer() {
@@ -123,7 +84,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={inter.className} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <ThemeInitializer />
@@ -248,10 +209,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
-        suppressHydrationWarning
-      >
+      <body className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <Providers>
           <div className="flex flex-col min-h-screen">
             <Header/>

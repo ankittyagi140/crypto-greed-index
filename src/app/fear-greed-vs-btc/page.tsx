@@ -21,11 +21,11 @@ interface ChartData {
 }
 
 interface BTCData {
-  date: string;
-  fgi: number;
-  btcPrice: number;
-  fgiClassification: string;
-}
+    date: string;
+    fgi: number;
+    btcPrice: number;
+    fgiClassification: string;
+  }
 
 interface DotProps {
   cx?: number;
@@ -43,7 +43,7 @@ export default function FearGreedVsBTCPage() {
   const [historicalData, setHistoricalData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRange, setSelectedRange] = useState('30');
-  const [btcComparisonData, setBtcComparisonData] = useState<BTCData[]>([]);
+    const [btcComparisonData, setBtcComparisonData] = useState<BTCData[]>([]);
 
   // Function to determine the color based on the index value
   const getIndexColor = (value: number) => {
@@ -85,8 +85,8 @@ export default function FearGreedVsBTCPage() {
     );
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
+    useEffect(() => {
+        const fetchData = async () => {
       const loadingToast = toast.loading('Fetching market data...');
       try {
         const [fgiResponse, btcResponse] = await Promise.all([
@@ -112,27 +112,27 @@ export default function FearGreedVsBTCPage() {
           setHistoricalData(formattedData);
 
           // Prepare combined BTC and FGI data
-          if (btcData.prices) {
-            const combinedData = fgiData.data
-              .slice(0, 90)
-              .map((fgiItem: FearGreedData, index: number) => {
-                const btcPrice = btcData.prices[index] ? btcData.prices[index][1] : null;
-                return {
-                  date: new Date(fgiItem.timestamp * 1000).toLocaleDateString(),
-                  fgi: parseInt(fgiItem.value),
-                  btcPrice: btcPrice,
-                  fgiClassification: fgiItem.value_classification
-                };
-              })
-              .reverse()
-              .filter((item: BTCData) => item.btcPrice !== null);
-            setBtcComparisonData(combinedData);
-          }
+            if (btcData.prices) {
+                const combinedData = fgiData.data
+                  .slice(0, 90)
+                  .map((fgiItem: FearGreedData, index: number) => {
+                    const btcPrice = btcData.prices[index] ? btcData.prices[index][1] : null;
+                    return {
+                      date: new Date(fgiItem.timestamp * 1000).toLocaleDateString(),
+                      fgi: parseInt(fgiItem.value),
+                      btcPrice: btcPrice,
+                      fgiClassification: fgiItem.value_classification
+                    };
+                  })
+                  .reverse()
+                  .filter((item: BTCData) => item.btcPrice !== null);
+                setBtcComparisonData(combinedData);
+              }
 
-          toast.success('Market data updated', {
-            id: loadingToast,
-            duration: 2000,
-          });
+              toast.success('Market data updated', {
+                id: loadingToast,
+                duration: 2000,
+              });
         }
         
         setLoading(false);
@@ -146,7 +146,7 @@ export default function FearGreedVsBTCPage() {
       }
     };
 
-    fetchData();
+        fetchData();
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [selectedRange]);
@@ -284,10 +284,10 @@ export default function FearGreedVsBTCPage() {
 
             {/* BTC Comparison */}
             <LazyChartSection>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
-                <BTCComparison data={btcComparisonData} />
-              </div>
-            </LazyChartSection>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+                    <BTCComparison data={btcComparisonData} />
+                  </div>
+                </LazyChartSection>
 
           </div>
             {/* Theory Section */}

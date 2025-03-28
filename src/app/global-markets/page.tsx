@@ -11,6 +11,7 @@ import {
   GlobeEuropeAfricaIcon,
   SunIcon 
 } from '@heroicons/react/24/solid';
+import Link from 'next/link';
 
 interface IndexData {
   key: string;
@@ -207,28 +208,51 @@ const IndexCard = ({ data }: { data: IndexData }) => {
     : '';
 
   return (
-    <article className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-200" aria-label={`${name} Market Index from ${country}`}>
+    <article 
+      className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-200" 
+      aria-label={`${name} Market Index from ${country}`}
+      itemScope
+      itemType="https://schema.org/FinancialProduct"
+      itemProp="offers"
+      data-market-status={marketClosed ? 'closed' : 'open'}
+    >
+      <meta itemProp="name" content={name} />
+      <meta itemProp="category" content="Stock Market Index" />
+      <meta itemProp="marketStatus" content={marketClosed ? 'Closed' : 'Open'} />
+      <meta itemProp="price" content={currentStats.price.toString()} />
+      <meta itemProp="priceCurrency" content="USD" />
+      
       <div className="flex flex-col h-full">
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white" itemProp="name">
                 {name}
               </h3>
               {marketClosed && (
-                <span className="px-3 py-1 text-xs font-medium bg-gray-900 text-white rounded-full">
+                <span 
+                  className="px-3 py-1 text-xs font-medium bg-gray-900 text-white rounded-full"
+                  aria-label="Market is closed"
+                >
                   CLOSED
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400" itemProp="location">
               {country}
             </p>
-            <p className="text-2xl sm:text-3xl font-bold mt-2" aria-label={`Current price: ${currentStats.price.toLocaleString()}`}>
+            <p 
+              className="text-2xl sm:text-3xl font-bold mt-2" 
+              aria-label={`Current price: ${currentStats.price.toLocaleString()}`}
+              itemProp="price"
+            >
               {currentStats.price.toLocaleString()}
             </p>
-            <div className={`flex items-center mt-1 ${currentStats.change >= 0 ? 'text-green-500' : 'text-red-500'}`} 
-                 aria-label={`Price change: ${currentStats.change >= 0 ? 'up' : 'down'} ${Math.abs(currentStats.change).toFixed(2)} points (${currentStats.changePercent.toFixed(2)}%)`}>
+            <div 
+              className={`flex items-center mt-1 ${currentStats.change >= 0 ? 'text-green-500' : 'text-red-500'}`} 
+              aria-label={`Price change: ${currentStats.change >= 0 ? 'up' : 'down'} ${Math.abs(currentStats.change).toFixed(2)} points (${currentStats.changePercent.toFixed(2)}%)`}
+              itemProp="priceChange"
+            >
               {currentStats.change >= 0 ? (
                 <ArrowUpIcon className="h-4 w-4 mr-1" aria-hidden="true" />
               ) : (
@@ -239,12 +263,20 @@ const IndexCard = ({ data }: { data: IndexData }) => {
               </span>
             </div>
             {formattedTime && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1" aria-label={`Last updated at ${formattedTime}`}>
+              <p 
+                className="text-xs text-gray-500 dark:text-gray-400 mt-1" 
+                aria-label={`Last updated at ${formattedTime}`}
+                itemProp="dateModified"
+              >
                 As of {formattedTime}
               </p>
             )}
           </div>
-          <div className="w-24 h-16 sm:w-32 sm:h-20" aria-hidden="true">
+          <div 
+            className="w-24 h-16 sm:w-32 sm:h-20" 
+            aria-hidden="true"
+            itemProp="priceHistory"
+          >
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={historicalData}>
                 <Line
@@ -262,15 +294,21 @@ const IndexCard = ({ data }: { data: IndexData }) => {
         <div className="grid grid-cols-2 gap-4 mt-auto">
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">YTD</p>
-            <p className={`text-sm font-semibold ${currentStats.yearToDateChange >= 0 ? 'text-green-500' : 'text-red-500'}`}
-               aria-label={`Year to date change: ${currentStats.yearToDateChange >= 0 ? 'up' : 'down'} ${Math.abs(currentStats.yearToDatePercent).toFixed(2)}%`}>
+            <p 
+              className={`text-sm font-semibold ${currentStats.yearToDateChange >= 0 ? 'text-green-500' : 'text-red-500'}`}
+              aria-label={`Year to date change: ${currentStats.yearToDateChange >= 0 ? 'up' : 'down'} ${Math.abs(currentStats.yearToDatePercent).toFixed(2)}%`}
+              itemProp="yearToDateChange"
+            >
               {currentStats.yearToDateChange >= 0 ? '+' : ''}{currentStats.yearToDatePercent.toFixed(2)}%
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Volume</p>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300"
-               aria-label={`Trading volume: ${(currentStats.volume / 1000000).toFixed(1)} million`}>
+            <p 
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+              aria-label={`Trading volume: ${(currentStats.volume / 1000000).toFixed(1)} million`}
+              itemProp="tradingVolume"
+            >
               {(currentStats.volume / 1000000).toFixed(1)}M
             </p>
           </div>
@@ -387,9 +425,39 @@ export default function GlobalMarkets() {
           </p>
         </header>
 
-        {Object.entries(marketData).map(([region, indices]) => (
-          <RegionSection key={region} title={region} data={indices} />
-        ))}
+        <nav aria-label="Market regions" className="mb-8">
+          <ul className="flex flex-wrap justify-center gap-4">
+            {Object.keys(marketData).map((region) => (
+              <li key={region}>
+                <a 
+                  href={`#region-${region.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="text-sm font-medium text-gray-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white"
+                >
+                  {region}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div role="region" aria-label="Global market data">
+          {Object.entries(marketData).map(([region, indices]) => (
+            <RegionSection key={region} title={region} data={indices} />
+          ))}
+        </div>
+
+        <footer className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p>Data is updated every 5 minutes. Market hours are in UTC.</p>
+          <p className="mt-2">
+            <Link 
+              href="/about" 
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              aria-label="Learn more about our data sources"
+            >
+              Learn more about our data sources
+            </Link>
+          </p>
+        </footer>
       </main>
     </div>
   );
