@@ -4,7 +4,6 @@ import { useEffect, Suspense } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
-import Link from 'next/link';
 
 // Dynamically import components with loading fallbacks
 const MarketMovers = dynamic(() => import('@/components/MarketMovers'), {
