@@ -107,6 +107,15 @@ const useIntersectionObserver = (options = {}) => {
   return [setRef, isVisible] as const;
 };
 
+// Add helper function to format market cap
+const formatMarketCap = (value: string) => {
+  const numValue = parseFloat(value);
+  if (numValue >= 1000) {
+    return `$${(numValue / 1000).toFixed(2)}T`;
+  }
+  return `$${numValue.toFixed(2)}B`;
+};
+
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState<FearGreedData | null>(null);
   const [historicalData, setHistoricalData] = useState<HistoricalData | null>(null);
@@ -237,7 +246,7 @@ export default function Home() {
             <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm overflow-x-auto whitespace-nowrap">
               <div className="flex items-center gap-2">
                 <span className="text-gray-500 dark:text-gray-400">Market Cap: </span>
-                <span className="text-gray-900 dark:text-white">${marketStats.marketCap.value}B</span>
+                <span className="text-gray-900 dark:text-white">{formatMarketCap(marketStats.marketCap.value)}</span>
                 {parseFloat(marketStats.marketCap.change) !== 0 && (
                   <span className={parseFloat(marketStats.marketCap.change) > 0 ? 'text-green-500' : 'text-red-500'}>
                     {parseFloat(marketStats.marketCap.change) > 0 ? '↑' : '↓'} {Math.abs(parseFloat(marketStats.marketCap.change))}%
@@ -421,17 +430,21 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Charts - Lazy loaded */}
-              <div className="min-h-[400px]">
+              {/* Charts - Lazy loaded with fixed height */}
+              <div className="min-h-[400px] w-full">
                 <LazyChartSection>
                   <FearAndGreedChart />
                 </LazyChartSection>
               </div>
 
-              {/* Market Cards Section - Lazy loaded */}
-              <section ref={marketCardsRef} className="py-8 sm:py-10 lg:py-12" aria-labelledby="market-sections">
-                {marketCardsVisible && (
-                   <LazyChartSection>
+              {/* Market Cards Section - Lazy loaded with fixed height */}
+              <section 
+                ref={marketCardsRef} 
+                className="py-8 sm:py-10 lg:py-12 min-h-[600px] w-full" 
+                aria-labelledby="market-sections"
+              >
+                {marketCardsVisible ? (
+                  <LazyChartSection>
                     <h2 id="market-sections" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 text-center">
                       Market Overview
                     </h2>
@@ -456,15 +469,40 @@ export default function Home() {
                       />
                     </div>
                   </LazyChartSection>
+                ) : (
+                  <div className="animate-pulse space-y-6">
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-4"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </section>
 
-              {/* FAQ Section - Lazy loaded */}
-              <div ref={faqRef} className="min-h-[300px]">
-                {faqVisible && (
+              {/* FAQ Section - Lazy loaded with fixed height */}
+              <div ref={faqRef} className="min-h-[400px] w-full">
+                {faqVisible ? (
                   <LazyChartSection>
                     <FAQSection />
                   </LazyChartSection>
+                ) : (
+                  <div className="animate-pulse space-y-6">
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
+                    <div className="space-y-4">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
