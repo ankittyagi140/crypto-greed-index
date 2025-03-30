@@ -23,7 +23,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Analysis</h3>
             <ul className="space-y-2">
@@ -53,7 +53,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/top-coins" className="text-gray-600 dark:text-gray-300 hover:text-[#048f04] dark:hover:text-white transition-colors">
+                <Link href="/top-crypto" className="text-gray-600 dark:text-gray-300 hover:text-[#048f04] dark:hover:text-white transition-colors">
                   Top 100 Crypto
                 </Link>
               </li>
@@ -100,7 +100,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Legal</h3>
             <ul className="space-y-2">
@@ -152,7 +152,7 @@ export default function Footer() {
             </Link>
           </div>
         </div>
-        
+
         <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
           <p className="text-center text-gray-600 dark:text-gray-300 text-sm">
             © {new Date().getFullYear()} www.cryptogreedindex.com. All rights reserved.

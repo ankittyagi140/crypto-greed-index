@@ -97,13 +97,13 @@ export default function ClientPage({ id }: Props) {
         }
         const result = await response.json();
         setData(result.data);
-        toast.success('Data updated successfully', { 
+        toast.success('Data updated successfully', {
           id: loadingToast,
           duration: 3000,
         });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load coin data';
-        toast.error(errorMessage, { 
+        toast.error(errorMessage, {
           id: loadingToast,
           duration: 4000,
         });
@@ -140,7 +140,7 @@ export default function ClientPage({ id }: Props) {
   // Calculate high and low prices from filtered data
   const chartStats = useMemo(() => {
     if (!filteredHistoricalData.length) return { high: 0, low: 0 };
-    
+
     const prices = filteredHistoricalData.map(item => item.price);
     return {
       high: Math.max(...prices),
@@ -151,11 +151,11 @@ export default function ClientPage({ id }: Props) {
   // Calculate price change for color gradient
   const getPriceChangeColor = () => {
     if (!filteredHistoricalData.length) return '#3B82F6';
-    
+
     const firstPrice = filteredHistoricalData[0].price;
     const lastPrice = filteredHistoricalData[filteredHistoricalData.length - 1].price;
     const change = ((lastPrice - firstPrice) / firstPrice) * 100;
-    
+
     return change >= 0 ? '#22C55E' : '#EF4444'; // green-500 : red-500
   };
 
@@ -255,7 +255,7 @@ export default function ClientPage({ id }: Props) {
             Coin not found
           </h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            The requested coin could not be found. Go back to the <Link href="/top-coins" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">top coins</Link> page.
+            The requested coin could not be found. Go back to the <Link href="/top-crypto" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">top gainers</Link> page.
           </p>
         </div>
       </div>
@@ -272,7 +272,7 @@ export default function ClientPage({ id }: Props) {
         />
       )}
 
-<Toaster
+      <Toaster
         position="top-right"
         reverseOrder={false}
         gutter={8}
@@ -308,7 +308,7 @@ export default function ClientPage({ id }: Props) {
         {/* Header Section */}
         <div className="mb-6 sm:mb-8">
           <button
-            onClick={() => router.push('/top-coins')}
+            onClick={() => router.push('/top-crypto')}
             className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4 cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -328,11 +328,10 @@ export default function ClientPage({ id }: Props) {
                 <button
                   key={range}
                   onClick={() => setTimeRange(range as typeof timeRange)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
-                    timeRange === range
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${timeRange === range
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
                 >
                   {range}
                 </button>
@@ -386,17 +385,17 @@ export default function ClientPage({ id }: Props) {
               <AreaChart data={filteredHistoricalData}>
                 <defs>
                   <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={getPriceChangeColor()} stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor={getPriceChangeColor()} stopOpacity={0}/>
+                    <stop offset="5%" stopColor={getPriceChangeColor()} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={getPriceChangeColor()} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tick={{ fontSize: 12 }}
                   tickFormatter={(value) => formatDate(value)}
                 />
-                <YAxis 
+                <YAxis
                   tick={{ fontSize: 12 }}
                   tickFormatter={(value) => `$${formatNumber(value)}`}
                 />

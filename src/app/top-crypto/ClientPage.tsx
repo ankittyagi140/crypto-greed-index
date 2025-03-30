@@ -35,6 +35,9 @@ export default function ClientPage() {
   const totalPages = 10; // 100 coins total / 20 coins per page
   const router = useRouter();
 
+
+  // Add time period filters
+
   useEffect(() => {
     const fetchCoins = async () => {
       const loadingToast = toast.loading('Fetching cryptocurrency data...', {
@@ -101,6 +104,12 @@ export default function ClientPage() {
       }))
     }
   };
+
+  // Add market stats summary
+
+
+  // Add filter controls
+
 
   if (isLoading) {
     return (
@@ -248,9 +257,9 @@ export default function ClientPage() {
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {coins?.map((coin) => (
-                  <tr 
-                    key={coin.id} 
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" 
+                  <tr
+                    key={coin.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     onClick={() => handleCoinClick(coin.id)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -295,8 +304,8 @@ export default function ClientPage() {
                       ${coin.current_price.toLocaleString()}
                     </td>
                     <td className={`px-6 py-4 whitespace-nowrap text-right text-sm font-medium ${coin.price_change_percentage_24h >= 0
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-red-600 dark:text-red-400'
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-600 dark:text-red-400'
                       }`}>
                       {coin.price_change_percentage_24h >= 0 ? '▲' : '▼'} {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                     </td>
@@ -322,7 +331,7 @@ export default function ClientPage() {
         </div>
         {/* Pagination */}
         <div className="flex justify-center items-center space-x-2 py-4">
-          <ResponsivePagination 
+          <ResponsivePagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={paginate}

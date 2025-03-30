@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import LazyChartSection from '@/components/LazyChartSection';
-import { FAQSkeleton } from '@/components/ChartSkeletons';
 import Link from 'next/link';
 import {
   ChartBarIcon,
@@ -28,7 +27,25 @@ import {
 // Lazy load components with custom loading states
 
 const FAQSection = dynamic(() => import('@/components/FAQSection'), {
-  loading: () => <FAQSkeleton />,
+  loading: () => (
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+            >
+              <div className="p-4">
+                <div className="h-6 bg-gray-100 dark:bg-gray-700 rounded w-3/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
   ssr: false
 });
 
@@ -116,6 +133,49 @@ const formatMarketCap = (value: string) => {
   return `$${numValue.toFixed(2)}B`;
 };
 
+// Helper function inline since it's only used here
+const classNames = (...classes: string[]) => {
+  return classes.filter(Boolean).join(' ');
+};
+
+const marketImplications = [
+  {
+    range: "Extreme Fear (0-25)",
+    implication: "Potential buying opportunity",
+    color: "text-red-600 dark:text-red-400",
+    bgColor: "bg-red-50 dark:bg-red-900/10",
+    borderColor: "border-red-200 dark:border-red-800"
+  },
+  {
+    range: "Fear (26-45)",
+    implication: "Caution with bearish bias",
+    color: "text-orange-600 dark:text-orange-400",
+    bgColor: "bg-orange-50 dark:bg-orange-900/10",
+    borderColor: "border-orange-200 dark:border-orange-800"
+  },
+  {
+    range: "Neutral (46-55)",
+    implication: "Market indecision",
+    color: "text-yellow-600 dark:text-yellow-400",
+    bgColor: "bg-yellow-50 dark:bg-yellow-900/10",
+    borderColor: "border-yellow-200 dark:border-yellow-800"
+  },
+  {
+    range: "Greed (56-75)",
+    implication: "Caution with bullish bias",
+    color: "text-lime-600 dark:text-lime-400",
+    bgColor: "bg-lime-50 dark:bg-lime-900/10",
+    borderColor: "border-lime-200 dark:border-lime-800"
+  },
+  {
+    range: "Extreme Greed (76-100)",
+    implication: "Potential selling opportunity",
+    color: "text-green-600 dark:text-green-400",
+    bgColor: "bg-green-50 dark:bg-green-900/10",
+    borderColor: "border-green-200 dark:border-green-800"
+  }
+];
+
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState<FearGreedData | null>(null);
   const [historicalData, setHistoricalData] = useState<HistoricalData | null>(null);
@@ -138,7 +198,7 @@ export default function Home() {
   });
 
   // Add intersection observer for FAQ section
-  const [faqRef, faqVisible] = useIntersectionObserver({
+  const [faqRef] = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: '50px'
   });
@@ -297,7 +357,7 @@ export default function Home() {
                 <TwitterShareButton
                   url={typeof window !== 'undefined' ? window.location.href : ''}
                   title={`Crypto Market Stats:
-                    Market Cap: $${marketStats.marketCap.value}B (${marketStats.marketCap.change}%)
+                    Market Cap: ${formatMarketCap(marketStats.marketCap.value)} (${marketStats.marketCap.change}%)
                     BTC Dominance: ${marketStats.btcDominance.value}%
                     ETH Dominance: ${marketStats.ethDominance.value}%
                     Altcoin Dominance: ${marketStats.altcoinDominance.value}%
@@ -314,7 +374,7 @@ export default function Home() {
                 <TelegramShareButton
                   url={typeof window !== 'undefined' ? window.location.href : ''}
                   title={`Crypto Market Stats:
-                  Market Cap: $${marketStats.marketCap.value}B (${marketStats.marketCap.change}%)
+                  Market Cap: ${formatMarketCap(marketStats.marketCap.value)} (${marketStats.marketCap.change}%)
                   BTC Dominance: ${marketStats.btcDominance.value}%
                   ETH Dominance: ${marketStats.ethDominance.value}%
                   Altcoin Dominance: ${marketStats.altcoinDominance.value}%
@@ -325,7 +385,7 @@ export default function Home() {
                 <WhatsappShareButton
                   url={typeof window !== 'undefined' ? window.location.href : ''}
                   title={`Crypto Market Stats:
-                  Market Cap: $${marketStats.marketCap.value}B (${marketStats.marketCap.change}%)
+                  Market Cap: ${formatMarketCap(marketStats.marketCap.value)} (${marketStats.marketCap.change}%)
                   BTC Dominance: ${marketStats.btcDominance.value}%
                   ETH Dominance: ${marketStats.ethDominance.value}%
                   Altcoin Dominance: ${marketStats.altcoinDominance.value}%
@@ -340,7 +400,7 @@ export default function Home() {
                     navigator.share({
                       title: 'Crypto Market Stats',
                       text: `Crypto Market Stats:
-                    Market Cap: $${marketStats.marketCap.value}B (${marketStats.marketCap.change}%)
+                    Market Cap: ${formatMarketCap(marketStats.marketCap.value)} (${marketStats.marketCap.change}%)
                     BTC Dominance: ${marketStats.btcDominance.value}%
                     ETH Dominance: ${marketStats.ethDominance.value}%
                     Altcoin Dominance: ${marketStats.altcoinDominance.value}%
@@ -430,6 +490,57 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Understanding Market Sentiment */}
+              <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                  Understanding Market Sentiment
+                </h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Key Indicators */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Key Indicators</h3>
+                    <ul className="space-y-2">
+                      {[
+                        'Market Volatility',
+                        'Trading Volume',
+                        'Social Media Sentiment',
+                        'Market Dominance',
+                        'Trends and Momentum'
+                      ].map((indicator) => (
+                        <li key={indicator} className="flex items-center text-gray-600 dark:text-gray-400">
+                          <span className="mr-2">•</span>
+                          {indicator}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Market Implications */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Market Implications</h3>
+                    <div className="space-y-3">
+                      {marketImplications.map((item) => (
+                        <div
+                          key={item.range}
+                          className={classNames(
+                            "rounded-lg border p-3 transition-all hover:shadow-md",
+                            item.bgColor,
+                            item.borderColor
+                          )}
+                        >
+                          <div className={classNames("font-medium", item.color)}>
+                            {item.range}
+                          </div>
+                          <div className="text-sm mt-1 text-gray-600 dark:text-gray-400">
+                            {item.implication}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
               {/* Charts - Lazy loaded with fixed height */}
               <div className="min-h-[400px] w-full">
                 <LazyChartSection>
@@ -437,78 +548,99 @@ export default function Home() {
                 </LazyChartSection>
               </div>
 
-              {/* Market Cards Section - Lazy loaded with fixed height */}
-              <section 
-                ref={marketCardsRef} 
-                className="py-8 sm:py-10 lg:py-12 min-h-[600px] w-full" 
+              {/* Market Cards Section */}
+              <section
+                ref={marketCardsRef}
+                className="py-8 sm:py-10 lg:py-12 w-full min-h-[500px]"
                 aria-labelledby="market-sections"
               >
-                {marketCardsVisible ? (
-                  <LazyChartSection>
-                    <h2 id="market-sections" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 text-center">
-                      Market Overview
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                      <MarketCard
-                        href="/us-markets"
-                        title="US Markets"
-                        description="Track real-time performance of major US stock indices including S&P 500, NASDAQ, Dow Jones, and Russell 2000."
-                        icon={ChartBarIcon}
-                      />
-                      <MarketCard
-                        href="/global-markets"
-                        title="Global Markets"
-                        description="Monitor major stock indices worldwide including Asia Pacific, Europe, Americas, and Middle East markets."
-                        icon={GlobeAltIcon}
-                      />
-                      <MarketCard
-                        href="/top-coins"
-                        title="Top Cryptocurrencies"
-                        description="Stay updated with real-time cryptocurrency prices, market trends, and trading volumes."
-                        icon={CurrencyDollarIcon}
-                      />
+                <div className="max-w-7xl mx-auto">
+                  {marketCardsVisible ? (
+                    <div className="w-full">
+                      <h2 id="market-sections" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 text-center">
+                        Market Overview
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                        <MarketCard
+                          href="/us-markets"
+                          title="US Markets"
+                          description="Track real-time performance of major US stock indices including S&P 500, NASDAQ, Dow Jones, and Russell 2000."
+                          icon={ChartBarIcon}
+                        />
+                        <MarketCard
+                          href="/global-markets"
+                          title="Global Markets"
+                          description="Monitor major stock indices worldwide including Asia Pacific, Europe, Americas, and Middle East markets."
+                          icon={GlobeAltIcon}
+                        />
+                        <MarketCard
+                          href="/top-crypto"
+                          title="Top Cryptocurrencies"
+                          description="Stay updated with real-time cryptocurrency prices, market trends, and trading volumes."
+                          icon={CurrencyDollarIcon}
+                        />
+                      </div>
                     </div>
-                  </LazyChartSection>
-                ) : (
-                  <div className="animate-pulse space-y-6">
-                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4"></div>
-                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-4"></div>
-                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-                        </div>
-                      ))}
+                  ) : (
+                    <div className="animate-pulse">
+                      <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto mb-6 sm:mb-8"></div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                        {[...Array(3)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 min-h-[180px]"
+                          >
+                            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                              <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                              <div className="h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                            </div>
+                            <div className="mt-4 flex items-center">
+                              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                              <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded-full ml-2"></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </section>
 
-              {/* FAQ Section - Lazy loaded with fixed height */}
-              <div ref={faqRef} className="min-h-[400px] w-full">
-                {faqVisible ? (
-                  <LazyChartSection>
+              {/* FAQ Section */}
+              <section className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12">
+                <div className="max-w-4xl mx-auto px-4">
+                  <div ref={faqRef}>
                     <FAQSection />
-                  </LazyChartSection>
-                ) : (
-                  <div className="animate-pulse space-y-6">
-                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
-                    <div className="space-y-4">
-                      {[...Array(4)].map((_, i) => (
-                        <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
-                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                        </div>
-                      ))}
-                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              </section>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Disclaimer Section */}
+      <section className="max-w-4xl mx-auto px-4 py-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-4">Disclaimer</h2>
+          <div className="prose dark:prose-invert max-w-none">
+            <h3 className="text-lg font-semibold mb-2">No Investment Advice</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+              The information provided on this website does not constitute investment advice,
+              financial advice, trading advice, or any other sort of advice and you should not
+              treat any of the website&lsquo;s content as such. Alternative.me does not recommend
+              that any cryptocurrency should be bought, sold, or held by you. Do conduct your
+              own due diligence and consult your financial advisor before making any investment
+              decisions.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
