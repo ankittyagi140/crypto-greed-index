@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { toast } from 'react-hot-toast';
-import { 
-  ArrowUpIcon, 
-  ArrowDownIcon, 
-  GlobeAsiaAustraliaIcon, 
-  GlobeAmericasIcon, 
+import {
+  ArrowUpIcon,
+  ArrowDownIcon,
+  GlobeAsiaAustraliaIcon,
+  GlobeAmericasIcon,
   GlobeEuropeAfricaIcon,
-  SunIcon 
+  SunIcon
 } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 
@@ -142,8 +142,8 @@ const MARKET_HOURS = {
 } as const;
 
 const IndexCard = ({ data }: { data: IndexData }) => {
-  const { currentStats, historicalData, name, country } = data;
-  
+  const { currentStats, name, country } = data;
+
   // Get current time in UTC
   const now = new Date();
   const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
@@ -151,8 +151,8 @@ const IndexCard = ({ data }: { data: IndexData }) => {
   // Check if market is closed based on trading hours and last update
   const isMarketClosed = () => {
     // If no recent update (more than 15 minutes), consider it closed
-    if (!currentStats.regularMarketTime || 
-        (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 15 * 60 * 1000) {
+    if (!currentStats.regularMarketTime ||
+      (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 15 * 60 * 1000) {
       return true;
     }
 
@@ -197,121 +197,145 @@ const IndexCard = ({ data }: { data: IndexData }) => {
   };
 
   const marketClosed = isMarketClosed();
-  
 
-  const formattedTime = currentStats.regularMarketTime 
+  const formattedTime = currentStats.regularMarketTime
     ? new Date(currentStats.regularMarketTime).toLocaleTimeString(undefined, {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      })
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    })
     : '';
 
+  // Calculate 7D change percentage
+  const calculate7DayChange = () => {
+    if (!data.historicalData || data.historicalData.length < 2) return null;
+
+    const latestPrice = data.historicalData[data.historicalData.length - 1].value;
+    const sevenDaysAgoPrice = data.historicalData[0].value;
+
+    if (!latestPrice || !sevenDaysAgoPrice) return null;
+
+    const changePercent = ((latestPrice - sevenDaysAgoPrice) / sevenDaysAgoPrice) * 100;
+    return changePercent;
+  };
+
+  const sevenDayChange = calculate7DayChange();
+  const isPositive = currentStats.change >= 0;
+
   return (
-    <article 
-      className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-200" 
-      aria-label={`${name} Market Index from ${country}`}
-      itemScope
-      itemType="https://schema.org/FinancialProduct"
-      itemProp="offers"
-      data-market-status={marketClosed ? 'closed' : 'open'}
+    <article
+      className={`
+        relative overflow-hidden rounded-xl shadow-lg 
+        ${isPositive
+          ? 'bg-gradient-to-br from-green-50/50 to-white dark:from-green-900/20 dark:to-gray-800'
+          : 'bg-gradient-to-br from-red-50/50 to-white dark:from-red-900/20 dark:to-gray-800'
+        }
+      `}
     >
-      <meta itemProp="name" content={name} />
-      <meta itemProp="category" content="Stock Market Index" />
-      <meta itemProp="marketStatus" content={marketClosed ? 'Closed' : 'Open'} />
-      <meta itemProp="price" content={currentStats.price.toString()} />
-      <meta itemProp="priceCurrency" content="USD" />
-      
-      <div className="flex flex-col h-full">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white" itemProp="name">
-                {name}
-              </h3>
-              {marketClosed && (
-                <span 
-                  className="px-3 py-1 text-xs font-medium bg-gray-900 text-white rounded-full"
-                  aria-label="Market is closed"
-                >
-                  CLOSED
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400" itemProp="location">
-              {country}
-            </p>
-            <p 
-              className="text-2xl sm:text-3xl font-bold mt-2" 
-              aria-label={`Current price: ${currentStats.price.toLocaleString()}`}
-              itemProp="price"
-            >
-              {currentStats.price.toLocaleString()}
-            </p>
-            <div 
-              className={`flex items-center mt-1 ${currentStats.change >= 0 ? 'text-green-500' : 'text-red-500'}`} 
-              aria-label={`Price change: ${currentStats.change >= 0 ? 'up' : 'down'} ${Math.abs(currentStats.change).toFixed(2)} points (${currentStats.changePercent.toFixed(2)}%)`}
-              itemProp="priceChange"
-            >
-              {currentStats.change >= 0 ? (
-                <ArrowUpIcon className="h-4 w-4 mr-1" aria-hidden="true" />
-              ) : (
-                <ArrowDownIcon className="h-4 w-4 mr-1" aria-hidden="true" />
-              )}
-              <span className="text-sm sm:text-base">
-                {currentStats.change >= 0 ? '+' : ''}{currentStats.change.toFixed(2)} ({currentStats.changePercent.toFixed(2)}%)
-              </span>
-            </div>
-            {formattedTime && (
-              <p 
-                className="text-xs text-gray-500 dark:text-gray-400 mt-1" 
-                aria-label={`Last updated at ${formattedTime}`}
-                itemProp="dateModified"
-              >
-                As of {formattedTime}
-              </p>
+      <div className="relative p-6">
+        {/* Status Badge */}
+        <div className="absolute top-2 right-2">
+          <span className="px-2 py-0.5 text-xs font-medium bg-gray-900/10 dark:bg-gray-700/50 rounded-full">
+            {marketClosed ? 'CLOSED' : 'OPEN'}
+          </span>
+        </div>
+
+        {/* Header */}
+        <div className="mb-2">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight pr-24">
+            {name}
+          </h3>
+        </div>
+
+        {/* Price and Change - Updated to prevent text overflow */}
+        <div className="flex flex-col mb-2">
+          <p className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight tabular-nums mb-1">
+            {currentStats.price.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
+          </p>
+          <div className={`
+            flex items-center text-sm
+            ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
+          `}>
+            {isPositive ? (
+              <ArrowUpIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+            ) : (
+              <ArrowDownIcon className="h-4 w-4 mr-1 flex-shrink-0" />
             )}
-          </div>
-          <div 
-            className="w-24 h-16 sm:w-32 sm:h-20" 
-            aria-hidden="true"
-            itemProp="priceHistory"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={historicalData}>
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke={currentStats.change >= 0 ? '#22c55e' : '#ef4444'}
-                  strokeWidth={2}
-                  dot={false}
-                  opacity={marketClosed ? 0.6 : 1}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <span className="font-bold tabular-nums whitespace-nowrap">
+              {isPositive ? '+' : ''}{currentStats.change.toFixed(2)} ({Math.abs(currentStats.changePercent).toFixed(2)}%)
+            </span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 mt-auto">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">YTD</p>
-            <p 
-              className={`text-sm font-semibold ${currentStats.yearToDateChange >= 0 ? 'text-green-500' : 'text-red-500'}`}
-              aria-label={`Year to date change: ${currentStats.yearToDateChange >= 0 ? 'up' : 'down'} ${Math.abs(currentStats.yearToDatePercent).toFixed(2)}%`}
-              itemProp="yearToDateChange"
-            >
+
+        {/* Time */}
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-4">
+          As of {formattedTime}
+        </p>
+
+        {/* Stats Grid - Updated for better spacing */}
+        <div className="grid grid-cols-3 gap-2 mt-4">
+          <div className="overflow-hidden">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">
+              YTD
+            </p>
+            <p className={`
+              text-sm font-bold tabular-nums whitespace-nowrap
+              ${currentStats.yearToDateChange >= 0
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-red-600 dark:text-red-400'
+              }
+            `}>
               {currentStats.yearToDateChange >= 0 ? '+' : ''}{currentStats.yearToDatePercent.toFixed(2)}%
             </p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Volume</p>
-            <p 
-              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
-              aria-label={`Trading volume: ${(currentStats.volume / 1000000).toFixed(1)} million`}
-              itemProp="tradingVolume"
-            >
+          <div className="overflow-hidden">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">
+              Volume
+            </p>
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums whitespace-nowrap">
               {(currentStats.volume / 1000000).toFixed(1)}M
             </p>
           </div>
+          <div className="overflow-hidden">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">
+              52W Range
+            </p>
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums whitespace-nowrap">
+              {Math.round(((currentStats.high52Week - currentStats.low52Week) / currentStats.low52Week) * 100)}%
+            </p>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div className="absolute top-12 right-4 w-28 h-16">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data.historicalData}>
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={isPositive ? '#22c55e' : '#ef4444'}
+                strokeWidth={1.5}
+                dot={false}
+                isAnimationActive={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          {sevenDayChange !== null && (
+            <div className="absolute -bottom-4 right-0 text-xs font-medium whitespace-nowrap">
+              <span className="text-gray-500 dark:text-gray-400">7D:</span>{' '}
+              <span className={
+                sevenDayChange >= 0
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
+              }>
+                {sevenDayChange >= 0 ? '+' : ''}
+                {sevenDayChange.toFixed(2)}%
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </article>
@@ -429,9 +453,9 @@ export default function GlobalMarkets() {
           <ul className="flex flex-wrap justify-center gap-4">
             {Object.keys(marketData).map((region) => (
               <li key={region}>
-                <a 
+                <a
                   href={`#region-${region.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="text-sm font-medium text-gray-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white"
+                  className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white"
                 >
                   {region}
                 </a>
@@ -449,8 +473,8 @@ export default function GlobalMarkets() {
         <footer className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
           <p>Data is updated every 5 minutes. Market hours are in UTC.</p>
           <p className="mt-2">
-            <Link 
-              href="/about" 
+            <Link
+              href="/about"
               className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               aria-label="Learn more about our data sources"
             >

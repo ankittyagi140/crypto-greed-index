@@ -85,7 +85,7 @@ export default function USMarkets() {
       position: 'top-right',
     });
     try {
-   
+
       const [marketData, moversData] = await Promise.all([
         fetch('/api/us-markets').then(res => res.json()),
         fetch('/api/market-movers').then(res => res.json())
@@ -147,17 +147,17 @@ export default function USMarkets() {
           <nav aria-label="Market sections" className="mb-8">
             <ul className="flex flex-wrap justify-center gap-4">
               <li>
-                <a href="#market-overview" className="text-sm font-medium text-gray-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
+                <a href="#market-overview" className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
                   Market Overview
                 </a>
               </li>
               <li>
-                <a href="#top-companies" className="text-sm font-medium text-gray-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
+                <a href="#top-companies" className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
                   Top Companies
                 </a>
               </li>
               <li>
-                <a href="#market-movers" className="text-sm font-medium text-gray-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
+                <a href="#market-movers" className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
                   Market Movers
                 </a>
               </li>
@@ -171,14 +171,14 @@ export default function USMarkets() {
                 <USMarketOverview />
               </Suspense>
             </section>
-            
+
             <section id="top-companies" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6" aria-labelledby="top-companies-title">
               <h2 id="top-companies-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4">Top Companies by Market Cap</h2>
               <Suspense fallback={<TopCompaniesByMarketCapSkeletonLoader />}>
                 <TopCompaniesByMarketCap />
               </Suspense>
             </section>
-            
+
             <section id="market-movers" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6" aria-labelledby="market-movers-title">
               <h2 id="market-movers-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4">Market Movers</h2>
               <Suspense fallback={<MarketMoversSkeletonLoader />}>
