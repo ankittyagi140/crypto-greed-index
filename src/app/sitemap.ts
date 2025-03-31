@@ -81,6 +81,11 @@ const PAGES = {
     priority: 0.5,
     changeFrequency: 'monthly' as const,
   },
+  EXCHANGES: {
+    path: 'top-crypto-exchanges',
+    priority: 0.9,
+    changeFrequency: 'daily' as const,
+  },
 };
 
 async function getTopCoins() {

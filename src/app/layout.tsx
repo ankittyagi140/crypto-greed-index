@@ -35,9 +35,9 @@ export const metadata: Metadata = {
     'crypto fear index',
     'stock market fear and greed'
   ].join(', '),
-  authors: [{ name: 'Crypto Fear & Greed Index' }],
-  creator: 'Crypto Fear & Greed Index',
-  publisher: 'Crypto Fear & Greed Index',
+  authors: [{ name: 'cryptogreedindex.com' }],
+  creator: 'cryptogreedindex.com',
+  publisher: 'cryptogreedindex.com',
   robots: {
     index: true,
     follow: true,
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     description: 'Real-time Fear & Greed Index tracking for crypto, Bitcoin, and traditional markets. Compare CNN Fear & Greed with crypto market sentiment.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/cryptogreedindex.png',
         width: 1200,
         height: 630,
         alt: 'Crypto Fear & Greed Index'
@@ -69,20 +69,19 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Fear and Greed Index | Live Market Sentiment',
     description: 'Real-time Fear & Greed Index tracking for crypto and traditional markets',
-    images: ['/twitter-image.png'],
-    creator: '@YourTwitterHandle'
+    images: ['/cryptogreedindex.png'],
+    creator: '@AnkiTyagi007'
   },
   icons: {
     icon: '/favicon.ico',
-    apple: '/feargreedindex.png',
+    apple: '/cryptogreedindex.png',
   },
   manifest: '/manifest.json',
   alternates: {
     canonical: 'https://www.cryptogreedindex.com'
   },
   verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
+    google: 'YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI',
   }
 };
 

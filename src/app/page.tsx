@@ -205,8 +205,8 @@ export default function Home() {
 
   // Combined fetch function to reduce number of effects and intervals
   const fetchAllData = useCallback(async () => {
-    const loadingToast = toast.loading('Fetching market data...');
-    try {
+      const loadingToast = toast.loading('Fetching market data...');
+      try {
       // Fetch fear and greed data
       const [currentResponse, historicalResponse] = await Promise.all([
         fetch('/api/fear-greed?limit=1'),
@@ -260,19 +260,19 @@ export default function Home() {
           },
           fearGreedScore: currentData.data[0]?.value || '44'
         });
-      }
+          }
 
-      toast.success('Market data updated', {
-        id: loadingToast,
-        duration: 2000,
-      });
+          toast.success('Market data updated', {
+            id: loadingToast,
+            duration: 2000,
+          });
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Failed to fetch market data', {
-        id: loadingToast,
-        duration: 4000,
-      });
-    }
+          id: loadingToast,
+          duration: 4000,
+        });
+      }
   }, []); // No dependencies needed
 
   useEffect(() => {
@@ -444,13 +444,13 @@ export default function Home() {
                       {currentIndex ? (
                         <>
                           <div className="w-full flex flex-col items-center">
-                            <GaugeIndicator
-                              value={parseInt(currentIndex.value)}
-                              classification={currentIndex.value_classification}
-                            />
+                    <GaugeIndicator 
+                      value={parseInt(currentIndex.value)} 
+                      classification={currentIndex.value_classification}
+                    />
                             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-3 sm:mt-4 text-center">
-                              Last updated: {new Date(currentIndex.timestamp * 1000).toLocaleString()}
-                            </p>
+                      Last updated: {new Date(currentIndex.timestamp * 1000).toLocaleString()}
+                    </p>
                           </div>
                         </>
                       ) : (
@@ -494,7 +494,7 @@ export default function Home() {
               <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                   Understanding Market Sentiment
-                </h2>
+                      </h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Key Indicators */}
                   <div>
@@ -513,8 +513,8 @@ export default function Home() {
                         </li>
                       ))}
                     </ul>
-                  </div>
-
+                    </div>
+                    
                   {/* Market Implications */}
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Market Implications</h3>
@@ -530,10 +530,10 @@ export default function Home() {
                         >
                           <div className={classNames("font-medium", item.color)}>
                             {item.range}
-                          </div>
+                    </div>
                           <div className="text-sm mt-1 text-gray-600 dark:text-gray-400">
                             {item.implication}
-                          </div>
+                        </div>
                         </div>
                       ))}
                     </div>
@@ -559,7 +559,7 @@ export default function Home() {
                     <div className="w-full">
                       <h2 id="market-sections" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 text-center">
                         Market Overview
-                      </h2>
+                  </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         <MarketCard
                           href="/us-markets"
@@ -611,13 +611,13 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* FAQ Section */}
+                {/* FAQ Section */}
               <section className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12">
                 <div className="max-w-4xl mx-auto px-4">
                   <div ref={faqRef}>
                     <FAQSection />
                   </div>
-                </div>
+              </div>
               </section>
             </div>
           </div>
@@ -639,7 +639,7 @@ export default function Home() {
               decisions.
             </p>
           </div>
-        </div>
+      </div>
       </section>
     </div>
   );

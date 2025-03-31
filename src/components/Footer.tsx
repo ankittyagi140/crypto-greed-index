@@ -57,6 +57,11 @@ export default function Footer() {
                   Top 100 Crypto
                 </Link>
               </li>
+              <li>
+                <Link href="/top-crypto-exchanges" className="text-gray-600 dark:text-gray-300 hover:text-[#048f04] dark:hover:text-white transition-colors">
+                  Top Crypto Exchanges
+                </Link>
+              </li>
             </ul>
           </div>
 

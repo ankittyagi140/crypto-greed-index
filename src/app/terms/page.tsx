@@ -35,7 +35,7 @@ export default function TermsAndConditions() {
               <li><strong>Third-party Social Media Service</strong> means any services or content (including data, information, products or services) provided by a third-party that may be displayed, included or made available by the Service.</li>
               <li><strong>Website</strong> refers to cryptogreedindex.com, accessible from <a href="https://www.cryptogreedindex.com" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">https://www.cryptogreedindex.com</a></li>
               <li><strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
-            </ul>
+              </ul>
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">Acknowledgment</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
