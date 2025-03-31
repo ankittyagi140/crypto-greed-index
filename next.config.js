@@ -4,19 +4,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'cryptologos.cc',
-        port: '',
-        pathname: '/logos/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'coin-images.coingecko.com',
+        hostname: 'assets.coingecko.com',
         port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'assets.coingecko.com',
+        hostname: 'cryptologos.cc',
         port: '',
         pathname: '/**',
       },
@@ -26,8 +20,16 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'coin-images.coingecko.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
+  reactStrictMode: true,
+  swcMinify: true,
 }
 
 module.exports = nextConfig 

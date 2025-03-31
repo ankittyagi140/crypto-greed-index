@@ -23,6 +23,30 @@ interface Exchange {
   trust_rank: number;
 }
 
+const ExchangeSkeleton = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 animate-pulse">
+    <div className="flex items-center space-x-4 mb-4">
+      <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+      <div className="flex-1">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mt-2"></div>
+      </div>
+    </div>
+    <div className="space-y-3">
+      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/6"></div>
+      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/6"></div>
+    </div>
+    <div className="mt-4 flex flex-wrap gap-2">
+      <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+      <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+      <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+      <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-28"></div>
+    </div>
+  </div>
+);
+
 export default function TopCryptoExchanges() {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [filteredExchanges, setFilteredExchanges] = useState<Exchange[]>([]);
@@ -138,12 +162,8 @@ export default function TopCryptoExchanges() {
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-8"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                  <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                </div>
+              {Array.from({ length: 20 }).map((_, i) => (
+                <ExchangeSkeleton key={i} />
               ))}
             </div>
           </div>
@@ -320,10 +340,14 @@ export default function TopCryptoExchanges() {
                   </p>
 
                   <div className="space-y-3 mb-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400">24h Volume</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {formatVolume(exchange.volume24h)}
+                  <div className="flex justify-between items-center">
+                      <span className="text-gray-500 dark:text-gray-400">Status</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        exchange.status === 'Active' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                      }`}>
+                        {exchange.status}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -338,14 +362,11 @@ export default function TopCryptoExchanges() {
                         #{exchange.trust_rank}
                       </span>
                     </div>
+                   
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400">Status</span>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        exchange.status === 'Active' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}>
-                        {exchange.status}
+                      <span className="text-gray-500 dark:text-gray-400">24h Volume</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">
+                        {formatVolume(exchange.volume24h)}
                       </span>
                     </div>
                   </div>
