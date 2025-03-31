@@ -1,230 +1,172 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Skeleton from '@/components/Skeleton';
+import React from 'react';
+import { 
+  ChartBarIcon, 
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  ShareIcon,
+  BellIcon,
+  ChartPieIcon,
+  MapIcon,
+  BuildingOfficeIcon
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
-export default function AboutPage() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate content loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <main className="container mx-auto px-4 py-12 max-w-4xl">
-          <Skeleton />
-        </main>
-      </div>
-    );
-  }
-
+export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <main className="container mx-auto px-4 py-12 max-w-6xl">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
-            About Crypto Greed Index
-        </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            Empowering investors with data-driven market sentiment analysis
-          </p>
-        </div>
-        
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-8">
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-              Our Mission
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              At Crypto Greed Index, we are dedicated to providing cryptocurrency investors with precise, 
-              real-time market sentiment data. Our mission is to empower investors with actionable insights 
-              that help them navigate the volatile cryptocurrency markets more effectively. By quantifying 
-              market sentiment through our sophisticated index, we enable both retail and institutional 
-              investors to make more informed investment decisions.
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12">
+      <div className="max-w-8xl mx-auto px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">About <Link href="https://www.cryptogreedindex.com" className="text-blue-600 hover:text-[#048F04] dark:text-blue-400 dark:hover:text-[#048F04]">CryptoGreedIndex.com</Link></h1>
+          
+          <div className="prose dark:prose-invert max-w-none">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              CryptoGreedIndex is your comprehensive platform for tracking cryptocurrency market sentiment and market movements. We provide real-time insights into the crypto market&rsquo;s emotional state and significant price movements across major cryptocurrencies.
             </p>
-          </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-              Our Methodology
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-              We employ a comprehensive, multi-factor analysis approach that combines various market indicators 
-              to generate our Greed Index. Our methodology is based on six key components:
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">Our Mission</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              To provide accurate, real-time market sentiment analysis and price movement tracking to help investors make informed decisions in the cryptocurrency market.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Market Volatility (25%)</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Analysis of current volatility compared to average values over the past 30/90 days.
+
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">Key Features</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <ChartBarIcon className="h-6 w-6 text-blue-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Fear & Greed Index</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Track the market&rsquo;s emotional state with our real-time Fear & Greed Index, updated daily to reflect current market sentiment.
                 </p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Market Momentum (25%)</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Measurement of current market volume and momentum against historical averages.
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <ArrowTrendingUpIcon className="h-6 w-6 text-green-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top Gainers</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Monitor the best-performing cryptocurrencies with our Top Gainers section, showing significant price increases.
                 </p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Social Media (15%)</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Sentiment analysis from major social platforms including Twitter, Reddit, and Telegram.
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <ArrowTrendingDownIcon className="h-6 w-6 text-red-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top Losers</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Stay informed about significant price declines with our Top Losers section, helping you identify market downtrends.
                 </p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Market Dominance (10%)</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Bitcoin&apos;s market dominance and its influence on overall market sentiment.
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <ChartPieIcon className="h-6 w-6 text-purple-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Market Dominance</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Track market dominance percentages for Bitcoin, Ethereum, and Altcoins to understand market structure.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <MapIcon className="h-6 w-6 text-indigo-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Global Markets</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Access comprehensive global market data including total market cap, 24h volume, and market trends across different regions.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <BuildingOfficeIcon className="h-6 w-6 text-orange-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">US Markets</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Track US-specific market data including trading volumes, market sentiment, and regulatory impacts on cryptocurrency markets.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <ShareIcon className="h-6 w-6 text-blue-400 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Social Sharing</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Share market insights with others through integrated social media sharing buttons for Twitter, Facebook, Telegram, and WhatsApp.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <BellIcon className="h-6 w-6 text-yellow-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Real-time Updates</h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Get instant updates on market movements and sentiment changes with our real-time data refresh system.
                 </p>
               </div>
             </div>
-          </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-              Our Technology
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Our platform leverages cutting-edge technology to deliver accurate and timely market sentiment data:
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">Data Sources</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              We rely on trusted data sources to provide accurate market information:
             </p>
-            <ul className="list-disc list-inside mt-4 space-y-2 text-gray-600 dark:text-gray-300">
-              <li>Real-time data processing and analysis</li>
-              <li>Advanced machine learning algorithms for sentiment analysis</li>
-              <li>Automated data validation and verification systems</li>
-              <li>High-frequency updates every 12 hours</li>
-              <li>Robust API infrastructure for data delivery</li>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-400 mb-6">
+              <li>
+                <a 
+                  href="https://www.coingecko.com/api/documentation" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  CoinGecko API
+                </a> - For cryptocurrency market data, prices, and market cap information
+              </li>
+              <li>
+                <a 
+                  href="https://alternative.me/crypto/api/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Alternative.me API
+                </a> - For Fear & Greed Index data and market sentiment analysis
+              </li>
+              <li>Real-time market data from multiple exchanges for accurate price tracking</li>
             </ul>
-          </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-              Our Commitment
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              We are committed to maintaining the highest standards of accuracy and reliability in our 
-              sentiment analysis. Our team continuously monitors and refines our methodology to ensure 
-              the index reflects the most accurate representation of market sentiment. We believe in 
-              transparency and provide detailed documentation of our methodology and regular updates 
-              about any changes or improvements to our system.
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">Market Overview</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Our platform provides comprehensive market insights including:
             </p>
-          </section>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-400 mb-6">
+              <li>Total market capitalization and 24h volume</li>
+              <li>Bitcoin and Ethereum dominance tracking</li>
+              <li>Altcoin market share analysis</li>
+              <li>Historical Fear & Greed Index trends</li>
+              <li>Significant price movements across major cryptocurrencies</li>
+              <li>US market specific data and trends</li>
+              <li>Global market overview and regional analysis</li>
+            </ul>
 
-          <section className="border-t border-gray-200 dark:border-gray-700 pt-8 mb-8">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-              Data Sources & Attributions
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-              We integrate data from several trusted sources to provide comprehensive market analysis:
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">Contact Us</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Have questions or suggestions? We&rsquo;d love to hear from you:
             </p>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Market Data & Sentiment</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-                  <li>
-                    <span className="font-medium">Alternative.me</span> - Core Fear & Greed Index data and historical metrics.
-                    <a 
-                      href="https://alternative.me/crypto/fear-and-greed-index/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 ml-1"
-                    >
-                      Visit Alternative.me
-                    </a>
-                  </li>
-                  <li>
-                    <span className="font-medium">CoinGecko API</span> - Real-time cryptocurrency prices, 
-                    market capitalization, and trading volume data.
-                    <a 
-                      href="https://www.coingecko.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 ml-1"
-                    >
-                      Visit CoinGecko
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Social Sentiment Analysis</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-                  <li>
-                    <span className="font-medium">Twitter API</span> - Social media sentiment and engagement metrics.
-                    <a 
-                      href="https://developer.twitter.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 ml-1"
-                    >
-                      Twitter Developer Platform
-                    </a>
-                  </li>
-                  <li>
-                    <span className="font-medium">Reddit API</span> - Community discussion and sentiment analysis.
-                    <a 
-                      href="https://www.reddit.com/dev/api" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 ml-1"
-                    >
-                      Reddit API Docs
-                    </a>
-                  </li>
-                  <li>
-                    <span className="font-medium">Telegram API</span> - Crypto community engagement and sentiment data.
-                    <a 
-                      href="https://core.telegram.org/api" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 ml-1"
-                    >
-                      Telegram API
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">API Usage & Terms</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  All data is sourced in accordance with each provider&apos;s terms of service and API usage guidelines. 
-                  We maintain appropriate rate limits and data handling practices as specified by our data partners.
-                </p>
-              </div>
-
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-                All trademarks, logos, and brand names are the property of their respective owners. 
-                All company, product, and service names used in this website are for identification purposes only. 
-                Use of these names, trademarks, and brands does not imply endorsement.
-              </p>
-            </div>
-          </section>
-
-          <section className="border-t border-gray-200 dark:border-gray-700 pt-8">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-              Contact Us
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              For inquiries about our Greed Index, partnership opportunities, or technical 
-              support, please reach out to us at{' '}
-              <a 
-                href="mailto:cryptogreedindex@gmail.com" 
-                className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                cryptogreedindex@gmail.com
-              </a>
-            </p>
-          </section>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-400">
+              <li>Email: <a href="mailto:cryptogreedindex@gmail.com" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">cryptogreedindex@gmail.com</a></li>
+              <li>Website: <a href="https://www.cryptogreedindex.com/contact" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">https://www.cryptogreedindex.com/contact</a></li>
+            </ul>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 } 

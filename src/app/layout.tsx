@@ -6,6 +6,7 @@ import Script from 'next/script';
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Toaster } from 'react-hot-toast';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -318,6 +319,7 @@ export default function RootLayout({
             },
           }}
         />
+        <ScrollToTop />
       </body>
     </html>
   );

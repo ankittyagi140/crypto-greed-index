@@ -114,6 +114,11 @@ export default function Footer() {
                   Terms & Conditions
                 </Link>
               </li>
+              <li>
+                <Link href="/disclaimer" className="text-gray-600 dark:text-gray-300 hover:text-[#048f04] dark:hover:text-white transition-colors">
+                  Disclaimer
+                </Link>
+              </li>
             </ul>
           </div>
 

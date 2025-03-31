@@ -51,6 +51,11 @@ const PAGES = {
     priority: 1,
     changeFrequency: 'daily' as const,
   },
+  ALTCOIN_DOMINANCE: {
+    path: 'altcoin-dominance',
+    priority: 1,
+    changeFrequency: 'daily' as const,
+  },
   ABOUT: {
     path: 'about',
     priority: 0.8,
@@ -68,6 +73,11 @@ const PAGES = {
   },
   TERMS: {
     path: 'terms',
+    priority: 0.5,
+    changeFrequency: 'monthly' as const,
+  },
+  DISCLAIMER: {
+    path: 'disclaimer',
     priority: 0.5,
     changeFrequency: 'monthly' as const,
   },
