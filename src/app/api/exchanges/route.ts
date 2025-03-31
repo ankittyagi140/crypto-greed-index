@@ -7,7 +7,8 @@ interface CoinGeckoExchange {
   description: string;
   trade_volume_24h_btc: number;
   number_of_trading_pairs: number;
-  trust_rank: number;
+  trust_score: number;
+  trust_score_rank: number;
   year_established: number;
   url: string;
   api_url: string;
@@ -39,7 +40,7 @@ interface FormattedExchange {
 export async function GET() {
   try {
     const response = await fetch(
-      'https://api.coingecko.com/api/v3/exchanges?per_page=100&page=1',
+      'https://api.coingecko.com/api/v3/exchanges?per_page=200&page=1',
       { next: { revalidate: 3600 } } // Cache for 1 hour
     );
 
@@ -53,20 +54,23 @@ export async function GET() {
       id: exchange.id,
       name: exchange.name,
       logo: exchange.image,
-      description: exchange.description,
-      volume24h: exchange.trade_volume_24h_btc,
-      tradingPairs: exchange.number_of_trading_pairs,
-      status: exchange.centralized ? 'Centralized' : 'Decentralized',
-      founded: exchange.year_established.toString(),
-      website: exchange.url,
-      apiUrl: exchange.api_url,
+      description: exchange.description || 'No description available',
+      volume24h: exchange.trade_volume_24h_btc || 0,
+      tradingPairs: exchange.number_of_trading_pairs || 0,
+      status: exchange.trust_score_rank ? 'Active' : 'Inactive',
+      founded: exchange.year_established ? exchange.year_established.toString() : 'N/A',
+      website: exchange.url || 'N/A',
+      apiUrl: exchange.api_url || 'N/A',
       features: [
         exchange.has_trading_incentive ? 'Trading Incentives' : null,
-        exchange.centralized ? 'Centralized' : 'Decentralized',
+        exchange.trust_score_rank ? 'Active' : 'Inactive',
         exchange.public_interest_score > 0 ? 'High Public Interest' : null,
         exchange.liquidity_score > 0 ? 'High Liquidity' : null,
+        'Spot Trading',
+        exchange.trust_score ? `Trust Score: ${exchange.trust_score}` : null
       ].filter((feature): feature is string => feature !== null),
-      trust_score: exchange.trust_rank,
+      trust_score: exchange.trust_score || 0,
+      trust_rank: exchange.trust_score_rank || 0
     }));
 
     return NextResponse.json(formattedExchanges);

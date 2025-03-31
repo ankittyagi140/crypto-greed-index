@@ -20,6 +20,7 @@ interface Exchange {
   apiUrl: string;
   features: string[];
   trust_score: number;
+  trust_rank: number;
 }
 
 export default function TopCryptoExchanges() {
@@ -33,7 +34,7 @@ export default function TopCryptoExchanges() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [exchangesPerPage] = useState(12);
+  const [exchangesPerPage] = useState(20);
 
   useEffect(() => {
     const fetchExchanges = async () => {
@@ -208,7 +209,7 @@ export default function TopCryptoExchanges() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => toggleStatusFilter('all')}
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer ${
                         statusFilter === 'all'
                           ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -218,7 +219,7 @@ export default function TopCryptoExchanges() {
                     </button>
                     <button
                       onClick={() => toggleStatusFilter('active')}
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer ${
                         statusFilter === 'active'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -228,7 +229,7 @@ export default function TopCryptoExchanges() {
                     </button>
                     <button
                       onClick={() => toggleStatusFilter('inactive')}
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer ${
                         statusFilter === 'inactive'
                           ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -245,7 +246,7 @@ export default function TopCryptoExchanges() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => toggleSort('volume')}
-                      className={`px-4 py-2 rounded-lg border ${
+                      className={`px-4 py-2 rounded-lg border cursor-pointer ${
                         sortBy === 'volume'
                           ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
                           : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
@@ -258,7 +259,7 @@ export default function TopCryptoExchanges() {
                     </button>
                     <button
                       onClick={() => toggleSort('name')}
-                      className={`px-4 py-2 rounded-lg border ${
+                      className={`px-4 py-2 rounded-lg border cursor-pointer ${
                         sortBy === 'name'
                           ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
                           : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
@@ -271,7 +272,7 @@ export default function TopCryptoExchanges() {
                     </button>
                     <button
                       onClick={() => toggleSort('rank')}
-                      className={`px-4 py-2 rounded-lg border ${
+                      className={`px-4 py-2 rounded-lg border cursor-pointer ${
                         sortBy === 'rank'
                           ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
                           : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
@@ -334,7 +335,7 @@ export default function TopCryptoExchanges() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-500 dark:text-gray-400">Trust Rank</span>
                       <span className="font-semibold text-gray-900 dark:text-white">
-                        #{exchange.trust_score}
+                        #{exchange.trust_rank}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
