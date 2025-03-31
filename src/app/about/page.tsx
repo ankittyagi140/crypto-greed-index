@@ -77,12 +77,12 @@ export default function About() {
                 <div className="flex items-center mb-4">
                   <MapIcon className="h-6 w-6 text-indigo-500 mr-2" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Global Markets</h3>
-                </div>
+            </div>
                 <p className="text-gray-600 dark:text-gray-400">
                   Access comprehensive global market data including total market cap, 24h volume, and market trends across different regions.
                 </p>
               </div>
-
+              
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <BuildingOfficeIcon className="h-6 w-6 text-orange-500 mr-2" />

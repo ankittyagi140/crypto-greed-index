@@ -1,26 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['coin-images.coingecko.com', 'assets.coingecko.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'assets.coingecko.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'coin-images.coingecko.com',
+        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'cryptologos.cc',
+        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'raw.githubusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'coin-images.coingecko.com',
+        port: '',
         pathname: '/**',
       },
     ],

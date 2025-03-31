@@ -25,30 +25,17 @@ interface CoinGeckoExchange {
 interface FormattedExchange {
   id: string;
   name: string;
-  logo: string;
+  image: string;
   description: string;
   volume24h: number;
-  tradingPairs: number;
+  tradingPairs: string | number;
   status: string;
   founded: string;
   website: string;
   apiUrl: string;
   features: string[];
   trust_score: number;
-  trust_rank: number;
 }
-
-const cleanImageUrl = (url: string) => {
-  try {
-    // Remove any query parameters from the URL
-    const urlObj = new URL(url);
-    return urlObj.origin + urlObj.pathname;
-  } catch (error) {
-    // If URL parsing fails, return the original URL
-    console.error('Error cleaning image URL:', error);
-    return url;
-  }
-};
 
 export async function GET() {
   try {
@@ -66,10 +53,10 @@ export async function GET() {
     const formattedExchanges: FormattedExchange[] = data.map((exchange) => ({
       id: exchange.id,
       name: exchange.name,
-      logo: cleanImageUrl(exchange.image),
+      image: exchange.image || `https://assets.coingecko.com/markets/images/${exchange.id}/small.png`,
       description: exchange.description || 'No description available',
       volume24h: exchange.trade_volume_24h_btc || 0,
-      tradingPairs: exchange.number_of_trading_pairs || 0,
+      tradingPairs: exchange.number_of_trading_pairs || 'N/A',
       status: exchange.trust_score_rank ? 'Active' : 'Inactive',
       founded: exchange.year_established ? exchange.year_established.toString() : 'N/A',
       website: exchange.url || 'N/A',
@@ -85,6 +72,7 @@ export async function GET() {
       trust_score: exchange.trust_score || 0,
       trust_rank: exchange.trust_score_rank || 0
     }));
+
 
     return NextResponse.json(formattedExchanges);
   } catch (error) {

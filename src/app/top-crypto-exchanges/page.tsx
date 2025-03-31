@@ -10,7 +10,7 @@ import Script from 'next/script';
 interface Exchange {
   id: string;
   name: string;
-  logo: string;
+  image: string;
   description: string;
   volume24h: number;
   tradingPairs: number;
@@ -46,35 +46,6 @@ const ExchangeSkeleton = () => (
     </div>
   </div>
 );
-
-const ExchangeLogo = ({ src, name }: { src: string; name: string }) => {
-  const [error, setError] = useState(false);
-  
-  if (error) {
-    return (
-      <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-        <span className="text-xl font-bold text-gray-500 dark:text-gray-400">
-          {name.charAt(0)}
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative w-12 h-12">
-      <Image
-        src={src}
-        alt={`${name} logo`}
-        fill
-        className="object-contain rounded-full"
-        sizes="48px"
-        onError={() => setError(true)}
-        priority={false}
-        quality={75}
-      />
-    </div>
-  );
-};
 
 export default function TopCryptoExchanges() {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
@@ -346,8 +317,14 @@ export default function TopCryptoExchanges() {
               >
                 <div className="p-6">
                   <div className="flex items-center mb-4">
-                    <div className="mr-4">
-                      <ExchangeLogo src={exchange.logo} name={exchange.name} />
+                    <div className="relative w-12 h-12 mr-4">
+                      <Image
+                       src={exchange.image}
+                       alt={exchange.name}
+                       height={32}
+                       width={32}
+                       className="w-auto h-auto"
+                      />
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-gray-900 dark:text-white">
