@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { ArrowUpIcon, ArrowDownIcon, MagnifyingGlassIcon, FunnelIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ArrowUpIcon, ArrowDownIcon, MagnifyingGlassIcon, FunnelIcon, ChevronLeftIcon, ChevronRightIcon,
+  GlobeAltIcon, CheckCircleIcon, XCircleIcon, ChartBarIcon, ShieldCheckIcon, ArrowTopRightOnSquareIcon 
+} from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { jsonLd } from './metadata';
 import Script from 'next/script';
@@ -46,6 +48,34 @@ const ExchangeSkeleton = () => (
     </div>
   </div>
 );
+
+// Add a loading placeholder component
+const ImageWithFallback = ({ src, alt }: { src: string; alt: string }) => {
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative flex items-center justify-center w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+      <Image
+        src={error ? '/placeholder-exchange.png' : src}
+        alt={alt}
+        width={48}
+        height={48}
+        className="w-full h-full object-cover"
+        priority={false}
+        quality={75}
+        onError={() => setError(true)}
+      />
+    </div>
+  );
+};
+
+// Add a function to get trust rank color
+const getTrustRankColor = (rank: number) => {
+  if (rank <= 10) return 'text-green-600 dark:text-green-400';
+  if (rank <= 30) return 'text-blue-600 dark:text-blue-400';
+  if (rank <= 50) return 'text-yellow-600 dark:text-yellow-400';
+  return 'text-gray-600 dark:text-gray-400';
+};
 
 export default function TopCryptoExchanges() {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
@@ -310,97 +340,130 @@ export default function TopCryptoExchanges() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {currentExchanges.map((exchange) => (
-              <div
-                key={exchange.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="relative w-12 h-12 mr-4">
-                      <Image
-                       src={exchange.image}
-                       alt={exchange.name}
-                       height={32}
-                       width={32}
-                       className="w-auto h-auto"
+            {loading ? (
+              Array.from({ length: 20 }).map((_, index) => (
+                <ExchangeSkeleton key={index} />
+              ))
+            ) : error ? (
+              <div className="col-span-full text-center text-red-500">{error}</div>
+            ) : (
+              currentExchanges.map((exchange) => (
+                <div
+                  key={exchange.id}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full"
+                >
+                  <div className="p-6 flex flex-col flex-1 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <ImageWithFallback
+                        src={exchange.image}
+                        alt={exchange.name}
                       />
+                      <div className="flex-1">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+                          {exchange.name}
+                        </h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1">
+                          <GlobeAltIcon className="h-4 w-4" />
+                          Founded: {exchange.founded}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {exchange.name}
-                      </h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Founded: {exchange.founded}
+
+                    <div className="relative">
+                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-base line-clamp-2 mb-2">
+                        {exchange.description}
                       </p>
-                    </div>
-                  </div>
-
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                    {exchange.description}
-                  </p>
-
-                  <div className="space-y-3 mb-4">
-                  <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400">Status</span>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        exchange.status === 'Active' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}>
-                        {exchange.status}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400">Trading Pairs</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {exchange.tradingPairs}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400">Trust Rank</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        #{exchange.trust_rank}
-                      </span>
-                    </div>
-                   
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400">24h Volume</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {formatVolume(exchange.volume24h)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                      Features
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {exchange.features.map((feature) => (
-                        <span
-                          key={feature}
-                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                      {exchange.description.length > 150 && (
+                        <button 
+                          onClick={() => window.open(exchange.website, '_blank')}
+                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
                         >
-                          {feature}
-                        </span>
-                      ))}
+                          Read More
+                        </button>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="flex justify-center items-center w-full">
-                    <a
-                      href={exchange.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-[#048f04] hover:bg-blue-500 text-white rounded-lg transition-colors duration-200"
-                    >
-                      Visit Website
-                    </a>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <ShieldCheckIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Trust Rank</span>
+                        </div>
+                        <span className={`text-xl font-bold ${getTrustRankColor(exchange.trust_rank)}`}>
+                          #{exchange.trust_rank}
+                        </span>
+                      </div>
+
+                      <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <ChartBarIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">24h Volume</span>
+                        </div>
+                        <span className="text-xl font-bold text-gray-900 dark:text-white">
+                          {formatVolume(exchange.volume24h)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {exchange.status === 'Active' ? (
+                            <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                          ) : (
+                            <XCircleIcon className="h-5 w-5 text-red-500" />
+                          )}
+                          <span className="text-gray-500 dark:text-gray-400">Status</span>
+                        </div>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          exchange.status === 'Active' 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        }`}>
+                          {exchange.status}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-500 dark:text-gray-400">Trading Pairs</span>
+                        <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {exchange.tradingPairs}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                        <ShieldCheckIcon className="h-5 w-5" />
+                        Features
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {exchange.features.map((feature) => (
+                          <span
+                            key={feature}
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 border border-blue-100 dark:border-blue-800"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center items-center w-full mt-auto pt-4">
+                      <a
+                        href={exchange.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-6 py-3 bg-[#048f04] hover:bg-[#037003] text-white rounded-lg transition-colors duration-200 gap-2 font-medium w-full justify-center"
+                      >
+                        Visit Website
+                        <ArrowTopRightOnSquareIcon className="h-5 w-5" />
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Pagination Controls */}
