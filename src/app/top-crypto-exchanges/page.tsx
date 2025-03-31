@@ -47,6 +47,35 @@ const ExchangeSkeleton = () => (
   </div>
 );
 
+const ExchangeLogo = ({ src, name }: { src: string; name: string }) => {
+  const [error, setError] = useState(false);
+  
+  if (error) {
+    return (
+      <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+        <span className="text-xl font-bold text-gray-500 dark:text-gray-400">
+          {name.charAt(0)}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-12 h-12">
+      <Image
+        src={src}
+        alt={`${name} logo`}
+        fill
+        className="object-contain rounded-full"
+        sizes="48px"
+        onError={() => setError(true)}
+        priority={false}
+        quality={75}
+      />
+    </div>
+  );
+};
+
 export default function TopCryptoExchanges() {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [filteredExchanges, setFilteredExchanges] = useState<Exchange[]>([]);
@@ -317,13 +346,8 @@ export default function TopCryptoExchanges() {
               >
                 <div className="p-6">
                   <div className="flex items-center mb-4">
-                    <div className="relative w-12 h-12 mr-4">
-                      <Image
-                        src={exchange.logo}
-                        alt={`${exchange.name} logo`}
-                        fill
-                        className="object-contain"
-                      />
+                    <div className="mr-4">
+                      <ExchangeLogo src={exchange.logo} name={exchange.name} />
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-gray-900 dark:text-white">
