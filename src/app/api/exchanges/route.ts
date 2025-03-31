@@ -43,8 +43,9 @@ const cleanImageUrl = (url: string) => {
     // Remove any query parameters from the URL
     const urlObj = new URL(url);
     return urlObj.origin + urlObj.pathname;
-  } catch (e) {
+  } catch (error) {
     // If URL parsing fails, return the original URL
+    console.error('Error cleaning image URL:', error);
     return url;
   }
 };
