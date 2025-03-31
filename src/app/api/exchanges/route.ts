@@ -53,7 +53,7 @@ export async function GET() {
     const formattedExchanges: FormattedExchange[] = data.map((exchange) => ({
       id: exchange.id,
       name: exchange.name,
-      image: exchange.image || `https://assets.coingecko.com/markets/images/${exchange.id}/small.png`,
+      image: exchange.image ? exchange.image : `https://assets.coingecko.com/markets/images/${exchange.id}/small.png`,
       description: exchange.description || 'No description available',
       volume24h: exchange.trade_volume_24h_btc || 0,
       tradingPairs: exchange.number_of_trading_pairs || 'N/A',
@@ -72,9 +72,8 @@ export async function GET() {
       trust_score: exchange.trust_score || 0,
       trust_rank: exchange.trust_score_rank || 0
     }));
-
-
     return NextResponse.json(formattedExchanges);
+
   } catch (error) {
     console.error('Error fetching exchanges:', error);
     return NextResponse.json(
