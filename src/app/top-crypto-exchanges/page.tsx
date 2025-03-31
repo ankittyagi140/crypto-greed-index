@@ -49,25 +49,6 @@ const ExchangeSkeleton = () => (
   </div>
 );
 
-// Add a loading placeholder component
-const ImageWithFallback = ({ src, alt }: { src: string; alt: string }) => {
-  const [error, setError] = useState(false);
-
-  return (
-    <div className="relative flex items-center justify-center w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-      <Image
-        src={error ? '/placeholder-exchange.png' : src}
-        alt={alt}
-        width={48}
-        height={48}
-        className="w-full h-full object-cover"
-        priority={false}
-        quality={75}
-        onError={() => setError(true)}
-      />
-    </div>
-  );
-};
 
 // Add a function to get trust rank color
 const getTrustRankColor = (rank: number) => {
@@ -354,9 +335,12 @@ export default function TopCryptoExchanges() {
                 >
                   <div className="p-6 flex flex-col flex-1 space-y-6">
                     <div className="flex items-center gap-4">
-                      <ImageWithFallback
+                      <Image
                         src={exchange.image}
                         alt={exchange.name}
+                        width={48}
+                        height={48}
+                        className="w-12 h-12 object-cover"
                       />
                       <div className="flex-1">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
