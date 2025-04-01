@@ -57,7 +57,7 @@ export default function Page() {
             "mainEntity": {
               "@type": "DataVisualization",
               "name": "Bitcoin Dominance Chart",
-              "description": "Interactive chart showing the percentage of total cryptocurrency market capitalization represented by Bitcoin",
+              "description": "Interactive chart showing Bitcoin's percentage of total cryptocurrency market cap",
               "dataType": "Financial Data",
               "temporalCoverage": "Real-time",
               "updateFrequency": "Daily",
@@ -67,7 +67,7 @@ export default function Page() {
               "about": {
                 "@type": "Thing",
                 "name": "Bitcoin Market",
-                "description": "The market capitalization of Bitcoin compared to the total cryptocurrency market"
+                "description": "Bitcoin's market cap compared to total crypto market"
               },
               "dataSource": {
                 "@type": "Dataset",
@@ -129,14 +129,6 @@ export default function Page() {
               "description": "The percentage of total cryptocurrency market capitalization that Bitcoin represents",
               "category": "Financial Market Analysis"
             },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "reviewCount": "1250",
-              "bestRating": "5",
-              "worstRating": "1",
-              "ratingCount": "1250"
-            }
           })
         }}
       />
