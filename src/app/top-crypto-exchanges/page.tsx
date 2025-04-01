@@ -52,9 +52,10 @@ const ExchangeSkeleton = () => (
 
 // Add a function to get trust rank color
 const getTrustRankColor = (rank: number) => {
-  if (rank <= 10) return 'text-green-600 dark:text-green-400';
-  if (rank <= 30) return 'text-blue-600 dark:text-blue-400';
-  if (rank <= 50) return 'text-yellow-600 dark:text-yellow-400';
+  if (rank <= 20) return 'text-green-600 dark:text-green-400';
+  if (rank <= 50) return 'text-orange-400 dark:text-orange-400';
+  if (rank <= 100) return 'text-yellow-400 dark:text-yellow-400';
+  if (rank >= 101) return 'text-red-400 dark:text-red-400';
   return 'text-gray-600 dark:text-gray-400';
 };
 
@@ -204,43 +205,43 @@ export default function TopCryptoExchanges() {
       />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">
             Top Cryptocurrency Exchanges
           </h1>
 
           {/* Search and Filter Controls */}
-          <div className="mb-8 space-y-4">
+          <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
             {/* Search Bar */}
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search exchanges..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2 text-sm sm:text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             {/* Filter Toggle Button */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+              className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
             >
-              <FunnelIcon className="h-5 w-5" />
+              <FunnelIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               {showFilters ? 'Hide Filters' : 'Show Filters'}
             </button>
 
             {/* Filter Options */}
             {showFilters && (
-              <div className="space-y-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+              <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
                 {/* Status Filter */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</h3>
-                  <div className="flex gap-2">
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</h3>
+                  <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => toggleStatusFilter('all')}
-                      className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer ${
+                      className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium cursor-pointer ${
                         statusFilter === 'all'
                           ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -250,7 +251,7 @@ export default function TopCryptoExchanges() {
                     </button>
                     <button
                       onClick={() => toggleStatusFilter('active')}
-                      className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer ${
+                      className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium cursor-pointer ${
                         statusFilter === 'active'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -260,7 +261,7 @@ export default function TopCryptoExchanges() {
                     </button>
                     <button
                       onClick={() => toggleStatusFilter('inactive')}
-                      className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer ${
+                      className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium cursor-pointer ${
                         statusFilter === 'inactive'
                           ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -273,45 +274,45 @@ export default function TopCryptoExchanges() {
 
                 {/* Sort Options */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort By</h3>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort By</h3>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => toggleSort('volume')}
-                      className={`px-4 py-2 rounded-lg border cursor-pointer ${
+                      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border cursor-pointer text-xs sm:text-sm ${
                         sortBy === 'volume'
                           ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
                           : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
-                      } hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2`}
+                      } hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-1 sm:gap-2`}
                     >
                       Volume
                       {sortBy === 'volume' && (
-                        sortOrder === 'desc' ? <ArrowDownIcon className="h-4 w-4" /> : <ArrowUpIcon className="h-4 w-4" />
+                        sortOrder === 'desc' ? <ArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" /> : <ArrowUpIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       )}
                     </button>
                     <button
                       onClick={() => toggleSort('name')}
-                      className={`px-4 py-2 rounded-lg border cursor-pointer ${
+                      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border cursor-pointer text-xs sm:text-sm ${
                         sortBy === 'name'
                           ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
                           : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
-                      } hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2`}
+                      } hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-1 sm:gap-2`}
                     >
                       Name
                       {sortBy === 'name' && (
-                        sortOrder === 'desc' ? <ArrowDownIcon className="h-4 w-4" /> : <ArrowUpIcon className="h-4 w-4" />
+                        sortOrder === 'desc' ? <ArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" /> : <ArrowUpIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       )}
                     </button>
                     <button
                       onClick={() => toggleSort('rank')}
-                      className={`px-4 py-2 rounded-lg border cursor-pointer ${
+                      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border cursor-pointer text-xs sm:text-sm ${
                         sortBy === 'rank'
                           ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
                           : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
-                      } hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2`}
+                      } hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-1 sm:gap-2`}
                     >
                       Trust Rank
                       {sortBy === 'rank' && (
-                        sortOrder === 'desc' ? <ArrowDownIcon className="h-4 w-4" /> : <ArrowUpIcon className="h-4 w-4" />
+                        sortOrder === 'desc' ? <ArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" /> : <ArrowUpIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       )}
                     </button>
                   </div>
@@ -320,7 +321,7 @@ export default function TopCryptoExchanges() {
             )}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {loading ? (
               Array.from({ length: 20 }).map((_, index) => (
                 <ExchangeSkeleton key={index} />
@@ -334,72 +335,64 @@ export default function TopCryptoExchanges() {
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full"
                 >
                   <div className="p-6 flex flex-col flex-1 space-y-6">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       <Image
                         src={exchange.image}
                         alt={exchange.name}
                         width={48}
                         height={48}
-                        className="w-12 h-12 object-cover"
+                        className="w-10 h-10 sm:w-12 sm:h-12 object-cover"
                       />
                       <div className="flex-1">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
                           {exchange.name}
                         </h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1">
-                          <GlobeAltIcon className="h-4 w-4" />
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 sm:gap-2 mt-1">
+                          <GlobeAltIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                           Founded: {exchange.founded}
                         </p>
                       </div>
                     </div>
 
-                    <div className="relative">
-                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-base line-clamp-2 mb-2">
+                    {/* <div className="relative">
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
                         {exchange.description}
                       </p>
-                      {exchange.description.length > 150 && (
-                        <button 
-                          onClick={() => window.open(exchange.website, '_blank')}
-                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          Read More
-                        </button>
-                      )}
-                    </div>
+                    </div> */}
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
-                        <div className="flex items-center gap-2 mb-1">
-                          <ShieldCheckIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Trust Rank</span>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                      <div className="bg-gray-50 dark:bg-gray-700/50 p-2 sm:p-3 rounded-lg">
+                        <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                          <ShieldCheckIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
+                          <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Trust Rank</span>
                         </div>
-                        <span className={`text-xl font-bold ${getTrustRankColor(exchange.trust_rank)}`}>
+                        <span className={`text-lg sm:text-xl font-bold ${getTrustRankColor(exchange.trust_rank)}`}>
                           #{exchange.trust_rank}
                         </span>
                       </div>
 
-                      <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
-                        <div className="flex items-center gap-2 mb-1">
-                          <ChartBarIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400">24h Volume</span>
+                      <div className="bg-gray-50 dark:bg-gray-700/50 p-2 sm:p-3 rounded-lg">
+                        <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                          <ChartBarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
+                          <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">24h Volume</span>
                         </div>
-                        <span className="text-xl font-bold text-gray-900 dark:text-white">
+                        <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                           {formatVolume(exchange.volume24h)}
                         </span>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           {exchange.status === 'Active' ? (
-                            <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                            <CheckCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                           ) : (
-                            <XCircleIcon className="h-5 w-5 text-red-500" />
+                            <XCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
                           )}
-                          <span className="text-gray-500 dark:text-gray-400">Status</span>
+                          <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Status</span>
                         </div>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        <span className={`inline-flex items-center px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${
                           exchange.status === 'Active' 
                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
@@ -409,23 +402,23 @@ export default function TopCryptoExchanges() {
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-500 dark:text-gray-400">Trading Pairs</span>
-                        <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Trading Pairs</span>
+                        <span className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                           {exchange.tradingPairs}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                        <ShieldCheckIcon className="h-5 w-5" />
+                      <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-1 sm:gap-2">
+                        <ShieldCheckIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                         Features
                       </h3>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {exchange.features.map((feature) => (
                           <span
                             key={feature}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 border border-blue-100 dark:border-blue-800"
+                            className="inline-flex items-center px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 border border-blue-100 dark:border-blue-800"
                           >
                             {feature}
                           </span>
@@ -433,15 +426,15 @@ export default function TopCryptoExchanges() {
                       </div>
                     </div>
 
-                    <div className="flex justify-center items-center w-full mt-auto pt-4">
+                    <div className="flex justify-center items-center w-full mt-auto pt-3 sm:pt-4">
                       <a
                         href={exchange.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-6 py-3 bg-[#048f04] hover:bg-[#037003] text-white rounded-lg transition-colors duration-200 gap-2 font-medium w-full justify-center"
+                        className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-[#048f04] hover:bg-[#037003] text-white rounded-lg transition-colors duration-200 gap-1.5 sm:gap-2 text-sm sm:text-base font-medium w-full justify-center"
                       >
                         Visit Website
-                        <ArrowTopRightOnSquareIcon className="h-5 w-5" />
+                        <ArrowTopRightOnSquareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                       </a>
                     </div>
                   </div>
@@ -451,51 +444,46 @@ export default function TopCryptoExchanges() {
           </div>
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="mt-8 flex justify-center items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-6 sm:mt-8">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Showing {indexOfFirstExchange + 1}-{Math.min(indexOfLastExchange, filteredExchanges.length)} of {filteredExchanges.length} exchanges
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`p-2 rounded-lg cursor-pointer ${
-                  currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed'
-                    : 'bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
+                className="p-1.5 sm:p-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-700"
+                aria-label="Previous page"
               >
-                <ChevronLeftIcon className="h-5 w-5" />
+                <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
 
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index + 1}
-                  onClick={() => paginate(index + 1)}
-                  className={`px-4 py-2 rounded-lg cursor-pointer ${
-                    currentPage === index + 1
-                      ? 'bg-[#048F04] text-white hover:bg-blue-500'
-                      : 'bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
+              {/* Mobile-friendly page numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => paginate(page)}
+                    className={`px-2 py-1 sm:px-3 sm:py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200
+                      ${currentPage === page
+                        ? 'bg-[#048f04] text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      } border border-gray-200 dark:border-gray-700`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
 
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`p-2 rounded-lg cursor-pointer ${
-                  currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed'
-                    : 'bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
+                className="p-1.5 sm:p-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-700"
+                aria-label="Next page"
               >
-                <ChevronRightIcon className="h-5 w-5" />
+                <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             </div>
-          )}
-
-          {/* Results Count */}
-          <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-            Showing {indexOfFirstExchange + 1} to {Math.min(indexOfLastExchange, filteredExchanges.length)} of {filteredExchanges.length} exchanges
           </div>
         </div>
       </div>
