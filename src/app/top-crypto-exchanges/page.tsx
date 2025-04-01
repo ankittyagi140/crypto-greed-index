@@ -444,7 +444,7 @@ export default function TopCryptoExchanges() {
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-6 sm:mt-8">
+          <div className="flex flex-col items-center justify-between gap-3 sm:gap-4 mt-6 sm:mt-8">
             <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               Showing {indexOfFirstExchange + 1}-{Math.min(indexOfLastExchange, filteredExchanges.length)} of {filteredExchanges.length} exchanges
             </div>
@@ -452,7 +452,7 @@ export default function TopCryptoExchanges() {
               <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-1.5 sm:p-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-700"
+                className="p-1.5 sm:p-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-700 cursor-pointer"
                 aria-label="Previous page"
               >
                 <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -464,7 +464,7 @@ export default function TopCryptoExchanges() {
                   <button
                     key={page}
                     onClick={() => paginate(page)}
-                    className={`px-2 py-1 sm:px-3 sm:py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200
+                    className={`px-2 py-1 sm:px-3 sm:py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 cursor-pointer hover:bg-[#037003]
                       ${currentPage === page
                         ? 'bg-[#048f04] text-white'
                         : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -478,7 +478,7 @@ export default function TopCryptoExchanges() {
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="p-1.5 sm:p-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-700"
+                className="p-1.5 sm:p-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-700 cursor-pointer"
                 aria-label="Next page"
               >
                 <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
