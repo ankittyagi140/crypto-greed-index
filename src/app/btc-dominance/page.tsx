@@ -4,28 +4,20 @@ import Script from 'next/script';
 
 // Metadata for SEO
 export const metadata: Metadata = {
-  title: 'Bitcoin Dominance | Crypto Market Analysis',
-  description: 'Track Bitcoin market dominance and understand its position in the cryptocurrency market.',
-  keywords: [
-    'bitcoin dominance',
-    'btc dominance',
-    'crypto market analysis',
-    'bitcoin market share',
-    'cryptocurrency market trends',
-    'bitcoin market cap',
-    'bitcoin dominance chart'
-  ],
+  title: "Bitcoin Dominance Chart | Live Market Analysis & Trends 2025",
+  description: "Track Bitcoin's market dominance in real-time. Compare Bitcoin's market cap against total crypto market cap. Live charts, historical data, and market trends analysis.",
+  keywords: "bitcoin dominance, btc dominance, crypto market analysis, bitcoin market share, cryptocurrency market trends, bitcoin market cap, bitcoin dominance chart, crypto market analysis, bitcoin dominance history, market dominance tracking",
   openGraph: {
-    title: 'Bitcoin Dominance Chart | Crypto Market Analysis',
-    description: 'Track Bitcoin dominance trends and market share analysis. Compare Bitcoin market cap against total crypto market cap to understand market dynamics.',
-    url: 'https://cryptofeargreedindex.com/btc-dominance',
+    title: "Bitcoin Dominance Chart | Live Market Analysis & Trends",
+    description: "Track Bitcoin's market dominance in real-time. Compare Bitcoin's market cap against total crypto market cap. Live charts and market trends analysis.",
+    url: 'https://www.cryptogreedindex.com/btc-dominance',
     siteName: 'Cryptogreedindex.com',
     images: [
       {
         url: '/cryptogreedindex.png',
         width: 1200,
         height: 630,
-        alt: 'Bitcoin Dominance | Crypto Market Analysis',
+        alt: 'Bitcoin Dominance Chart',
       },
     ],
     locale: 'en_US',
@@ -33,11 +25,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Bitcoin Dominance Chart | Crypto Market Analysis',
-    description: 'Track Bitcoin dominance trends and market share analysis. Compare Bitcoin market cap against total crypto market cap to understand market dynamics.',
+    title: "Bitcoin Dominance Chart | Live Market Analysis & Trends",
+    description: "Track Bitcoin's market dominance in real-time. Compare Bitcoin's market cap against total crypto market cap. Live charts and market trends analysis.",
     images: ['/cryptogreedindex.png'],
-    creator: 'Cryptogreedindex.com',
+    creator: '@cryptogreedindex',
   },
+  alternates: {
+    canonical: 'https://www.cryptogreedindex.com/btc-dominance'
+  }
 };
 
 export default function Page() {
@@ -50,14 +45,14 @@ export default function Page() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Bitcoin Dominance Chart",
-            "description": "Track Bitcoin market dominance and understand its position in the cryptocurrency market.",
+            "name": "Bitcoin Dominance Chart | Live Market Analysis",
+            "description": "Track Bitcoin's market dominance in real-time. Compare Bitcoin's market cap against total crypto market cap.",
             "url": "https://www.cryptogreedindex.com/btc-dominance",
             "image": "https://www.cryptogreedindex.com/cryptogreedindex.png",
             "mainEntity": {
               "@type": "DataVisualization",
               "name": "Bitcoin Dominance Chart",
-              "description": "Interactive chart showing Bitcoin's percentage of total cryptocurrency market cap",
+              "description": "Live chart showing Bitcoin's percentage of total cryptocurrency market cap",
               "dataType": "Financial Data",
               "temporalCoverage": "Real-time",
               "updateFrequency": "Daily",
@@ -126,9 +121,9 @@ export default function Page() {
             "about": {
               "@type": "Thing",
               "name": "Bitcoin Market Dominance",
-              "description": "The percentage of total cryptocurrency market capitalization that Bitcoin represents",
+              "description": "Bitcoin's percentage of total cryptocurrency market cap",
               "category": "Financial Market Analysis"
-            },
+            }
           })
         }}
       />
