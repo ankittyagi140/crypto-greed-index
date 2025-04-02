@@ -141,10 +141,16 @@ export default function IndexDetail() {
     price: null as number | null,
     change: null as number | null,
     changePercent: null as number | null,
+    weekChange: null as number | null,
+    weekChangePercent: null as number | null,
+    monthChange: null as number | null,
+    monthChangePercent: null as number | null,
     yearToDateChange: null as number | null,
     yearToDatePercent: null as number | null,
     high52Week: null as number | null,
     low52Week: null as number | null,
+    dailyHigh: null as number | null,
+    dailyLow: null as number | null,
     volume: null as number | null
   });
   const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
@@ -468,49 +474,60 @@ export default function IndexDetail() {
 
           {/* Current Stats Section */}
           <section aria-label="Current Statistics" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              <article className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">Current Price</h2>
-                <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
-                  ${currentStats?.price?.toLocaleString() ?? 'Loading...'}
-                </div>
-                {currentStats.change !== null && currentStats.changePercent !== null && (
-                  <div className={`flex items-center text-base sm:text-lg mt-1 ${currentStats.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    <span>{currentStats.change >= 0 ? '+' : ''}{currentStats.change.toFixed(2)}</span>
-                    <span className="ml-2">({currentStats.changePercent.toFixed(2)}%)</span>
-                  </div>
-                )}
-              </article>
-              <article className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">Year to Date</h2>
-                {currentStats.yearToDateChange !== null && currentStats.yearToDatePercent !== null && (
-                  <div className={`text-xl sm:text-2xl font-bold mt-2 ${currentStats.yearToDateChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {currentStats.yearToDateChange >= 0 ? '+' : ''}{currentStats.yearToDatePercent.toFixed(2)}%
-                  </div>
-                )}
-              </article>
-              <article className="lg:col-span-2 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">52 Week Range</h2>
-                <PriceGauge
-                  currentPrice={currentStats.price}
-                  lowPrice={currentStats.low52Week}
-                  highPrice={currentStats.high52Week}
-                />
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Volume</div>
-                    <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                      {currentStats.volume ? `${(currentStats.volume / 1000000).toFixed(1)}M` : 'N/A'}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Volatility</div>
-                    <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                      {technicalIndicators?.atr ? `${technicalIndicators.atr.toFixed(2)}` : 'N/A'}
-                    </div>
-                  </div>
-                </div>
-              </article>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Price</h3>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  ${currentStats.price?.toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Change</h3>
+                <p className={`text-2xl font-bold ${currentStats.change && currentStats.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {currentStats.change && currentStats.change >= 0 ? '+' : ''}{currentStats.change?.toLocaleString()}
+                  <span className="text-sm ml-1">
+                    ({currentStats.changePercent?.toFixed(2)}%)
+                  </span>
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">7-Day Change</h3>
+                <p className={`text-2xl font-bold ${currentStats.weekChange && currentStats.weekChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {currentStats.weekChange && currentStats.weekChange >= 0 ? '+' : ''}{currentStats.weekChange?.toLocaleString()}
+                  <span className="text-sm ml-1">
+                    ({currentStats.weekChangePercent?.toFixed(2)}%)
+                  </span>
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">1-Month Change</h3>
+                <p className={`text-2xl font-bold ${currentStats.monthChange && currentStats.monthChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {currentStats.monthChange && currentStats.monthChange >= 0 ? '+' : ''}{currentStats.monthChange?.toLocaleString()}
+                  <span className="text-sm ml-1">
+                    ({currentStats.monthChangePercent?.toFixed(2)}%)
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* Daily Range Bar */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-8">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Daily Range</h3>
+              <PriceGauge 
+                currentPrice={currentStats.price}
+                lowPrice={currentStats.dailyLow}
+                highPrice={currentStats.dailyHigh}
+              />
+            </div>
+
+            {/* 52-Week Range Bar */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-8">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">52-Week Range</h3>
+              <PriceGauge 
+                currentPrice={currentStats.price}
+                lowPrice={currentStats.low52Week}
+                highPrice={currentStats.high52Week}
+              />
             </div>
           </section>
 

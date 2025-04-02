@@ -12,6 +12,7 @@ import {
   SunIcon
 } from '@heroicons/react/24/solid';
 import Link from 'next/link';
+import RangeBar from '../../components/RangeBar';
 
 interface IndexData {
   key: string;
@@ -24,10 +25,21 @@ interface IndexData {
     changePercent: number;
     yearToDateChange: number;
     yearToDatePercent: number;
-    high52Week: number;
-    low52Week: number;
+    dailyRange: {
+      low: number;
+      high: number;
+      range: string;
+    };
+    fiftyTwoWeekRange: {
+      low: number;
+      high: number;
+      range: string;
+    };
     volume: number;
+    previousClose: number;
+    open: number;
     regularMarketTime?: Date;
+    weekChange?: number;
   };
 }
 
@@ -148,6 +160,16 @@ const IndexCard = ({ data }: { data: IndexData }) => {
   const now = new Date();
   const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
 
+  // Calculate week change
+  const calculateWeekChange = () => {
+    if (!data.historicalData || data.historicalData.length < 2) return 0;
+    const latestPrice = data.historicalData[data.historicalData.length - 1].value;
+    const sevenDaysAgoPrice = data.historicalData[0].value;
+    return ((latestPrice - sevenDaysAgoPrice) / sevenDaysAgoPrice) * 100;
+  };
+
+  currentStats.weekChange = calculateWeekChange();
+
   // Check if market is closed based on trading hours and last update
   const isMarketClosed = () => {
     // If no recent update (more than 15 minutes), consider it closed
@@ -197,148 +219,114 @@ const IndexCard = ({ data }: { data: IndexData }) => {
   };
 
   const marketClosed = isMarketClosed();
-
-  const formattedTime = currentStats.regularMarketTime
-    ? new Date(currentStats.regularMarketTime).toLocaleTimeString(undefined, {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    })
-    : '';
-
-  // Calculate 7D change percentage
-  const calculate7DayChange = () => {
-    if (!data.historicalData || data.historicalData.length < 2) return null;
-
-    const latestPrice = data.historicalData[data.historicalData.length - 1].value;
-    const sevenDaysAgoPrice = data.historicalData[0].value;
-
-    if (!latestPrice || !sevenDaysAgoPrice) return null;
-
-    const changePercent = ((latestPrice - sevenDaysAgoPrice) / sevenDaysAgoPrice) * 100;
-    return changePercent;
-  };
-
-  const sevenDayChange = calculate7DayChange();
   const isPositive = currentStats.change >= 0;
 
   return (
-    <article
-      className={`
-        relative overflow-hidden rounded-xl shadow-lg 
-        ${isPositive
-          ? 'bg-gradient-to-br from-green-50/50 to-white dark:from-green-900/20 dark:to-gray-800'
-          : 'bg-gradient-to-br from-red-50/50 to-white dark:from-red-900/20 dark:to-gray-800'
-        }
-      `}
-    >
-      <div className="relative p-6">
-        {/* Status Badge */}
-        <div className="absolute top-2 right-2">
-          <span className="px-2 py-0.5 text-xs font-medium bg-gray-900/10 dark:bg-gray-700/50 rounded-full">
-            {marketClosed ? 'CLOSED' : 'OPEN'}
+    <div className="relative p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      {/* Market Status */}
+      <div className="absolute top-2 right-2">
+        <span className="px-2 py-0.5 text-xs font-medium bg-gray-900/10 dark:bg-gray-700/50 rounded-full">
+          {marketClosed ? 'CLOSED' : 'LIVE'}
+        </span>
+      </div>
+
+      {/* Index Name */}
+      <div className="mb-2">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight pr-24">{name}</h3>
+      </div>
+
+      {/* Price and Change */}
+      <div className="flex flex-col mb-2">
+        <p className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight tabular-nums mb-1">
+          {currentStats.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        </p>
+        <div className={`
+          flex items-center text-sm
+          ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
+        `}>
+          {isPositive ? (
+            <ArrowUpIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+          ) : (
+            <ArrowDownIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+          )}
+          <span className="font-bold tabular-nums whitespace-nowrap">
+            {isPositive ? '+' : ''}{currentStats.change.toFixed(2)} ({Math.abs(currentStats.changePercent).toFixed(2)}%)
           </span>
         </div>
+      </div>
 
-        {/* Header */}
-        <div className="mb-2">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight pr-24">
-            {name}
-          </h3>
-        </div>
+      {/* Last Updated Time */}
+      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-4">
+        As of {new Date(currentStats.regularMarketTime || '').toLocaleTimeString(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        })}
+      </p>
 
-        {/* Price and Change - Updated to prevent text overflow */}
-        <div className="flex flex-col mb-2">
-          <p className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight tabular-nums mb-1">
-            {currentStats.price.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}
-          </p>
-          <div className={`
-            flex items-center text-sm
-            ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
+      {/* Range Bars */}
+      <div className="space-y-4 mb-4">
+        <RangeBar
+          low={currentStats.dailyRange.low}
+          high={currentStats.dailyRange.high}
+          current={currentStats.price}
+          label="Daily Range"
+        />
+        <RangeBar
+          low={currentStats.fiftyTwoWeekRange.low}
+          high={currentStats.fiftyTwoWeekRange.high}
+          current={currentStats.price}
+          label="52 Week Range"
+        />
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-3 gap-2 mt-4">
+        <div className="overflow-hidden">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">YTD</p>
+          <p className={`
+            text-sm font-bold tabular-nums whitespace-nowrap
+            ${currentStats.yearToDatePercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
           `}>
-            {isPositive ? (
-              <ArrowUpIcon className="h-4 w-4 mr-1 flex-shrink-0" />
-            ) : (
-              <ArrowDownIcon className="h-4 w-4 mr-1 flex-shrink-0" />
-            )}
-            <span className="font-bold tabular-nums whitespace-nowrap">
-              {isPositive ? '+' : ''}{currentStats.change.toFixed(2)} ({Math.abs(currentStats.changePercent).toFixed(2)}%)
-            </span>
-          </div>
+            {currentStats.yearToDatePercent >= 0 ? '+' : ''}{currentStats.yearToDatePercent.toFixed(2)}%
+          </p>
         </div>
-
-        {/* Time */}
-        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-4">
-          As of {formattedTime}
-        </p>
-
-        {/* Stats Grid - Updated for better spacing */}
-        <div className="grid grid-cols-3 gap-2 mt-4">
-          <div className="overflow-hidden">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">
-              YTD
-            </p>
-            <p className={`
-              text-sm font-bold tabular-nums whitespace-nowrap
-              ${currentStats.yearToDateChange >= 0
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400'
-              }
-            `}>
-              {currentStats.yearToDateChange >= 0 ? '+' : ''}{currentStats.yearToDatePercent.toFixed(2)}%
-            </p>
-          </div>
-          <div className="overflow-hidden">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">
-              Volume
-            </p>
-            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums whitespace-nowrap">
-              {(currentStats.volume / 1000000).toFixed(1)}M
-            </p>
-          </div>
-          <div className="overflow-hidden">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">
-              52W Range
-            </p>
-            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums whitespace-nowrap">
-              {Math.round(((currentStats.high52Week - currentStats.low52Week) / currentStats.low52Week) * 100)}%
-            </p>
-          </div>
+        <div className="overflow-hidden">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">Volume</p>
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums whitespace-nowrap">
+            {(currentStats.volume / 1000000).toFixed(1)}M
+          </p>
         </div>
-
-        {/* Chart */}
-        <div className="absolute top-12 right-4 w-28 h-16">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data.historicalData}>
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke={isPositive ? '#22c55e' : '#ef4444'}
-                strokeWidth={1.5}
-                dot={false}
-                isAnimationActive={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-          {sevenDayChange !== null && (
-            <div className="absolute -bottom-4 right-0 text-xs font-medium whitespace-nowrap">
-              <span className="text-gray-500 dark:text-gray-400">7D:</span>{' '}
-              <span className={
-                sevenDayChange >= 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              }>
-                {sevenDayChange >= 0 ? '+' : ''}
-                {sevenDayChange.toFixed(2)}%
-              </span>
-            </div>
-          )}
+        <div className="overflow-hidden">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide truncate">52W Range</p>
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums whitespace-nowrap">
+            {Math.round(((currentStats.fiftyTwoWeekRange.high - currentStats.fiftyTwoWeekRange.low) / currentStats.fiftyTwoWeekRange.low) * 100)}%
+          </p>
         </div>
       </div>
-    </article>
+
+      {/* Chart */}
+      <div className="absolute top-12 right-4 w-28 h-16">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data.historicalData}>
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={isPositive ? '#22c55e' : '#ef4444'}
+              strokeWidth={1.5}
+              dot={false}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+        <div className="absolute -bottom-4 right-0 text-xs font-medium whitespace-nowrap">
+          <span className="text-gray-500 dark:text-gray-400">7D:</span>{' '}
+          <span className={isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+            {isPositive ? '+' : ''}{currentStats.weekChange?.toFixed(2)}%
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };
 

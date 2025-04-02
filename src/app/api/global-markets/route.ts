@@ -15,11 +15,9 @@ const GLOBAL_INDICES: Record<string, GlobalIndexInfo> = {
   '000001.SS': { key: 'shanghai', name: 'Shanghai Composite', region: 'Asia Pacific', country: 'China' },
   '399001.SZ': { key: 'shenzhen', name: 'Shenzhen Component', region: 'Asia Pacific', country: 'China' },
   '^AXJO': { key: 'asx200', name: 'ASX 200', region: 'Asia Pacific', country: 'Australia' },
-  '^KOSPI': { key: 'kospi', name: 'KOSPI', region: 'Asia Pacific', country: 'South Korea' },
   '^TWII': { key: 'taiex', name: 'TAIEX', region: 'Asia Pacific', country: 'Taiwan' },
   '^STI': { key: 'sti', name: 'Straits Times Index', region: 'Asia Pacific', country: 'Singapore' },
   '^JKSE': { key: 'jakarta', name: 'Jakarta Composite', region: 'Asia Pacific', country: 'Indonesia' },
-  '^SENSEX': { key: 'sensex', name: 'BSE SENSEX', region: 'Asia Pacific', country: 'India' },
   '^NSEI': { key: 'nifty50', name: 'NIFTY 50', region: 'Asia Pacific', country: 'India' },
 
   // Europe
@@ -28,29 +26,25 @@ const GLOBAL_INDICES: Record<string, GlobalIndexInfo> = {
   '^FCHI': { key: 'cac40', name: 'CAC 40', region: 'Europe', country: 'France' },
   '^STOXX50E': { key: 'eurostoxx50', name: 'Euro Stoxx 50', region: 'Europe', country: 'Eurozone' },
   '^IBEX': { key: 'ibex35', name: 'IBEX 35', region: 'Europe', country: 'Spain' },
-  '^FTMIB': { key: 'ftseItalia', name: 'FTSE MIB', region: 'Europe', country: 'Italy' },
   '^AEX': { key: 'aex', name: 'AEX', region: 'Europe', country: 'Netherlands' },
   '^SSMI': { key: 'smi', name: 'SMI', region: 'Europe', country: 'Switzerland' },
   '^OMX': { key: 'omx30', name: 'OMX 30', region: 'Europe', country: 'Sweden' },
   'IMOEX.ME': { key: 'moex', name: 'MOEX', region: 'Europe', country: 'Russia' },
 
   // Americas
+  '^DJI': { key: 'dowjones', name: 'Dow Jones Industrial Average', region: 'Americas', country: 'United States' },
+  '^GSPC': { key: 'sp500', name: 'S&P 500', region: 'Americas', country: 'United States' },
+  '^IXIC': { key: 'nasdaq', name: 'NASDAQ Composite', region: 'Americas', country: 'United States' },
+  '^RUT': { key: 'russell2000', name: 'Russell 2000', region: 'Americas', country: 'United States' },
   '^BVSP': { key: 'bovespa', name: 'Bovespa', region: 'Americas', country: 'Brazil' },
   '^MXX': { key: 'ipc', name: 'S&P/BMV IPC', region: 'Americas', country: 'Mexico' },
   '^GSPTSE': { key: 'tsx', name: 'S&P/TSX Composite', region: 'Americas', country: 'Canada' },
   '^MERV': { key: 'merval', name: 'S&P Merval', region: 'Americas', country: 'Argentina' },
   '^IPSA': { key: 'ipsa', name: 'S&P/CLX IPSA', region: 'Americas', country: 'Chile' },
-  '^COLCAP': { key: 'colcap', name: 'COLCAP', region: 'Americas', country: 'Colombia' },
 
   // Middle East & Africa
-  'TASI.SR': { key: 'tasi', name: 'Tadawul All Share', region: 'Middle East & Africa', country: 'Saudi Arabia' },
   '^TA125.TA': { key: 'ta125', name: 'TA-125', region: 'Middle East & Africa', country: 'Israel' },
-  '^QSI': { key: 'qsi', name: 'Qatar General', region: 'Middle East & Africa', country: 'Qatar' },
-  '^ADI': { key: 'adi', name: 'ADX General', region: 'Middle East & Africa', country: 'UAE' },
-  '^DFMGI': { key: 'dfmgi', name: 'DFM General', region: 'Middle East & Africa', country: 'UAE' },
-  '^EGX30': { key: 'egx30', name: 'EGX 30', region: 'Middle East & Africa', country: 'Egypt' },
-  '^CASE30': { key: 'case30', name: 'EGX 30 Capped', region: 'Middle East & Africa', country: 'Egypt' },
-  '^JSE': { key: 'jse', name: 'JSE Top 40', region: 'Middle East & Africa', country: 'South Africa' }
+  '^CASE30': { key: 'case30', name: 'EGX 30 Capped', region: 'Middle East & Africa', country: 'Egypt' }
 };
 
 async function fetchIndexData(symbol: string) {
@@ -99,19 +93,29 @@ async function fetchIndexData(symbol: string) {
         changePercent: quote.regularMarketChangePercent || 0,
         yearToDateChange,
         yearToDatePercent,
-        high52Week: quote.fiftyTwoWeekHigh || regularMarketPrice,
-        low52Week: quote.fiftyTwoWeekLow || regularMarketPrice,
+        // Add daily range
+        dailyRange: {
+          low: quote.regularMarketDayLow || 0,
+          high: quote.regularMarketDayHigh || 0,
+          range: `${quote.regularMarketDayLow || 0} - ${quote.regularMarketDayHigh || 0}`
+        },
+        // Add 52-week range
+        fiftyTwoWeekRange: {
+          low: quote.fiftyTwoWeekLow || 0,
+          high: quote.fiftyTwoWeekHigh || 0,
+          range: `${quote.fiftyTwoWeekLow || 0} - ${quote.fiftyTwoWeekHigh || 0}`
+        },
+        // Add volume
         volume: quote.regularMarketVolume || 0,
-        regularMarketTime: quote.regularMarketTime 
-          ? typeof quote.regularMarketTime === 'number' 
-            ? new Date(quote.regularMarketTime * 1000)
-            : new Date(quote.regularMarketTime)
-          : undefined
+        // Add previous close
+        previousClose: quote.regularMarketPreviousClose || 0,
+        // Add open price
+        open: quote.regularMarketOpen || 0
       }
     };
   } catch (error) {
     console.error(`Error fetching data for ${symbol}:`, error);
-    return null;
+    throw error;
   }
 }
 
@@ -127,10 +131,19 @@ interface MarketDataAccumulator {
       changePercent: number;
       yearToDateChange: number;
       yearToDatePercent: number;
-      high52Week: number;
-      low52Week: number;
+      dailyRange: {
+        low: number;
+        high: number;
+        range: string;
+      };
+      fiftyTwoWeekRange: {
+        low: number;
+        high: number;
+        range: string;
+      };
       volume: number;
-      regularMarketTime?: Date;
+      previousClose: number;
+      open: number;
     };
   }>;
 }
