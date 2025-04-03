@@ -4,6 +4,7 @@ import { useEffect, Suspense } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import Link from 'next/link';
 
 // Dynamically import components with loading fallbacks
 const MarketMovers = dynamic(() => import('@/components/MarketMovers'), {
@@ -130,7 +131,7 @@ export default function USMarkets() {
         <meta name="twitter:description" content="Track real-time US market data, stock indices, and market trends. Get live updates from major US markets." />
       </Head>
 
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <main className="min-h-screen py-12">
         <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-8xl">
           <header className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-3">
@@ -186,6 +187,18 @@ export default function USMarkets() {
               </Suspense>
             </section>
           </div>
+        </div>
+        <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p>Data is updated every 5 minutes. Market hours are in UTC.</p>
+          <p className="mt-2">
+            <Link
+              href="/about"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              aria-label="Learn more about our data sources"
+            >
+              Learn more about our data sources
+            </Link>
+          </p>
         </div>
       </main>
 

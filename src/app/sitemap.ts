@@ -16,6 +16,11 @@ const PAGES = {
     priority: 1,
     changeFrequency: 'daily' as const,
   },
+  TOP_10_CRYPTO: {
+    path: 'top-10-crypto',
+    priority: 1,
+    changeFrequency: 'always' as const,
+  },
   FEAR_GREED_VS_BTC: {
     path: 'fear-greed-vs-btc',
     priority: 1,

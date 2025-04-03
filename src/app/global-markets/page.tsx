@@ -403,7 +403,7 @@ export default function GlobalMarkets() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen">
         <main className="container mx-auto px-4 py-8" aria-busy="true" aria-label="Loading global markets data">
           <div className="animate-pulse space-y-12">
             {['Asia Pacific', 'Europe', 'Americas', 'Middle East & Africa'].map((region) => (
@@ -423,7 +423,7 @@ export default function GlobalMarkets() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen">
       <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-8xl">
         <header className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4">
@@ -458,7 +458,7 @@ export default function GlobalMarkets() {
           ))}
         </div>
 
-        <footer className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
           <p>Data is updated every 5 minutes. Market hours are in UTC.</p>
           <p className="mt-2">
             <Link
@@ -469,7 +469,7 @@ export default function GlobalMarkets() {
               Learn more about our data sources
             </Link>
           </p>
-        </footer>
+        </div>
       </main>
     </div>
   );
