@@ -159,6 +159,7 @@ const IndexCard = ({ data }: { data: IndexData }) => {
   // Get current time in UTC
   const now = new Date();
   const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
+  const utcDay = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
   // Calculate week change
   const calculateWeekChange = () => {
@@ -172,50 +173,110 @@ const IndexCard = ({ data }: { data: IndexData }) => {
 
   // Check if market is closed based on trading hours and last update
   const isMarketClosed = () => {
+    // If it's Saturday or Sunday, market is closed
+    if (utcDay === 0 || utcDay === 6) return true;
+
     // If no recent update (more than 15 minutes), consider it closed
     if (!currentStats.regularMarketTime ||
       (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 15 * 60 * 1000) {
       return true;
     }
 
+    // Get market hours for the current country
+    const marketHours = getMarketHours();
+    if (!marketHours) return true;
+
+    // Check if current time is within market hours
+    const isWithinHours = (hours: MarketHours) => {
+      const { start, end } = hours;
+      // Handle cases where market spans across UTC day boundary
+      if (start > end) {
+        return utcHours >= start || utcHours <= end;
+      }
+      return utcHours >= start && utcHours <= end;
+    };
+
+    return !isWithinHours(marketHours);
+  };
+
+  // Get market hours for the current country
+  const getMarketHours = () => {
     // Check Asian market hours
     const asianMarketHours = MARKET_HOURS['Asia Pacific']?.open;
     const asianCountry = country as keyof AsianMarketHours;
     if (asianMarketHours && asianCountry in asianMarketHours) {
-      const hours = asianMarketHours[asianCountry];
-      // Handle cases where market spans across UTC day boundary
-      if (hours.start > hours.end) {
-        return !(utcHours >= hours.start || utcHours <= hours.end);
-      }
-      return !(utcHours >= hours.start && utcHours <= hours.end);
+      return asianMarketHours[asianCountry];
     }
 
     // Check European market hours
     const europeanMarketHours = MARKET_HOURS['Europe']?.open;
     const europeanCountry = country as keyof EuropeanMarketHours;
     if (europeanMarketHours && europeanCountry in europeanMarketHours) {
-      const hours = europeanMarketHours[europeanCountry];
-      return !(utcHours >= hours.start && utcHours <= hours.end);
+      return europeanMarketHours[europeanCountry];
     }
 
     // Check Americas market hours
     const americasMarketHours = MARKET_HOURS['Americas']?.open;
     const americasCountry = country as keyof AmericasMarketHours;
     if (americasMarketHours && americasCountry in americasMarketHours) {
-      const hours = americasMarketHours[americasCountry];
-      return !(utcHours >= hours.start && utcHours <= hours.end);
+      return americasMarketHours[americasCountry];
     }
 
     // Check Middle East & Africa market hours
     const meaMarketHours = MARKET_HOURS['Middle East & Africa']?.open;
     const meaCountry = country as keyof MiddleEastAfricaMarketHours;
     if (meaMarketHours && meaCountry in meaMarketHours) {
-      const hours = meaMarketHours[meaCountry];
-      return !(utcHours >= hours.start && utcHours <= hours.end);
+      return meaMarketHours[meaCountry];
     }
 
-    // For other markets, use the 15-minute rule
-    return (now.getTime() - new Date(currentStats.regularMarketTime).getTime()) > 15 * 60 * 1000;
+    return null;
+  };
+
+  // Format market status with time
+  const formatMarketStatus = () => {
+    if (marketClosed) {
+      const nextOpenTime = getNextOpenTime();
+      return nextOpenTime ? `CLOSED (Opens ${nextOpenTime})` : 'CLOSED';
+    }
+    return 'LIVE';
+  };
+
+  // Get next market open time
+  const getNextOpenTime = () => {
+    const now = new Date();
+    const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
+    const utcDay = now.getUTCDay();
+
+    // If it's Saturday, next open is Monday
+    if (utcDay === 6) {
+      const daysUntilMonday = 2;
+      const nextMonday = new Date(now);
+      nextMonday.setDate(now.getDate() + daysUntilMonday);
+      return nextMonday.toLocaleDateString(undefined, { weekday: 'long' });
+    }
+
+    // If it's Sunday, next open is Monday
+    if (utcDay === 0) {
+      const daysUntilMonday = 1;
+      const nextMonday = new Date(now);
+      nextMonday.setDate(now.getDate() + daysUntilMonday);
+      return nextMonday.toLocaleDateString(undefined, { weekday: 'long' });
+    }
+
+    // For weekdays, check if market is closed for the day
+    const marketHours = getMarketHours();
+    if (marketHours) {
+      if (utcHours > marketHours.end) {
+        // Market closed for the day, next open is tomorrow
+        const tomorrow = new Date(now);
+        tomorrow.setDate(now.getDate() + 1);
+        return tomorrow.toLocaleDateString(undefined, { weekday: 'long' });
+      }
+      // Market hasn't opened yet today
+      return 'Today';
+    }
+
+    return null;
   };
 
   const marketClosed = isMarketClosed();
@@ -226,7 +287,7 @@ const IndexCard = ({ data }: { data: IndexData }) => {
       {/* Market Status */}
       <div className="absolute top-2 right-2">
         <span className="px-2 py-0.5 text-xs font-medium bg-gray-900/10 dark:bg-gray-700/50 rounded-full">
-          {marketClosed ? 'CLOSED' : 'LIVE'}
+          {formatMarketStatus()}
         </span>
       </div>
 

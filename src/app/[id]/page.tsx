@@ -9,7 +9,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   return {
-    title: `${id} Details | ${id} Live Charts`,
+    title: `${id} price | ${id} Live Charts`,
     description: `Detailed information about ${id} cryptocurrency including price, market data, and technical analysis.`,
     keywords: `${id} details, ${id} price, ${id} market data, ${id} technical analysis`,
     openGraph: {
