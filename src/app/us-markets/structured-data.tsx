@@ -15,11 +15,6 @@ export default function StructuredData() {
       priceCurrency: 'USD',
       availability: 'https://schema.org/InStock'
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '125'
-    },
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': 'https://cryptogreedindex.com/us-markets'
