@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     siteName: 'Crypto Greed Index',
     images: [
       {
-        url: '/images/cryptogreedindex.png',
+        url: '/cryptogreedindex.png',
         width: 1200,
         height: 630,
         alt: 'Best Crypto Trading App and Top Cryptocurrency Exchanges',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Best Crypto Trading App 2025 | Top Cryptocurrency Exchanges & Platforms',
     description: 'Find the best cryptocurrency trading app and top crypto exchanges for 2025. Compare features, security, and trading volumes of leading platforms.',
-    images: ['/images/cryptogreedindex.png'],
+    images: ['/cryptogreedindex.png'],
   },
   alternates: {
     canonical: 'https://cryptogreedindex.com/top-crypto-exchanges',
