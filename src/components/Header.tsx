@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+// import Image from 'next/image';
 import ThemeToggle from './ThemeToggle';
 import { useState } from 'react';
 
@@ -24,7 +24,7 @@ export default function Header({
       <header className="bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="relative w-10 h-10">
+            {/* <div className="relative w-10 h-10">
               <Image
                 src="/cryptogreedindex.png"
                 alt="CryptogreedIndex.com"
@@ -33,7 +33,7 @@ export default function Header({
                 className="object-contain"
                 priority
               />
-            </div>
+            </div> */}
             <h1 className="text-l font-bold text-[#048f04] dark:text-white">
               {title}
             </h1>
