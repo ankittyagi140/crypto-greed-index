@@ -30,9 +30,54 @@ interface EnrichedCryptoData extends CryptoMarketData {
   price_change_percentage_30d: number | null;
 }
 
+/**
+ * Fetches data with retry logic and exponential backoff
+ * @param url The URL to fetch
+ * @param options Fetch options
+ * @param maxRetries Maximum number of retries
+ * @param baseDelay Base delay in ms before retrying
+ * @returns The fetch response
+ */
+async function fetchWithRetry(
+  url: string, 
+  options: RequestInit, 
+  maxRetries = 3, 
+  baseDelay = 1000
+): Promise<Response> {
+  let retries = 0;
+  
+  while (true) {
+    try {
+      const response = await fetch(url, options);
+      
+      // If not rate limited or we've used all retries, return the response
+      if (response.status !== 429 || retries >= maxRetries) {
+        return response;
+      }
+      
+      // Calculate delay with exponential backoff
+      const delay = baseDelay * Math.pow(2, retries);
+      console.log(`Rate limited. Retrying in ${delay}ms (attempt ${retries + 1}/${maxRetries})`);
+      
+      // Wait before retrying
+      await new Promise(resolve => setTimeout(resolve, delay));
+      retries++;
+    } catch (error) {
+      // For network errors, also use retry logic
+      if (retries >= maxRetries) throw error;
+      
+      const delay = baseDelay * Math.pow(2, retries);
+      console.log(`Network error. Retrying in ${delay}ms (attempt ${retries + 1}/${maxRetries})`);
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+      retries++;
+    }
+  }
+}
+
 async function fetchCryptoMarketData() {
   try {
-    const response = await fetch(
+    const response = await fetchWithRetry(
       'https://api.coingecko.com/api/v3/coins/markets' +
       '?vs_currency=usd' +
       '&order=market_cap_desc' +
@@ -44,7 +89,7 @@ async function fetchCryptoMarketData() {
           'Accept': 'application/json',
         },
         next: {
-          revalidate: 60 // Cache for 1 minute
+          revalidate: 300 // Cache for 5 minutes to reduce API calls
         }
       }
     );
@@ -66,14 +111,14 @@ async function fetchCryptoMarketData() {
 
 async function fetchOHLCData(coinId: string) {
   try {
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=30`,
       {
         headers: {
           'Accept': 'application/json',
         },
         next: {
-          revalidate: 60 // Cache for 1 minute
+          revalidate: 300 // Cache for 5 minutes to reduce API calls
         }
       }
     );
@@ -113,6 +158,7 @@ export async function GET() {
           const monthHigh = monthData.length > 0 ? Math.max(...monthData.map((d: number[]) => d[2])) : null;
           const monthLow = monthData.length > 0 ? Math.min(...monthData.map((d: number[]) => d[3])) : null;
 
+          // Make sure sparkline_in_7d is included in the enriched data
           return {
             ...crypto,
             high_24h: crypto.high_24h || crypto.current_price,
@@ -122,7 +168,8 @@ export async function GET() {
             high_30d: monthHigh || crypto.current_price,
             low_30d: monthLow || crypto.current_price,
             price_change_percentage_7d: crypto.price_change_percentage_7d_in_currency,
-            price_change_percentage_30d: crypto.price_change_percentage_30d_in_currency
+            price_change_percentage_30d: crypto.price_change_percentage_30d_in_currency,
+            sparkline_in_7d: crypto.sparkline_in_7d // Ensure sparkline data is included
           } as EnrichedCryptoData;
         } catch (err) {
           console.error(`Error processing OHLC data for ${crypto.id}:`, err);
@@ -136,13 +183,19 @@ export async function GET() {
             high_30d: crypto.current_price,
             low_30d: crypto.current_price,
             price_change_percentage_7d: crypto.price_change_percentage_7d_in_currency,
-            price_change_percentage_30d: crypto.price_change_percentage_30d_in_currency
+            price_change_percentage_30d: crypto.price_change_percentage_30d_in_currency,
+            sparkline_in_7d: crypto.sparkline_in_7d // Ensure sparkline data is included
           } as EnrichedCryptoData;
         }
       })
     );
 
-    return NextResponse.json(enrichedData);
+    // Cache the response for 5 minutes
+    return NextResponse.json(enrichedData, {
+      headers: {
+        'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=300'
+      }
+    });
   } catch (error) {
     console.error('API Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Failed to fetch cryptocurrency data';
@@ -150,7 +203,13 @@ export async function GET() {
     
     return NextResponse.json(
       { error: errorMessage },
-      { status }
+      { 
+        status,
+        headers: {
+          // Cache error responses for a shorter time
+          'Cache-Control': 'public, max-age=60, s-maxage=60'
+        }
+      }
     );
   }
 } 

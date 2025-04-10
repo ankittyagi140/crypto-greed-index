@@ -492,51 +492,112 @@ export default function Home() {
               </div>
 
               {/* Understanding Market Sentiment */}
-              <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                  Understanding Market Sentiment
-                      </h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Key Indicators */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Key Indicators</h3>
-                    <ul className="space-y-2">
-                      {[
-                        'Market Volatility',
-                        'Trading Volume',
-                        'Social Media Sentiment',
-                        'Market Dominance',
-                        'Trends and Momentum'
-                      ].map((indicator) => (
-                        <li key={indicator} className="flex items-center text-gray-600 dark:text-gray-400">
-                          <span className="mr-2">•</span>
-                          {indicator}
+              <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 mb-8 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-50/30 to-green-50/30 dark:from-blue-900/10 dark:to-green-900/10 rounded-full -mr-32 -mt-32 z-0"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-red-50/30 to-orange-50/30 dark:from-red-900/10 dark:to-orange-900/10 rounded-full -ml-32 -mb-32 z-0"></div>
+                
+                <div className="relative z-10">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span className="inline-block p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </span>
+                    Understanding Market Sentiment
+                  </h2>
+                  
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* Key Indicators */}
+                    <div className="bg-white from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transform transition-transform hover:scale-[1.01]">
+                      <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800 dark:text-white">
+                        <span className="inline-block p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                          </svg>
+                        </span>
+                        Key Indicators
+                      </h3>
+                      
+                      <ul className="space-y-3">
+                        <li className="flex items-center text-gray-700 dark:text-gray-300 group">
+                          <span className="mr-3 flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 group-hover:bg-red-100 dark:group-hover:bg-red-900/30 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </span>
+                          Market Volatility
                         </li>
-                      ))}
-                    </ul>
+                        
+                        <li className="flex items-center text-gray-700 dark:text-gray-300 group">
+                          <span className="mr-3 flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                            </svg>
+                          </span>
+                          Trading Volume
+                        </li>
+                        
+                        <li className="flex items-center text-gray-700 dark:text-gray-300 group">
+                          <span className="mr-3 flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                            </svg>
+                          </span>
+                          Social Media Sentiment
+                        </li>
+                        
+                        <li className="flex items-center text-gray-700 dark:text-gray-300 group">
+                          <span className="mr-3 flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-50 dark:bg-yellow-900/20 text-yellow-500 dark:text-yellow-400 group-hover:bg-yellow-100 dark:group-hover:bg-yellow-900/30 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                          </span>
+                          Market Dominance
+                        </li>
+                        
+                        <li className="flex items-center text-gray-700 dark:text-gray-300 group">
+                          <span className="mr-3 flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 dark:bg-green-900/20 text-green-500 dark:text-green-400 group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                          </span>
+                          Trends and Momentum
+                        </li>
+                      </ul>
                     </div>
                     
-                  {/* Market Implications */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Market Implications</h3>
-                    <div className="space-y-3">
-                      {marketImplications.map((item) => (
-                        <div
-                          key={item.range}
-                          className={classNames(
-                            "rounded-lg border p-3 transition-all hover:shadow-md",
-                            item.bgColor,
-                            item.borderColor
-                          )}
-                        >
-                          <div className={classNames("font-medium", item.color)}>
-                            {item.range}
-                    </div>
-                          <div className="text-sm mt-1 text-gray-600 dark:text-gray-400">
-                            {item.implication}
-                        </div>
-                        </div>
-                      ))}
+                    {/* Market Implications */}
+                    <div className="bg-white from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transform transition-transform hover:scale-[1.01]">
+                      <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800 dark:text-white">
+                        <span className="inline-block p-1.5 bg-green-100 dark:bg-green-900/30 rounded-lg mr-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </span>
+                        Market Implications
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        {marketImplications.map((item) => (
+                          <div
+                            key={item.range}
+                            className={classNames(
+                              "rounded-lg border p-4 transition-all hover:shadow-md relative overflow-hidden group",
+                              item.bgColor,
+                              item.borderColor
+                            )}
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/5 dark:to-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className={classNames("font-medium flex items-center", item.color)}>
+                              <span className="w-2 h-2 rounded-full bg-current mr-2"></span>
+                              {item.range}
+                            </div>
+                            <div className="text-sm mt-1.5 text-gray-600 dark:text-gray-400 pl-4 border-l-2 border-current ml-[0.2rem]">
+                              {item.implication}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -630,24 +691,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-
-      {/* Disclaimer Section */}
-      <section className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Disclaimer</h2>
-          <div className="prose dark:prose-invert max-w-none">
-            <h3 className="text-lg font-semibold mb-2">No Investment Advice</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              The information provided on this website does not constitute investment advice,
-              financial advice, trading advice, or any other sort of advice and you should not
-              treat any of the website&lsquo;s content as such. Alternative.me does not recommend
-              that any cryptocurrency should be bought, sold, or held by you. Do conduct your
-              own due diligence and consult your financial advisor before making any investment
-              decisions.
-            </p>
-          </div>
-      </div>
-      </section>
     </div>
   );
 }

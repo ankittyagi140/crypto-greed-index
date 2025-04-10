@@ -169,6 +169,13 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
+          {/* Investment Advice Disclaimer */}
+          <div className="mb-6 text-center px-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              The information provided on this website does not constitute investment advice, financial advice, trading advice, or any other sort of advice and you should not treat any of the website&lsquo;s content as such. Alternative.me does not recommend that any cryptocurrency should be bought, sold, or held by you. Do conduct your own due diligence and consult your financial advisor before making any investment decisions.
+            </p>
+          </div>
+          
           <p className="text-center text-gray-600 dark:text-gray-300 text-sm">
             © {new Date().getFullYear()} www.cryptogreedindex.com. All rights reserved.
           </p>

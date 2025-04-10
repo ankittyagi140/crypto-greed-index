@@ -9,7 +9,7 @@ const SYMBOL_MAP = {
   'dollar-index': 'DX-Y.NYB'
 } as const;
 
-type RouteParams = {
+type Params = {
   symbol: keyof typeof SYMBOL_MAP;
 };
 
@@ -172,7 +172,7 @@ async function fetchIndexData(symbol: string, timeRange: string = '1Y') {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<RouteParams> }
+  { params }: { params: Promise<Params> }
 ) {
   try {
     const resolvedParams = await params;

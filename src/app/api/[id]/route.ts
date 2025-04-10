@@ -2,30 +2,105 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 
+// Define params type with Promise
+type Params = {
+  id: string;
+};
+
+/**
+ * Fetches data with retry logic and exponential backoff
+ * @param url The URL to fetch
+ * @param options Fetch options
+ * @param maxRetries Maximum number of retries
+ * @param baseDelay Base delay in ms before retrying
+ * @returns The fetch response
+ */
+async function fetchWithRetry(
+  url: string, 
+  options: RequestInit = {}, 
+  maxRetries = 3, 
+  baseDelay = 1000
+): Promise<Response> {
+  let retries = 0;
+  
+  while (true) {
+    try {
+      const response = await fetch(url, options);
+      
+      // If not rate limited or we've used all retries, return the response
+      if (response.status !== 429 || retries >= maxRetries) {
+        return response;
+      }
+      
+      // Calculate delay with exponential backoff
+      const delay = baseDelay * Math.pow(2, retries);
+      console.log(`Rate limited. Retrying in ${delay}ms (attempt ${retries + 1}/${maxRetries})`);
+      
+      // Wait before retrying
+      await new Promise(resolve => setTimeout(resolve, delay));
+      retries++;
+    } catch (error) {
+      // For network errors, also use retry logic
+      if (retries >= maxRetries) throw error;
+      
+      const delay = baseDelay * Math.pow(2, retries);
+      console.log(`Network error. Retrying in ${delay}ms (attempt ${retries + 1}/${maxRetries})`);
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+      retries++;
+    }
+  }
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<Params> }
 ) {
   try {
-    const { id } = await params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
     if (!id) {
       return NextResponse.json({ error: 'Coin ID is required' }, { status: 400 });
     }
 
-    // Fetch both coin details and historical data in parallel
+    // Fetch both coin details and historical data in parallel with retry
     const [coinResponse, historyResponse] = await Promise.all([
-      fetch(
-        `${COINGECKO_API}/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=false`
+      fetchWithRetry(
+        `${COINGECKO_API}/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=false`,
+        {
+          headers: {
+            'Accept': 'application/json',
+          },
+          next: {
+            revalidate: 300 // Cache for 5 minutes
+          }
+        }
       ),
-      fetch(
-        `${COINGECKO_API}/coins/${id}/market_chart?vs_currency=usd&days=365&interval=daily`
+      fetchWithRetry(
+        `${COINGECKO_API}/coins/${id}/market_chart?vs_currency=usd&days=365&interval=daily`,
+        {
+          headers: {
+            'Accept': 'application/json',
+          },
+          next: {
+            revalidate: 300 // Cache for 5 minutes
+          }
+        }
       )
     ]);
 
     if (!coinResponse.ok || !historyResponse.ok) {
+      const status = coinResponse.status === 429 || historyResponse.status === 429 ? 429 : 
+                   (coinResponse.status || historyResponse.status);
+      
       return NextResponse.json(
         { error: `Failed to fetch coin data: ${coinResponse.statusText || historyResponse.statusText}` },
-        { status: coinResponse.status || historyResponse.status }
+        { 
+          status,
+          headers: {
+            'Cache-Control': 'public, max-age=60, s-maxage=60'
+          }
+        }
       );
     }
 
@@ -108,12 +183,24 @@ export async function GET(
       historicalData,
     };
 
-    return NextResponse.json({ data: formattedData });
+    return NextResponse.json({ data: formattedData }, {
+      headers: {
+        'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=300'
+      }
+    });
   } catch (error) {
     console.error('Error fetching coin data:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
+    const status = errorMessage.includes('Rate limit') ? 429 : 500;
+    
     return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
+      { error: errorMessage },
+      { 
+        status,
+        headers: {
+          'Cache-Control': 'public, max-age=60, s-maxage=60'
+        }
+      }
     );
   }
 } 
