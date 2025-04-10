@@ -295,12 +295,12 @@ export default function IndexDetail() {
   const fetchData = useCallback(async () => {
     if (!symbol) return;
     
-    try {
-      setLoading(true);
-      setError(null);
-      const loadingToast = toast.loading('Fetching market data...', {
-        position: 'top-right',
-      });
+      try {
+        setLoading(true);
+        setError(null);
+        const loadingToast = toast.loading('Fetching market data...', {
+          position: 'top-right',
+        });
       
       // Fetch both market data and market breadth data in parallel
       const [marketDataResponse, marketBreadthResponse] = await Promise.all([
@@ -315,9 +315,9 @@ export default function IndexDetail() {
       }
 
       const { historicalData, currentStats, lastUpdated } = marketDataResult.data;
-      setHistoricalData(historicalData);
-      setCurrentStats(currentStats);
-      setLastUpdated(lastUpdated);
+        setHistoricalData(historicalData);
+        setCurrentStats(currentStats);
+        setLastUpdated(lastUpdated);
       
       // Process market breadth data if available
       if (marketBreadthResponse.ok) {
@@ -327,32 +327,32 @@ export default function IndexDetail() {
         }
       }
         
-      // Calculate technical indicators after setting historical data
-      const indicators = calculateIndicators(historicalData);
-      setTechnicalIndicators(indicators);
+        // Calculate technical indicators after setting historical data
+        const indicators = calculateIndicators(historicalData);
+        setTechnicalIndicators(indicators);
 
-      toast.success('Market data updated', {
-        id: loadingToast,
-        duration: 2000,
-      });
-    } catch (err) {
+        toast.success('Market data updated', {
+          id: loadingToast,
+          duration: 2000,
+        });
+      } catch (err) {
       console.error('Error fetching data:', err);
       setError('Failed to load market data. Please try again later.');
       toast.error('Failed to load market data. Please try again later.', {
-        duration: 4000,
-      });
-    } finally {
-      setLoading(false);
-    }
+          duration: 4000,
+        });
+      } finally {
+        setLoading(false);
+      }
   }, [symbol, timeRange, calculateIndicators]); // Only include dependencies that are used in the function
 
   useEffect(() => {
     if (!symbol) return;
-    
-    fetchData();
+
+      fetchData();
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
   }, [fetchData, symbol]); // Add symbol to dependency array
 
   // Format large numbers with abbreviations

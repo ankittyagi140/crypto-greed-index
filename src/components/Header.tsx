@@ -5,6 +5,9 @@ import Image from 'next/image';
 import ThemeToggle from './ThemeToggle';
 import { useState } from 'react';
 
+// Define the logo directly in the component to ensure it's always available
+import cryptoLogo from '../../public/cryptogreedindex.png';
+
 interface HeaderProps {
   title?: string;
 }
@@ -24,16 +27,16 @@ export default function Header({
       <header className="bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="relative w-10 h-10">
+            <span className="relative flex items-center justify-center w-10 h-10">
               <Image
-                src="/cryptogreedindex.png"
+                src={cryptoLogo}
                 alt="CryptogreedIndex.com"
                 width={40}
                 height={40}
                 className="object-contain"
                 priority
               />
-            </div>
+            </span>
             <h1 className="text-l font-bold text-[#048f04] dark:text-white">
               {title}
             </h1>

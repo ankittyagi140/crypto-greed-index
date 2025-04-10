@@ -361,14 +361,14 @@ const IndexRow = ({ data }: { data: IndexData }) => {
       </td>
       <td className="py-3 px-4">
         <div className={`flex items-center justify-end whitespace-nowrap ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-          {isPositive ? (
-            <ArrowUpIcon className="h-4 w-4 mr-1 flex-shrink-0" />
-          ) : (
-            <ArrowDownIcon className="h-4 w-4 mr-1 flex-shrink-0" />
-          )}
+            {isPositive ? (
+              <ArrowUpIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+            ) : (
+              <ArrowDownIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+            )}
           <span className="font-medium">
             {isPositive ? '+' : ''}{currentStats.change.toFixed(2)}
-          </span>
+            </span>
         </div>
       </td>
       <td className="py-3 px-4">
@@ -437,9 +437,9 @@ const RegionSection = ({ title, data }: { title: string; data: IndexData[] }) =>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {data.map((index) => (
+        {data.map((index) => (
               <IndexRow key={index.key} data={index} />
-            ))}
+        ))}
           </tbody>
         </table>
       </div>
