@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FaTwitter, FaInstagram, FaCoffee } from 'react-icons/fa';
+import { FaTwitter, FaInstagram, FaCoffee, FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -152,6 +152,15 @@ export default function Footer() {
                 aria-label="Follow us on Instagram"
               >
                 <FaInstagram className="w-6 h-6" />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/atyagi-js"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-blue-700 dark:text-gray-400 dark:hover:text-blue-500 transition-colors"
+                aria-label="Connect on LinkedIn"
+              >
+                <FaLinkedin className="w-6 h-6" />
               </a>
             </div>
           </div>

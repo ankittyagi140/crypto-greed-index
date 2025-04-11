@@ -27,6 +27,7 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    domains: ['www.cryptogreedindex.com'],
   },
   reactStrictMode: true,
 }

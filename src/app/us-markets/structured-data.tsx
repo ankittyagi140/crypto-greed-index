@@ -1,64 +1,86 @@
 export default function StructuredData() {
+  const dateModified = new Date().toISOString();
+
   const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FinancialProduct',
-    name: 'US Stock Market Live',
-    description: 'Real-time tracking of US stock markets including Dow Jones, S&P 500, and NASDAQ futures. Get live updates on after hours trading, market hours, and current market conditions.',
-    provider: {
-      '@type': 'Organization',
-      name: 'Crypto Greed Index',
-      url: 'https://cryptogreedindex.com'
-    },
-    category: 'Stock Market',
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock'
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': 'https://cryptogreedindex.com/us-markets'
-    },
-    additionalProperty: [
-      {
-        '@type': 'PropertyValue',
-        name: 'Market Hours',
-        value: '9:30 AM - 4:00 PM EST'
-      },
-      {
-        '@type': 'PropertyValue',
-        name: 'After Hours Trading',
-        value: '4:00 PM - 8:00 PM EST'
-      },
-      {
-        '@type': 'PropertyValue',
-        name: 'Futures Trading',
-        value: '24/7'
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "US Markets Live | S&P 500, NASDAQ, Dow Jones & Russell 2000 Today",
+    "url": "https://www.cryptogreedindex.com/us-markets",
+    "description":
+      "Track real-time US market data, stock indices, and market trends. Get live updates from major US markets including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
+    "dateModified": dateModified,
+    "publisher": {
+      "@type": "Organization",
+      "name": "CryptoGreedIndex.com",
+      "url": "https://www.cryptogreedindex.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.cryptogreedindex.com/cryptogreedindex.png"
       }
-    ],
-    about: [
-      {
-        '@type': 'FinancialProduct',
-        name: 'Dow Jones Industrial Average',
-        tickerSymbol: 'DJIA'
-      },
-      {
-        '@type': 'FinancialProduct',
-        name: 'S&P 500 Index',
-        tickerSymbol: 'SPX'
-      },
-      {
-        '@type': 'FinancialProduct',
-        name: 'NASDAQ Composite',
-        tickerSymbol: 'COMP'
-      }
-    ],
-    potentialAction: {
-      '@type': 'TradeAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: 'https://cryptogreedindex.com/us-markets'
-      }
+    },
+    "mainEntity": {
+      "@type": "DataFeed",
+      "name": "US Markets Data Feed",
+      "description":
+        "Live data feed for major US stock market indices including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
+      "dataFeedElement": [
+        {
+          "@type": "DataFeedItem",
+          "dateModified": dateModified,
+          "item": {
+            "@type": "FinancialProduct",
+            "name": "S&P 500",
+            "category": "US Stock Market Index",
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "Market Status",
+              "value": "Open"
+            }
+          }
+        },
+        {
+          "@type": "DataFeedItem",
+          "dateModified": dateModified,
+          "item": {
+            "@type": "FinancialProduct",
+            "name": "NASDAQ",
+            "category": "US Stock Market Index",
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "Market Status",
+              "value": "Open"
+            }
+          }
+        },
+        {
+          "@type": "DataFeedItem",
+          "dateModified": dateModified,
+          "item": {
+            "@type": "FinancialProduct",
+            "name": "Dow Jones",
+            "category": "US Stock Market Index",
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "Market Status",
+              "value": "Open"
+            }
+          }
+        },
+        {
+          "@type": "DataFeedItem",
+          "dateModified": dateModified,
+          "item": {
+            "@type": "FinancialProduct",
+            "name": "Russell 2000",
+            "category": "US Stock Market Index",
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "Market Status",
+              "value": "Open"
+            }
+          }
+        }
+      ]
     }
   };
 
@@ -68,4 +90,4 @@ export default function StructuredData() {
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
   );
-} 
+}

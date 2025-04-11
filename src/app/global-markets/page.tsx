@@ -113,7 +113,7 @@ const MARKET_HOURS = {
       'Hong Kong': { start: 1.5, end: 8 }, // 9:30-16:00 HKT
       'South Korea': { start: 0, end: 6 }, // 9:00-15:00 KST
       'Australia': { start: 0, end: 6 }, // 10:00-16:00 AEST
-      'India': { start: 3.5, end: 10 }, // 9:15-15:30 IST
+      'India': { start: 3.75, end: 10 }, // 9:15-15:30 IST (UTC+5:30)
       'Singapore': { start: 1, end: 9 }, // 9:00-17:00 SGT
       'Indonesia': { start: 1.5, end: 9 }, // 9:30-16:00 WIB
       'Taiwan': { start: 1, end: 5.5 }, // 9:00-13:30 TST
@@ -194,10 +194,20 @@ const countryToFlagCode: Record<string, string> = {
 const IndexRow = ({ data }: { data: IndexData }) => {
   const { currentStats, name, country, historicalData } = data;
 
-  // Get current time in UTC
+  // Get current time in UTC with more precision
   const now = new Date();
-  const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
+  const utcHours = now.getUTCHours() + (now.getUTCMinutes() / 60);
   const utcDay = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  
+  // Log the current time for debugging
+  if (country === 'India') {
+    console.log('Current UTC time:', {
+      hours: now.getUTCHours(),
+      minutes: now.getUTCMinutes(),
+      utcHours,
+      date: now.toISOString()
+    });
+  }
 
   // Calculate week change
   const calculateWeekChange = () => {
@@ -228,14 +238,14 @@ const IndexRow = ({ data }: { data: IndexData }) => {
     }
   };
 
-  // Check if market is closed based on trading hours and last update
-  const isMarketClosed = () => {
+  // Check if market is open based on trading hours and last update
+  const isMarketOpen = () => {
     // If it's Saturday or Sunday, market is closed
-    if (utcDay === 0 || utcDay === 6) return true;
+    if (utcDay === 0 || utcDay === 6) return false;
 
     // Get market hours for the current country
     const marketHours = getMarketHours();
-    if (!marketHours) return true;
+    if (!marketHours) return false;
 
     // Check if current time is within market hours
     const isWithinHours = (hours: MarketHours) => {
@@ -247,29 +257,44 @@ const IndexRow = ({ data }: { data: IndexData }) => {
       return utcHours >= start && utcHours <= end;
     };
 
+    // Check if we're within market hours
+    const isWithinMarketHours = isWithinHours(marketHours);
+    
     // Check for valid regularMarketTime
     const marketTime = currentStats.regularMarketTime;
-    if (!marketTime) return true;
-    
+    if (!marketTime) return isWithinMarketHours; // If no market time, just use hours
+
     // Parse the date safely
     let marketDate: Date;
     try {
       if (typeof marketTime === 'string' || marketTime instanceof Date) {
         marketDate = new Date(marketTime);
-        if (isNaN(marketDate.getTime())) return true; // Invalid date
+        if (isNaN(marketDate.getTime())) return isWithinMarketHours; // If invalid date, just use hours
       } else {
-        return true; // Not a valid date input
+        return isWithinMarketHours; // If not a valid date input, just use hours
       }
     } catch (e) {
       console.error("Error parsing market date:", e, marketTime);
-      return true;
+      return isWithinMarketHours; // If error, just use hours
     }
 
-    // Check if we're within market hours and have recent data
-    const isWithinMarketHours = isWithinHours(marketHours);
-    const hasRecentUpdate = (now.getTime() - marketDate.getTime()) <= 15 * 60 * 1000;
+    // Check if we have recent data (last 30 minutes)
+    const hasRecentUpdate = (now.getTime() - marketDate.getTime()) <= 30 * 60 * 1000; // Increased to 30 minutes
     
-    return !(isWithinMarketHours && hasRecentUpdate);
+    // For debugging
+    if (country === 'India') {
+      console.log('India market check:', { 
+        utcHours, 
+        marketHours, 
+        isWithinMarketHours,
+        hasRecentUpdate, 
+        marketDate: marketDate?.toISOString(),
+        nowTime: now.toISOString()
+      });
+    }
+    
+    // Return true if within market hours and has recent update
+    return isWithinMarketHours && hasRecentUpdate;
   };
 
   // Get market hours for the current country
@@ -305,9 +330,9 @@ const IndexRow = ({ data }: { data: IndexData }) => {
     return null;
   };
 
-  const marketClosed = isMarketClosed();
+  const isOpen = isMarketOpen();
   const isPositive = currentStats.change >= 0;
-  const statusClass = marketClosed ? "text-red-500" : "text-green-500";
+  const statusClass = isOpen ? "text-green-500" : "text-red-500";
   const flagCode = countryToFlagCode[country] || '';
 
   // Add a tooltip to show market hours

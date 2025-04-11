@@ -1,9 +1,10 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import StructuredData from './structured-data';
 
 export const metadata: Metadata = {
   title: 'Global Markets Live | World Stock Markets & Indices Today',
-  description: 'Track real-time global market data, world stock indices, and international market trends. Get live updates from major world markets including Asia, Europe, Americas, and Middle East. Updated daily with current market conditions.',
+  description:
+    'Track real-time global market data, world stock indices, and international market trends. Get live updates from major world markets including Asia, Europe, Americas, and Middle East. Updated daily with current market conditions.',
   keywords: [
     'global markets',
     'world markets',
@@ -25,31 +26,33 @@ export const metadata: Metadata = {
     'global equity index',
     'world stock exchange',
     'global stock index'
-  ].join(', '),
+  ],
   openGraph: {
     title: 'Global Markets Live | World Stock Markets & Indices Today',
-    description: 'Track real-time global market data, world stock indices, and international market trends. Get live updates from major world markets.',
+    description:
+      'Track real-time global market data, world stock indices, and international market trends. Get live updates from major world markets.',
     type: 'website',
     locale: 'en_US',
     siteName: 'Cryptogreedindex.com',
     url: 'https://www.cryptogreedindex.com/global-markets',
     images: [
       {
-        url: '/cryptogreedindex.png',
+        url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
         width: 1200,
         height: 630,
-        alt: 'Global Markets Live | World Stock Markets & Indices Today',
-      },
-    ],
+        alt: 'Global Markets Live | World Stock Markets & Indices Today'
+      }
+    ]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Global Markets Live | World Stock Markets & Indices Today',
-    description: 'Track real-time global market data, world stock indices, and international market trends. Get live updates from major world markets.',
-    images: ['/cryptogreedindex.png'],
+    description:
+      'Track real-time global market data, world stock indices, and international market trends. Get live updates from major world markets.',
+    images: ['https://www.cryptogreedindex.com/cryptogreedindex.png']
   },
   alternates: {
-    canonical: 'https://www.cryptogreedindex.com/global-markets',
+    canonical: 'https://www.cryptogreedindex.com/global-markets'
   },
   robots: {
     index: true,
@@ -59,13 +62,13 @@ export const metadata: Metadata = {
       follow: true,
       'max-video-preview': -1,
       'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+      'max-snippet': -1
+    }
   },
 };
 
 export default function GlobalMarketsLayout({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {
@@ -75,4 +78,4 @@ export default function GlobalMarketsLayout({
       {children}
     </>
   );
-} 
+}

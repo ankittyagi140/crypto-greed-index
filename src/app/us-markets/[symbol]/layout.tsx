@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Script from 'next/script';
 
 const indexInfo = {
   sp500: {
@@ -46,6 +47,8 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
   const title = `${index.name} - Live Market Data, Charts & Analysis`;
   const description = `${index.description} Get real-time ${index.name} price, technical indicators, market movers, and comprehensive market analysis.`;
+  const imageUrl = `https://www.cryptogreedindex.com/cryptogreedindex.png`;
+  const pageUrl = `https://www.cryptogreedindex.com/us-markets/${symbol}`;
 
   return {
     title,
@@ -55,25 +58,66 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       description,
       type: 'website',
       locale: 'en_US',
-      siteName: 'cryptogreedindex.com',
-      url: `https://www.cryptogreedindex.com/us-markets/${symbol}`,
+      siteName: 'CryptoGreedIndex.com',
+      url: pageUrl,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${index.name} Market Chart`
+        }
+      ]
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [imageUrl]
     },
     alternates: {
-      canonical: `https://www.cryptogreedindex.com/us-markets/${symbol}`
+      canonical: pageUrl
     }
   };
 }
 
-export default function Layout({
+export default async function Layout({
   children,
+  params
 }: {
   children: React.ReactNode;
   params: Promise<{ symbol: string }>;
 }) {
-  return children;
-} 
+  const { symbol } = await params;
+  const index = indexInfo[symbol as keyof typeof indexInfo];
+
+  return (
+    <>
+      {index && (
+        <Script
+          id="structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FinancialProduct",
+              name: index.name,
+              description: index.description,
+              category: "US Stock Market Index",
+              provider: {
+                "@type": "Organization",
+                name: "CryptoGreedIndex.com",
+                url: "https://www.cryptogreedindex.com"
+              },
+              mainEntityOfPage: {
+                "@type": "WebPage",
+                "@id": `https://www.cryptogreedindex.com/us-markets/${symbol}`
+              }
+            })
+          }}
+        />
+      )}
+      {children}
+    </>
+  );
+}

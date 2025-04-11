@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import Head from 'next/head';
 import Link from 'next/link';
 import { 
   ArrowUpIcon, 
@@ -346,10 +345,10 @@ function USMarketsTable() {
                     {index.low52Week.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    {index.openPrice?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || 'N/A'}
+                    {index.openPrice ? index.openPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : index.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    {index.previousClose?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || 'N/A'}
+                    {index.previousClose ? index.previousClose.toLocaleString(undefined, { minimumFractionDigits: 2 }) : index.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
                   <td className="py-3 px-4 text-right">
                     {index.high52Week.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -407,19 +406,6 @@ export default function USMarkets() {
 
   return (
     <>
-      <Head>
-        <title>US Markets Live | S&P 500, NASDAQ, Dow Jones & Russell 2000 Today</title>
-        <meta name="description" content="Track real-time US market data, stock indices, and market trends. Get live updates from major US markets including S&P 500, NASDAQ, Dow Jones, and Russell 2000. Updated every 5 minutes." />
-        <meta name="keywords" content="us markets, us stock market, us stock market today, us stock market live, us market live, us market today, us stock market news, us stock market open, us stock market futures, us stock market index" />
-        <meta property="og:title" content="US Markets Live | S&P 500, NASDAQ, Dow Jones & Russell 2000 Today" />
-        <meta property="og:description" content="Track real-time US market data, stock indices, and market trends. Get live updates from major US markets including S&P 500, NASDAQ, Dow Jones, and Russell 2000." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.cryptogreedindex.com/us-markets" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="US Markets Live | S&P 500, NASDAQ, Dow Jones & Russell 2000 Today" />
-        <meta name="twitter:description" content="Track real-time US market data, stock indices, and market trends. Get live updates from major US markets." />
-      </Head>
-
       <main className="min-h-screen py-12 bg-white">
         <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-8xl">
           <header className="text-center mb-8">
@@ -490,66 +476,6 @@ export default function USMarkets() {
           </p>
         </div>
       </main>
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "US Markets Live | S&P 500, NASDAQ, Dow Jones & Russell 2000 Today",
-            "description": "Track real-time US market data, stock indices, and market trends. Get live updates from major US markets including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
-            "url": "https://www.cryptogreedindex.com/us-markets",
-            "mainEntity": {
-              "@type": "DataFeed",
-              "name": "US Markets Data",
-              "description": "Real-time US market data and indices",
-              "dataFeedElement": [
-                {
-                  "@type": "DataFeedItem",
-                  "dateModified": new Date().toISOString(),
-                  "item": {
-                    "@type": "FinancialProduct",
-                    "name": "S&P 500",
-                    "category": "US Stock Market Index",
-                    "marketStatus": "Open"
-                  }
-                },
-                {
-                  "@type": "DataFeedItem",
-                  "dateModified": new Date().toISOString(),
-                  "item": {
-                    "@type": "FinancialProduct",
-                    "name": "NASDAQ",
-                    "category": "US Stock Market Index",
-                    "marketStatus": "Open"
-                  }
-                },
-                {
-                  "@type": "DataFeedItem",
-                  "dateModified": new Date().toISOString(),
-                  "item": {
-                    "@type": "FinancialProduct",
-                    "name": "Dow Jones",
-                    "category": "US Stock Market Index",
-                    "marketStatus": "Open"
-                  }
-                },
-                {
-                  "@type": "DataFeedItem",
-                  "dateModified": new Date().toISOString(),
-                  "item": {
-                    "@type": "FinancialProduct",
-                    "name": "Russell 2000",
-                    "category": "US Stock Market Index",
-                    "marketStatus": "Open"
-                  }
-                }
-              ]
-            }
-          })
-        }}
-      />
     </>
   );
 }

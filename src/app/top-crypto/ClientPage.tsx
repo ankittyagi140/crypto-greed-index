@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { formatLargeNumber } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
-import Script from 'next/script';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
 import ResponsivePagination from '@/components/ResponsivePagination';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Coin {
   id: string;
@@ -81,35 +81,6 @@ export default function ClientPage() {
   const handleCoinClick = (coinId: string) => {
     router.push(`/${coinId}`);
   };
-
-  // Generate structured data for SEO
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Table",
-    "about": "Top 100 Cryptocurrencies by Market Cap",
-    "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": coins.length,
-      "itemListElement": coins.map((coin, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
-          "@type": "Cryptocurrency",
-          "name": coin.name,
-          "symbol": coin.symbol.toUpperCase(),
-          "image": coin.image,
-          "price": coin.current_price,
-          "marketCap": coin.market_cap,
-        }
-      }))
-    }
-  };
-
-  // Add market stats summary
-
-
-  // Add filter controls
-
 
   if (isLoading) {
     return (
@@ -204,11 +175,6 @@ export default function ClientPage() {
 
   return (
     <>
-      <Script
-        id="structured-data"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
       <div className="container mx-auto px-4 py-8 space-y-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -336,6 +302,18 @@ export default function ClientPage() {
             totalPages={totalPages}
             onPageChange={paginate}
           />
+        </div>
+        <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p>Data is updated every 5 minutes. Market hours are in UTC.</p>
+          <p className="mt-2">
+            <Link
+              href="/about"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              aria-label="Learn more about our data sources"
+            >
+              Learn more about our data sources
+            </Link>
+          </p>
         </div>
       </div>
     </>
