@@ -149,7 +149,7 @@ export default function ClientPage() {
               Ethereum Market Dominance Analysis
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg max-w-3xl mx-auto">
-              Track Ethereum&apos;s influence in the cryptocurrency market through its dominance metrics
+              Track Ethereum&apos;s influence in the cryptocurrency market through its dominance metrics and understand market trends in real-time
             </p>
           </div>
 
@@ -182,6 +182,11 @@ export default function ClientPage() {
               <p className="text-base sm:text-lg">
                 Ethereum dominance represents Ethereum&apos;s market capitalization as a percentage of the total cryptocurrency market capitalization. This metric is crucial for understanding Ethereum&apos;s relative strength and influence in the crypto market.
               </p>
+              
+              <p className="text-base sm:text-lg">
+                As the leading smart contract platform, Ethereum&apos;s dominance reflects its position in the blockchain ecosystem, where it hosts thousands of decentralized applications (dApps), DeFi protocols, NFT marketplaces, and Web3 services. Tracking ETH dominance helps investors and analysts gauge market sentiment and identify potential shifts in the crypto landscape.
+              </p>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
                 <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
                   <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
@@ -192,6 +197,8 @@ export default function ClientPage() {
                     <li>DeFi and NFT market growth</li>
                     <li>Smart contract platform leadership</li>
                     <li>Institutional adoption</li>
+                    <li>Increased developer activity</li>
+                    <li>Higher network usage and gas fees</li>
                   </ul>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
@@ -203,11 +210,75 @@ export default function ClientPage() {
                     <li>Market diversification</li>
                     <li>Layer 2 solution growth</li>
                     <li>Scaling challenges</li>
+                    <li>Shift in investor sentiment</li>
+                    <li>Emerging blockchain technologies</li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+              Historical ETH Dominance Trends
+            </h2>
+            <div className="space-y-4 text-gray-600 dark:text-gray-300">
+              <p className="text-base sm:text-lg">
+                Since Ethereum&apos;s launch in 2015, its market dominance has evolved through several distinct phases, reflecting the broader cryptocurrency market cycles and Ethereum&apos;s own development milestones.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    Early Growth (2015-2017)
+                  </h3>
+                  <p className="text-base">
+                    During this period, Ethereum emerged as the second-largest cryptocurrency by market cap, establishing itself as the primary smart contract platform with the ICO boom driving adoption and increasing its dominance.
+                  </p>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    DeFi Summer (2020)
+                  </h3>
+                  <p className="text-base">
+                    The explosion of decentralized finance protocols built on Ethereum significantly boosted its dominance as billions of dollars in value flowed into DeFi applications, highlighting Ethereum&apos;s critical infrastructure role.
+                  </p>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    Proof of Stake Transition
+                  </h3>
+                  <p className="text-base">
+                    Ethereum&apos;s transition to Proof of Stake through The Merge in 2022 marked a significant technological upgrade that affected its market position and environmental footprint, potentially influencing its dominance in the long term.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+              ETH Dominance as a Market Indicator
+            </h2>
+            <div className="space-y-4 text-gray-600 dark:text-gray-300">
+              <p className="text-base sm:text-lg">
+                Many crypto analysts and traders use ETH dominance as a key market indicator to:
+              </p>
+              
+              <ul className="list-disc list-inside space-y-2 text-base sm:text-lg pl-4">
+                <li><span className="font-medium">Gauge altcoin cycles</span> - Rising ETH dominance often precedes altcoin rallies</li>
+                <li><span className="font-medium">Identify market rotation</span> - Shifts between Bitcoin, Ethereum, and other crypto sectors</li>
+                <li><span className="font-medium">Assess market maturity</span> - Increasing ETH dominance may indicate growing importance of utility over speculation</li>
+                <li><span className="font-medium">Evaluate technological adoption</span> - Changes in dominance reflect the market&apos;s valuation of Ethereum&apos;s technology and ecosystem</li>
+                <li><span className="font-medium">Predict market sentiment</span> - ETH dominance often correlates with investor confidence in blockchain technology beyond simple store of value</li>
+              </ul>
+              
+              <p className="text-base sm:text-lg mt-4">
+                Our real-time ETH dominance tracker provides investors with up-to-date data to make informed decisions based on these market dynamics.
+              </p>
+            </div>
+          </div>
+
         </div>
       </div>
     </>
