@@ -6,7 +6,8 @@ const US_MARKET_INDICES = [
   'sp500',
   'nasdaq',
   'dow-jones',
-  'russell2000'
+  'russell2000',
+  'dollar-index',  
 ] as const;
 
 const PAGES = {
@@ -14,6 +15,26 @@ const PAGES = {
     path: '',
     priority: 1,
     changeFrequency: 'daily' as const,
+  },
+  TOP_10_CRYPTO: {
+    path: 'top-10-crypto',
+    priority: 1,
+    changeFrequency: 'always' as const,
+  },
+  FEAR_GREED_VS_BTC: {
+    path: 'fear-greed-vs-btc',
+    priority: 1,
+    changeFrequency: 'daily' as const,
+  },
+  SOCIAL_SENTIMENTS_BTC: {
+    path: 'social-sentiments-btc',
+    priority: 1,
+    changeFrequency: 'daily' as const,
+  },
+  DONATE: {
+    path: 'donate',
+    priority: 0.8,
+    changeFrequency: 'monthly' as const,
   },
   US_MARKETS: {
     path: 'us-markets',
@@ -32,6 +53,11 @@ const PAGES = {
   },
   ETH_DOMINANCE: {
     path: 'eth-dominance',
+    priority: 1,
+    changeFrequency: 'daily' as const,
+  },
+  ALTCOIN_DOMINANCE: {
+    path: 'altcoin-dominance',
     priority: 1,
     changeFrequency: 'daily' as const,
   },
@@ -55,9 +81,38 @@ const PAGES = {
     priority: 0.5,
     changeFrequency: 'monthly' as const,
   },
+  DISCLAIMER: {
+    path: 'disclaimer',
+    priority: 0.5,
+    changeFrequency: 'monthly' as const,
+  },
+  EXCHANGES: {
+    path: 'top-crypto-exchanges',
+    priority: 0.9,
+    changeFrequency: 'daily' as const,
+  },
 };
 
-export default function sitemap(): MetadataRoute.Sitemap {
+async function getTopCoins() {
+  try {
+    const response = await fetch(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&sparkline=false',
+      { next: { revalidate: 3600 } } // Cache for 1 hour
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch coins');
+    }
+
+    const coins = await response.json();
+    return coins.map((coin: { id: string }) => coin.id);
+  } catch (error) {
+    console.error('Error fetching coins for sitemap:', error);
+    return [];
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   
   // Generate main pages
@@ -76,8 +131,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
+  // Generate coin pages
+  const topCoins = await getTopCoins();
+  const coinPages = topCoins.map((coinId: string) => ({
+    url: `${BASE_URL}/${coinId}`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: 0.8,
+  }));
+
   return [
     ...mainPages,
     ...marketIndexPages,
+    ...coinPages,
   ]
 } 

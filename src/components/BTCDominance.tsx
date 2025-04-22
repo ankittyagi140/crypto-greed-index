@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
 import TimeRangeSelector from './TimeRangeSelector';
 import { useRouter } from 'next/navigation';
 
@@ -31,7 +31,7 @@ const CurrentDominance = ({ value, data }: { value: number; data: { date: string
 
   return (
     <div className={`${isPositive ? 'bg-green-100 dark:bg-green-900/40' : 'bg-red-100 dark:bg-red-900/40'} rounded-lg p-4 mb-6 max-w-xs mx-auto border ${isPositive ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800'}`}>
-      <div className={`${isPositive ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'} text-sm font-medium mb-1`}>Current BTC Dominance</div>
+      <div className={`${isPositive ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'} text-sm font-medium mb-1 text-center`}>Current BTC Dominance</div>
       <div className="flex items-baseline gap-2 justify-center">
         <div className={`text-2xl font-bold ${isPositive ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}`}>
           {value.toFixed(1)}%
@@ -80,10 +80,22 @@ export default function BTCDominance({ data, isDetailPage = false }: BTCDominanc
   // Get current dominance value (latest data point)
   const currentDominance = data[data.length - 1]?.dominance || 0;
 
+  // Calculate ATH and lowest dominance from all data
+  const athDominance = Math.max(...data.map(d => d.dominance));
+  const lowestDominance = Math.min(...data.map(d => d.dominance));
+
   // Calculate min and max values for better Y-axis scaling
   const minDominance = Math.floor(Math.min(...filteredData.map(d => d.dominance)));
   const maxDominance = Math.ceil(Math.max(...filteredData.map(d => d.dominance)));
   const yAxisDomain = [minDominance - 1, maxDominance + 1];
+
+  // Calculate trend color based on the overall change in the selected time range
+  const trendColor = (() => {
+    if (filteredData.length < 2) return '#f7931a'; // Default Bitcoin orange if not enough data
+    const startValue = filteredData[0].dominance;
+    const endValue = filteredData[filteredData.length - 1].dominance;
+    return endValue >= startValue ? '#22c55e' : '#ef4444'; // Green for increasing, red for decreasing
+  })();
 
   const handleClick = () => {
     if (!isDetailPage) {
@@ -111,6 +123,16 @@ export default function BTCDominance({ data, isDetailPage = false }: BTCDominanc
         <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
           Track Bitcoin&apos;s share of the total cryptocurrency market capitalization
         </p>
+        <div className="flex flex-wrap justify-center gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <span className="text-gray-600 dark:text-gray-400">ATH: {athDominance.toFixed(2)}%</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <span className="text-gray-600 dark:text-gray-400">Lowest: {lowestDominance.toFixed(2)}%</span>
+          </div>
+        </div>
         <TimeRangeSelector
           selectedRange={selectedRange}
           onRangeChange={setSelectedRange}
@@ -122,8 +144,8 @@ export default function BTCDominance({ data, isDetailPage = false }: BTCDominanc
           <AreaChart data={filteredData}>
             <defs>
               <linearGradient id="btcDominanceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f7931a" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#f7931a" stopOpacity={0} />
+                <stop offset="5%" stopColor={trendColor} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={trendColor} stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
@@ -145,10 +167,22 @@ export default function BTCDominance({ data, isDetailPage = false }: BTCDominanc
               }}
             />
             <Tooltip content={<CustomTooltip />} />
+            <ReferenceLine
+              y={athDominance}
+              stroke="#22c55e"
+              strokeDasharray="3 3"
+              label={{ value: `ATH: ${athDominance.toFixed(2)}%`, position: 'right', fill: '#22c55e' }}
+            />
+            <ReferenceLine
+              y={lowestDominance}
+              stroke="#ef4444"
+              strokeDasharray="3 3"
+              label={{ value: `Lowest: ${lowestDominance.toFixed(2)}%`, position: 'right', fill: '#ef4444' }}
+            />
             <Area
               type="monotone"
               dataKey="dominance"
-              stroke="#f7931a"
+              stroke={trendColor}
               strokeWidth={2}
               fill="url(#btcDominanceGradient)"
               name="BTC Dominance"

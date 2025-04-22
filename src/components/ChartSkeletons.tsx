@@ -38,14 +38,27 @@ export const BTCComparisonSkeleton = () => (
   </div>
 );
 
-export const FAQSkeleton = () => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-    <div className="h-7 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
-    {[...Array(4)].map((_, i) => (
-      <div key={i} className="mb-4">
-        <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-        <div className="h-20 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+export const FAQSkeleton = () => {
+  return (
+    <div className="animate-pulse space-y-6">
+      <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto mb-8"></div>
+      <div className="space-y-6">
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+          >
+            <div className="p-4 flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+              <div className="h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+            </div>
+            <div className="p-4">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+            </div>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-); 
+    </div>
+  );
+}; 

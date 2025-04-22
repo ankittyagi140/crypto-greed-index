@@ -11,6 +11,10 @@ interface MarketIndex {
   ytdChange: number;
   high52Week: number;
   low52Week: number;
+  openPrice: number;
+  previousClose: number;
+  dayHigh: number;
+  dayLow: number;
   historicalData: { date: string; value: number; }[];
   regularMarketTime?: Date;
 }
@@ -71,6 +75,10 @@ export async function GET() {
         ytdChange,
         high52Week: quote.fiftyTwoWeekHigh || 0,
         low52Week: quote.fiftyTwoWeekLow || 0,
+        openPrice: quote.regularMarketOpen || currentPrice,
+        previousClose: quote.regularMarketPreviousClose || currentPrice,
+        dayHigh: quote.regularMarketDayHigh || currentPrice,
+        dayLow: quote.regularMarketDayLow || currentPrice,
         historicalData: chartData,
         regularMarketTime: quote.regularMarketTime ? new Date(Number(quote.regularMarketTime) * 1000) : undefined
       };

@@ -113,7 +113,7 @@ export default function MarketMovers({ index }: MarketMoversProps) {
       <div className="flex gap-4 mb-4 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setSelectedIndex('dow')}
-          className={`px-4 py-2 text-sm font-medium ${
+          className={`px-4 py-2 text-sm font-medium cursor-pointer ${
             selectedIndex === 'dow'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
@@ -123,7 +123,7 @@ export default function MarketMovers({ index }: MarketMoversProps) {
         </button>
         <button
           onClick={() => setSelectedIndex('nasdaq')}
-          className={`px-4 py-2 text-sm font-medium ${
+          className={`px-4 py-2 text-sm font-medium cursor-pointer ${
             selectedIndex === 'nasdaq'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
@@ -133,7 +133,7 @@ export default function MarketMovers({ index }: MarketMoversProps) {
         </button>
         <button
           onClick={() => setSelectedIndex('sp500')}
-          className={`px-4 py-2 text-sm font-medium ${
+          className={`px-4 py-2 text-sm font-medium cursor-pointer ${
             selectedIndex === 'sp500'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'

@@ -1,26 +1,39 @@
 import { NextResponse } from 'next/server';
 
+interface FearGreedData {
+  value: string;
+  value_classification: string;
+  timestamp: number;
+}
+
+interface FearGreedResponse {
+  data: FearGreedData[];
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = searchParams.get('limit') || '90';
-    
-    const response = await fetch(`https://api.alternative.me/fng/?limit=${limit}`, {
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
+    const limit = parseInt(searchParams.get('limit') || '1');
+
+    const response = await fetch(
+      `https://api.alternative.me/fng/?limit=${limit}`
+    );
 
     if (!response.ok) {
-      throw new Error(`Fear & Greed API responded with status: ${response.status}`);
+      throw new Error('Failed to fetch Fear & Greed Index data');
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    const data: FearGreedResponse = await response.json();
+
+    if (!data.data || !Array.isArray(data.data)) {
+      throw new Error('Invalid data format received from API');
+    }
+
+    return NextResponse.json({ data: data.data });
   } catch (error) {
-    console.error('Error fetching fear & greed data:', error);
+    console.error('Error fetching Fear & Greed Index:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch fear & greed index data' },
+      { error: 'Failed to fetch Fear & Greed Index data' },
       { status: 500 }
     );
   }

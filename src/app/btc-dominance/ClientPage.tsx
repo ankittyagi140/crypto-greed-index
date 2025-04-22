@@ -1,8 +1,9 @@
 'use client';
 
 import BTCDominance from '@/components/BTCDominance';
+import BitcoinMetrics from '@/components/BitcoinMetrics';
 import { useEffect, useState } from 'react';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 interface DominanceData {
   date: string;
@@ -66,8 +67,74 @@ export default function ClientPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <div className="animate-pulse bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 h-[500px]" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header Skeleton */}
+          <div className="text-center mb-8">
+            <div className="h-10 w-3/4 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-4"></div>
+            <div className="h-6 w-2/3 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto"></div>
+          </div>
+
+          {/* Main Content Grid Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 sm:gap-6 lg:gap-8">
+            {/* Left Panel Skeleton */}
+            <div className="w-full lg:col-span-7 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+              <div className="animate-pulse">
+                {/* Current BTC Dominance Box */}
+                <div className="w-48 h-24 mx-auto bg-gray-100 dark:bg-gray-700 rounded-lg mb-6"></div>
+                
+                {/* Time Range Selector */}
+                <div className="flex justify-center gap-4 mb-8">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="h-8 w-20 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                  ))}
+                </div>
+
+                {/* Chart Area */}
+                <div className="h-[300px] bg-gray-100 dark:bg-gray-700 rounded-lg"></div>
+              </div>
+            </div>
+
+            {/* Right Panel Skeleton */}
+            <div className="w-full lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+              <div className="animate-pulse space-y-4">
+                <div className="h-6 w-3/4 bg-gray-100 dark:bg-gray-700 rounded mb-6"></div>
+                
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-1 gap-4">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                      <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+                      <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Understanding BTC Dominance Section Skeleton */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <div className="animate-pulse">
+              <div className="h-8 w-1/2 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+              <div className="space-y-4 mb-8">
+                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {[1, 2].map((i) => (
+                  <div key={i} className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                    <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-600 rounded mb-4"></div>
+                    <div className="space-y-3">
+                      {[1, 2, 3, 4].map((j) => (
+                        <div key={j} className="h-4 w-5/6 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -75,46 +142,14 @@ export default function ClientPage() {
 
   return (
     <>
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        gutter={8}
-        toastOptions={{
-          duration: 5000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            style: {
-              background: '#059669',
-              color: '#fff',
-            },
-          },
-          error: {
-            duration: 4000,
-            style: {
-              background: '#DC2626',
-              color: '#fff',
-            },
-          },
-          loading: {
-            style: {
-              background: '#2563EB',
-              color: '#fff',
-            },
-          },
-        }}
-      />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-4">
               Bitcoin Market Dominance Analysis
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
-              Track Bitcoin&apos;s influence in the cryptocurrency market through its dominance metrics
+            <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg max-w-3xl mx-auto">
+              Track Bitcoin&apos;s influence in the cryptocurrency market through its dominance metrics and monitor real-time market trends
             </p>
           </div>
 
@@ -129,43 +164,163 @@ export default function ClientPage() {
               </button>
             </div>
           ) : (
-            data.length > 0 && <BTCDominance data={data} isDetailPage={true} />
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 sm:gap-6 lg:gap-8">
+              <div className="w-full lg:col-span-7 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                {data.length > 0 && <BTCDominance data={data} isDetailPage={true} />}
+              </div>
+              <div className="w-full lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                <BitcoinMetrics isDetailPage={true} />
+              </div>
+            </div>
           )}
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-white mb-4">
               Understanding BTC Dominance
             </h2>
             <div className="space-y-4 text-gray-600 dark:text-gray-300">
-              <p>
+              <p className="text-base sm:text-lg">
                 Bitcoin dominance represents Bitcoin&apos;s market capitalization as a percentage of the total cryptocurrency market capitalization. This metric is crucial for understanding Bitcoin&apos;s relative strength and influence in the crypto market.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+              
+              <p className="text-base sm:text-lg">
+                As the first and largest cryptocurrency, Bitcoin serves as the cornerstone of the entire crypto industry. Bitcoin dominance is widely considered a fundamental market indicator that reflects investor sentiment, market cycles, and capital flow dynamics within the broader digital asset landscape.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
                     High Dominance Implications
                   </h3>
-                  <ul className="list-disc list-inside space-y-2">
+                  <ul className="list-disc list-inside space-y-2 text-base sm:text-lg">
                     <li>Strong Bitcoin market position</li>
                     <li>Reduced altcoin market share</li>
                     <li>Potential consolidation phase</li>
                     <li>Traditional market confidence</li>
+                    <li>Heightened institutional interest</li>
+                    <li>Risk-off sentiment in crypto markets</li>
                   </ul>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
                     Low Dominance Implications
                   </h3>
-                  <ul className="list-disc list-inside space-y-2">
+                  <ul className="list-disc list-inside space-y-2 text-base sm:text-lg">
                     <li>Altcoin season potential</li>
                     <li>Market diversification</li>
                     <li>Increased market maturity</li>
                     <li>Innovation in altcoin space</li>
+                    <li>Broader crypto market expansion</li>
+                    <li>Higher risk appetite among investors</li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+              Bitcoin Dominance: Historical Perspective
+            </h2>
+            <div className="space-y-4 text-gray-600 dark:text-gray-300">
+              <p className="text-base sm:text-lg">
+                Since the inception of alternative cryptocurrencies, Bitcoin dominance has undergone significant fluctuations that mirror the evolution of the crypto ecosystem. Understanding these historical trends provides valuable context for market analysis.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    Early Monopoly (2009-2017)
+                  </h3>
+                  <p className="text-base">
+                    Bitcoin enjoyed near-total market dominance in the early years of cryptocurrency, regularly maintaining over 80% of the total market capitalization until 2017 when the first major altcoin bull run dramatically reduced its dominance.
+                  </p>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    Market Cycles (2017-2022)
+                  </h3>
+                  <p className="text-base">
+                    Throughout multiple market cycles, Bitcoin dominance has typically increased during bear markets as investors seek the relative safety of BTC, while dominance tends to decrease during bull markets as capital flows into altcoins in search of higher returns.
+                  </p>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    Institutional Era (2020-Present)
+                  </h3>
+                  <p className="text-base">
+                    The entrance of institutional investors into the cryptocurrency space has significantly impacted Bitcoin dominance patterns, with many large institutions preferring Bitcoin over other cryptocurrencies due to its established history, liquidity, and regulatory clarity.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+              Trading Strategies Based on BTC Dominance
+            </h2>
+            <div className="space-y-4 text-gray-600 dark:text-gray-300">
+              <p className="text-base sm:text-lg">
+                Many traders and investors incorporate Bitcoin dominance analysis into their trading strategies to optimize market positioning:
+              </p>
+              
+              <ul className="list-disc list-inside space-y-2 text-base sm:text-lg pl-4">
+                <li><span className="font-medium">Dominance breakouts:</span> Significant breaks in BTC dominance trend lines often signal major market rotations</li>
+                <li><span className="font-medium">Divergence trading:</span> Monitoring divergence between BTC price and dominance can reveal hidden market dynamics</li>
+                <li><span className="font-medium">Sector rotation timing:</span> Using dominance shifts to time movements between Bitcoin, large-cap altcoins, and smaller projects</li>
+                <li><span className="font-medium">Market cycle identification:</span> Recognizing where in the market cycle we are based on historical dominance patterns</li>
+                <li><span className="font-medium">Portfolio rebalancing:</span> Adjusting Bitcoin-to-altcoin ratios based on dominance trends to optimize risk-adjusted returns</li>
+              </ul>
+              
+              <p className="text-base sm:text-lg mt-4">
+                Our real-time Bitcoin dominance tracker helps traders implement these strategies with accurate, up-to-date dominance data that responds quickly to changing market conditions.
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mt-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+              Factors Influencing Bitcoin Dominance
+            </h2>
+            <div className="space-y-4 text-gray-600 dark:text-gray-300">
+              <p className="text-base sm:text-lg">
+                Multiple factors can influence shifts in Bitcoin dominance, including:
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    Market Forces
+                  </h3>
+                  <ul className="list-disc list-inside space-y-2 text-base">
+                    <li>Macroeconomic conditions</li>
+                    <li>Institutional investment flows</li>
+                    <li>Retail investor sentiment</li>
+                    <li>Trading volume distribution</li>
+                    <li>Liquidity across exchanges</li>
+                  </ul>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:p-6 rounded-lg">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    Technological Developments
+                  </h3>
+                  <ul className="list-disc list-inside space-y-2 text-base">
+                    <li>Bitcoin network upgrades</li>
+                    <li>Layer 2 scaling solutions</li>
+                    <li>Innovations in alternative blockchains</li>
+                    <li>DeFi and NFT ecosystem growth</li>
+                    <li>Regulatory developments</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <p className="text-base sm:text-lg mt-4">
+                By tracking these factors alongside Bitcoin dominance metrics, investors can develop a more comprehensive understanding of market dynamics and potential future trends.
+              </p>
+            </div>
+          </div>
+          
         </div>
       </div>
     </>

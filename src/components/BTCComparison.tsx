@@ -73,10 +73,10 @@ const BTCComparison: React.FC<BTCComparisonProps> = ({ data }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-12">
       <div className="mb-6 flex flex-col gap-2 items-center">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
           Fear & Greed Index vs Bitcoin Price
         </h2>
-        <p className="text-gray-600 dark:text-gray-300 text-sm">
+        <p className="text-gray-600 dark:text-gray-300 text-base text-center max-w-2xl mx-auto">
           Compare market sentiment with Bitcoin price movements
         </p>
       </div>

@@ -9,8 +9,8 @@ interface HeaderProps {
   title?: string;
 }
 
-export default function Header({ 
-  title = "Crypto Greed Index"
+export default function Header({
+  title = "CryptogreedIndex.com"
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'analysis' | 'markets' | null>(null);
@@ -22,27 +22,27 @@ export default function Header({
   return (
     <div className="sticky top-0 z-50">
       <header className="bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg">
-        <div className="container mx-auto px-4 py-4 max-w-6xl flex justify-between items-center">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3">
             <div className="relative w-10 h-10">
               <Image
                 src="/cryptogreedindex.png"
-                alt="Crypto Greed Index"
+                alt="CryptogreedIndex.com"
                 width={40}
                 height={40}
                 className="object-contain"
                 priority
               />
             </div>
-            <h1 className="text-xl font-bold text-[#048f04] dark:text-white">
+            <h1 className="text-l font-bold text-[#048f04] dark:text-white">
               {title}
             </h1>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -50,17 +50,8 @@ export default function Header({
               </svg>
               <span>Home</span>
             </Link>
-            <Link 
-              href="/about" 
-              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-              </svg>
-              <span>About Us</span>
-            </Link>
             <div className="relative">
-              <button 
+              <button
                 onClick={() => handleDropdownClick('analysis')}
                 className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors cursor-pointer"
               >
@@ -73,33 +64,54 @@ export default function Header({
                 </svg>
               </button>
               <div className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 transition-all duration-200 ${activeDropdown === 'analysis' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                <Link 
-                  href="/btc-dominance" 
+                <Link
+                  href="/top-crypto"
+                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  onClick={() => setActiveDropdown(null)}
+                >
+                  Top Cryptocurrencies
+                </Link>
+                <Link
+                  href="/btc-dominance"
                   className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
                   onClick={() => setActiveDropdown(null)}
                 >
                   BTC Dominance
                 </Link>
-                <Link 
-                  href="/eth-dominance" 
+                <Link
+                  href="/eth-dominance"
                   className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
                   onClick={() => setActiveDropdown(null)}
                 >
                   ETH Dominance
                 </Link>
-                <Link 
-                  href="/altcoin-dominance" 
+                <Link
+                  href="/altcoin-dominance"
                   className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
                   onClick={() => setActiveDropdown(null)}
                 >
                   Altcoin Dominance
+                </Link>
+                <Link
+                  href="/fear-greed-vs-btc"
+                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  onClick={() => setActiveDropdown(null)}
+                >
+                  Fear & Greed vs BTC
+                </Link>
+                <Link
+                  href="/social-sentiments-btc"
+                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  onClick={() => setActiveDropdown(null)}
+                >
+                  Social Sentiments & BTC
                 </Link>
               </div>
             </div>
 
             {/* Markets Dropdown */}
             <div className="relative">
-              <button 
+              <button
                 onClick={() => handleDropdownClick('markets')}
                 className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors cursor-pointer"
               >
@@ -112,15 +124,15 @@ export default function Header({
                 </svg>
               </button>
               <div className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 transition-all duration-200 ${activeDropdown === 'markets' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                <Link 
-                  href="/global-markets" 
+                <Link
+                  href="/global-markets"
                   className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
                   onClick={() => setActiveDropdown(null)}
                 >
                   Global Markets
                 </Link>
-                <Link 
-                  href="/us-markets" 
+                <Link
+                  href="/us-markets"
                   className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
                   onClick={() => setActiveDropdown(null)}
                 >
@@ -157,13 +169,12 @@ export default function Header({
 
       {/* Mobile Navigation Menu */}
       <div
-        className={`bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg md:hidden overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-96' : 'max-h-0'
-        }`}
+        className={`bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg md:hidden overflow-hidden transition-[max-height] duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-96' : 'max-h-0'
+          }`}
       >
         <nav className="container mx-auto px-4 py-4 max-w-6xl flex flex-col space-y-4">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -172,20 +183,20 @@ export default function Header({
             </svg>
             <span>Home</span>
           </Link>
-          <Link 
-            href="/about" 
-            className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-            </svg>
-            <span>About Us</span>
-          </Link>
           <div className="space-y-2">
             <div className="text-gray-600 dark:text-gray-300 font-medium px-2 dark:hover:text-white transition-colors">Analysis</div>
-            <Link 
-              href="/btc-dominance" 
+            <Link
+              href="/top-crypto"
+              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+              </svg>
+              <span>Top Cryptocurrencies</span>
+            </Link>
+            <Link
+              href="/btc-dominance"
               className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -194,8 +205,8 @@ export default function Header({
               </svg>
               <span>BTC Dominance</span>
             </Link>
-            <Link 
-              href="/eth-dominance" 
+            <Link
+              href="/eth-dominance"
               className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -204,23 +215,52 @@ export default function Header({
               </svg>
               <span>ETH Dominance</span>
             </Link>
-            <Link 
-              href="/altcoin-dominance" 
+            <Link
+              href="/altcoin-dominance"
               className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setActiveDropdown(null);
+              }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
               </svg>
               <span>Altcoin Dominance</span>
             </Link>
+            <Link
+              href="/fear-greed-vs-btc"
+              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setActiveDropdown(null);
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+              </svg>
+              <span>Fear & Greed vs BTC</span>
+            </Link>
+            <Link
+              href="/social-sentiments-btc"
+              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setActiveDropdown(null);
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+              </svg>
+              <span>Social Sentiments & BTC</span>
+            </Link>
           </div>
 
           {/* Mobile Markets Section */}
           <div className="space-y-2">
             <div className="text-gray-600 dark:text-gray-300 font-medium px-2 dark:hover:text-white transition-colors">Markets</div>
-            <Link 
-              href="/global-markets" 
+            <Link
+              href="/global-markets"
               className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -229,8 +269,8 @@ export default function Header({
               </svg>
               <span>Global Markets</span>
             </Link>
-            <Link 
-              href="/us-markets" 
+            <Link
+              href="/us-markets"
               className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors pl-4"
               onClick={() => setIsMobileMenuOpen(false)}
             >

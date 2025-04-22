@@ -1,41 +1,42 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Toaster, toast } from 'react-hot-toast';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area, ComposedChart } from 'recharts';
 import { useParams } from 'next/navigation';
 import MarketMovers from '@/components/MarketMovers';
-import Script from 'next/script';
-
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
+import { ArrowUpIcon, ArrowDownIcon, ArrowLeftIcon } from '@heroicons/react/24/solid';
+import Head from 'next/head';
 
 const indexInfo = {
   'sp500': {
     name: 'S&P 500',
-    symbol: 'sp500',
+    symbol: '^GSPC',
     description: 'The Standard and Poor\'s 500 tracks the performance of 500 large US companies.',
     color: '#2E7D32'
   },
   'nasdaq': {
-    name: 'NASDAQ',
-    symbol: 'nasdaq',
+    name: 'NASDAQ Composite',
+    symbol: '^IXIC',
     description: 'The Nasdaq Composite includes all stocks listed on the Nasdaq stock market.',
     color: '#1976D2'
   },
   'dow-jones': {
     name: 'Dow Jones Industrial Average',
-    symbol: 'dow-jones',
+    symbol: '^DJI',
     description: 'The Dow Jones Industrial Average tracks 30 large US companies.',
     color: '#D32F2F'
   },
   'russell2000': {
     name: 'Russell 2000',
-    symbol: 'russell2000',
+    symbol: '^RUT',
     description: 'The Russell 2000 tracks 2,000 small-cap US companies.',
     color: '#7B1FA2'
   },
   'dollar-index': {
     name: 'US Dollar Index',
-    symbol: 'dollar-index',
+    symbol: 'DX-Y.NYB',
     description: 'The US Dollar Index measures the value of the USD against a basket of major world currencies.',
     color: '#00796B'
   }
@@ -72,6 +73,8 @@ interface TechnicalIndicators {
   obv: number;
 }
 
+// Add a type definition for the time range
+type TimeRangeType = '1D' | '1W' | '1M' | '3M' | '6M' | '1Y';
 
 const PriceGauge = ({ 
   currentPrice, 
@@ -120,30 +123,108 @@ const PriceGauge = ({
   );
 };
 
+const getChartColor = (data: HistoricalData[]) => {
+  if (data.length < 2) return { stroke: '#6B7280', fill: '#6B7280' };
+  const firstPrice = data[0].value;
+  const lastPrice = data[data.length - 1].value;
+  return lastPrice >= firstPrice 
+    ? { stroke: '#22c55e', fill: '#22c55e' }  // Green for upward trend
+    : { stroke: '#ef4444', fill: '#ef4444' };  // Red for downward trend
+};
+
+const TechnicalIndicatorCard = ({ title, value, description }: { title: string; value: number | null; description?: string }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</h3>
+    <div className="mt-1">
+      <span className="text-lg font-bold text-gray-900 dark:text-white">
+        {value !== null ? value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A'}
+      </span>
+    </div>
+    {description && (
+      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{description}</p>
+    )}
+  </div>
+);
+
+// Define types for API responses
+interface SuccessfulApiResult {
+  indexKey: string;
+  data: {
+    success: boolean;
+    data: {
+      currentStats: {
+        price: number;
+        change: number;
+        changePercent: number;
+      }
+    }
+  };
+  success: true;
+}
+
+interface FailedApiResult {
+  indexKey: string;
+  error: Error;
+  success: false;
+}
+
+type ApiResult = SuccessfulApiResult | FailedApiResult;
+
+// Define type for other indices data
+interface IndexData {
+  price: number;
+  change: number;
+  changePercent: number;
+}
+
 export default function IndexDetail() {
+  const router = useRouter();
   const params = useParams();
-  const symbol = params?.symbol as string;
+  const symbol = Array.isArray(params.symbol) ? params.symbol[0] : params.symbol || '';
   const index = indexInfo[symbol as keyof typeof indexInfo];
-
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<TimeRangeType>('1D');
   const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
-
   const [currentStats, setCurrentStats] = useState({
     price: null as number | null,
     change: null as number | null,
     changePercent: null as number | null,
+    weekChange: null as number | null,
+    weekChangePercent: null as number | null,
+    monthChange: null as number | null,
+    monthChangePercent: null as number | null,
     yearToDateChange: null as number | null,
     yearToDatePercent: null as number | null,
     high52Week: null as number | null,
     low52Week: null as number | null,
+    dailyHigh: null as number | null,
+    dailyLow: null as number | null,
     volume: null as number | null
   });
   const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [ytdStats, setYtdStats] = useState({
+    yearToDateChange: null as number | null,
+    yearToDatePercent: null as number | null
+  });
+  // Add state for other indices data
+  const [otherIndices, setOtherIndices] = useState<Record<string, IndexData>>({});
 
   // Calculate technical indicators
+  const calculateEMA = useCallback((prices: number[], period: number): number => {
+    const multiplier = 2 / (period + 1);
+    let ema = prices[0];
+    prices.forEach(price => {
+      ema = (price - ema) * multiplier + ema;
+    });
+    return ema;
+  }, []);
+
   const calculateIndicators = useCallback((data: HistoricalData[]) => {
-    if (!data.length) return null;
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return null;
+    }
 
     const prices = data.map(d => d.value);
     const length = prices.length;
@@ -165,9 +246,9 @@ export default function IndexDetail() {
     const changes = prices.slice(1).map((price, i) => price - prices[i]);
     const gains = changes.filter(change => change > 0);
     const losses = changes.filter(change => change < 0).map(loss => Math.abs(loss));
-    const avgGain = gains.reduce((a, b) => a + b, 0) / 14;
-    const avgLoss = losses.reduce((a, b) => a + b, 0) / 14;
-    const rs = avgGain / avgLoss;
+    const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / 14 : 0;
+    const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / 14 : 0;
+    const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
     const rsi = 100 - (100 / (1 + rs));
 
     // Calculate Bollinger Bands (20-period SMA with 2 standard deviations)
@@ -239,291 +320,519 @@ export default function IndexDetail() {
       atr,
       obv
     };
-  }, []);
+  }, [calculateEMA]);
 
-  const calculateEMA = useCallback((prices: number[], period: number): number => {
-    const multiplier = 2 / (period + 1);
-    let ema = prices[0];
-    prices.forEach(price => {
-      ema = (price - ema) * multiplier + ema;
-    });
-    return ema;
-  }, []);
+  // Add a separate function to fetch YTD data
+  const fetchYtdData = useCallback(async () => {
+    if (!symbol) return;
+    
+    try {
+      // Fetch year data for current index to calculate YTD
+      const ytdResponse = await fetch(`/api/us-markets/${symbol}?timeRange=1Y`);
+      const ytdResult = await ytdResponse.json();
+      
+      if (ytdResult.success) {
+        setYtdStats({
+          yearToDateChange: ytdResult.data.currentStats.yearToDateChange,
+          yearToDatePercent: ytdResult.data.currentStats.yearToDatePercent
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching YTD data:', error);
+    }
+  }, [symbol]);
 
+  // Memoize the fetchData function with useCallback
   const fetchData = useCallback(async () => {
-    if (!index) return;
-
-    const loadingToast = toast.loading(`Fetching ${index.name} data...`, {
-      position: 'top-right',
-    });
+    if (!symbol) return;
+    
     try {
       setLoading(true);
-      const response = await fetch(`/api/us-markets/${index.symbol}`);
-      const result = await response.json();
+      setError(null);
+      const loadingToast = toast.loading('Fetching market data...', {
+        position: 'top-right',
+      });
       
-      if (result.success && result.data) {
-        const indicators = calculateIndicators(result.data.historicalData);
-        setTechnicalIndicators(indicators);
-        setCurrentStats(result.data.currentStats);
-        setHistoricalData(result.data.historicalData);
-        toast.success(`${index.name} market data updated`, {
-          id: loadingToast,
-          duration: 3000,
-        });
-      } else {
-        console.error('Invalid market data:', result);
+      // Only fetch market data when time range changes
+      const marketDataResponse = await fetch(`/api/us-markets/${symbol}?timeRange=${timeRange}`);
+      const marketDataResult = await marketDataResponse.json();
+      
+      if (!marketDataResult.success) {
+        throw new Error(marketDataResult.error || 'Failed to fetch market data');
       }
 
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : `Failed to load ${index.name} market data`;
-      console.error('Error fetching data:', error);
-      toast.error(errorMessage, {
+      const { historicalData, currentStats, lastUpdated } = marketDataResult.data;
+      setHistoricalData(historicalData);
+      setCurrentStats(currentStats);
+      setLastUpdated(lastUpdated);
+        
+      // Calculate technical indicators after setting historical data
+      const indicators = calculateIndicators(historicalData);
+      setTechnicalIndicators(indicators);
+
+      toast.success('Market data updated', {
         id: loadingToast,
+        duration: 2000,
+      });
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError('Failed to load market data. Please try again later.');
+      toast.error('Failed to load market data. Please try again later.', {
         duration: 4000,
       });
     } finally {
       setLoading(false);
     }
-  }, [index, calculateIndicators]);
+  }, [symbol, timeRange, calculateIndicators]); // Only include dependencies that are used in the function
 
   useEffect(() => {
-    const intervalId = setInterval(fetchData, 300000); // 5 minutes
+    if (!symbol) return;
+
     fetchData();
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [fetchData]);
+    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [fetchData, symbol]); // Add symbol to dependency array
 
-  const TechnicalIndicatorCard = ({ title, value, description }: { title: string; value: number | null; description?: string }) => (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-      <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</h3>
-      <div className="mt-1">
-        <span className="text-xl font-bold text-gray-900 dark:text-white">
-          {value ? value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A'}
-        </span>
-      </div>
-      {description && (
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{description}</p>
-      )}
-    </div>
-  );
+  // Add a separate useEffect for YTD data that only depends on symbol
+  useEffect(() => {
+    fetchYtdData();
+    // No need for interval here as YTD doesn't change that frequently
+  }, [fetchYtdData]);
 
-  // Generate structured data for SEO
-  const generateStructuredData = () => {
-    if (!currentStats.price) return null;
-
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'FinancialProduct',
-      name: index.name,
-      description: index.description,
-      url: window.location.href,
-      dateModified: new Date().toISOString(),
-      price: {
-        '@type': 'MonetaryAmount',
-        currency: 'USD',
-        value: currentStats.price
-      },
-      additionalProperty: [
-        {
-          '@type': 'PropertyValue',
-          name: 'Change',
-          value: currentStats.change
-        },
-        {
-          '@type': 'PropertyValue',
-          name: 'Change Percentage',
-          value: currentStats.changePercent
-        },
-        {
-          '@type': 'PropertyValue',
-          name: '52 Week High',
-          value: currentStats.high52Week
-        },
-        {
-          '@type': 'PropertyValue',
-          name: '52 Week Low',
-          value: currentStats.low52Week
-        },
-        {
-          '@type': 'PropertyValue',
-          name: 'Trading Volume',
-          value: currentStats.volume
+  // Function to fetch data for other indices
+  const fetchOtherIndices = useCallback(async () => {
+    if (!symbol) return;
+    
+    try {
+      // Create an array of indices to fetch, excluding the current one
+      const indicesToFetch = Object.keys(indexInfo).filter(key => key !== symbol);
+      
+      // Fetch data for each index
+      const results = await Promise.all(
+        indicesToFetch.map(indexKey => 
+          fetch(`/api/us-markets/${indexKey}?timeRange=1D`)
+            .then(res => res.json())
+            .then(data => ({ indexKey, data, success: true } as SuccessfulApiResult))
+            .catch(err => ({ indexKey, error: err as Error, success: false } as FailedApiResult))
+        )
+      );
+      
+      // Process the results
+      const indexData: Record<string, IndexData> = {};
+      
+      results.forEach((result: ApiResult) => {
+        if (result.success && result.data && result.data.success) {
+          indexData[result.indexKey] = {
+            price: result.data.data.currentStats.price,
+            change: result.data.data.currentStats.change,
+            changePercent: result.data.data.currentStats.changePercent
+          };
         }
-      ]
-    };
+      });
+      
+      setOtherIndices(indexData);
+    } catch (error) {
+      console.error('Error fetching other indices data:', error);
+    }
+  }, [symbol]); // Remove indexInfo from dependencies
+
+  // Add useEffect to fetch other indices data
+  useEffect(() => {
+    fetchOtherIndices();
+    const interval = setInterval(fetchOtherIndices, 5 * 60 * 1000); // Refresh every 5 minutes
+    
+    return () => clearInterval(interval);
+  }, [fetchOtherIndices]);
+
+  // Format large numbers with abbreviations
+  const formatLargeNumber = (num: number) => {
+    if (num >= 1000000000) {
+      return (num / 1000000000).toFixed(2) + 'B';
+    } else if (num >= 1000000) {
+      return (num / 1000000).toFixed(2) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(2) + 'K';
+    }
+    return num.toString();
   };
 
-  if (loading || !index) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <main className="container mx-auto px-4 py-8" aria-busy="true">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mx-auto"></div>
-            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
-          </div>
-        </main>
-      </div>
-    );
+  // Format date for chart tooltip
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const isPositive = currentStats.change !== null ? currentStats.change >= 0 : false;
+  const chartColor = getChartColor(historicalData);
+
+  if (!index) {
+    return null;
   }
 
-  const structuredData = generateStructuredData();
-
   return (
-    <>
-      {structuredData && (
-        <Script id="structured-data" type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </Script>
-      )}
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <Toaster
-          position="top-right"
-          reverseOrder={false}
-          gutter={8}
-          toastOptions={{
-            duration: 5000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              style: {
-                background: '#059669',
-                color: '#fff',
-              },
-            },
-            error: {
-              duration: 4000,
-              style: {
-                background: '#DC2626',
-                color: '#fff',
-              },
-            },
-            loading: {
-              style: {
-                background: '#2563EB',
-                color: '#fff',
-              },
-            },
-          }}
-        />
-        <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
-          {/* Header Section */}
-          <header className="text-center mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4">
+    <div className="min-h-screen py-8 bg-white">
+      <Head>
+        <title>{index.name} Live Chart | US Markets</title>
+        <meta name="description" content={`Live chart and data for ${index.name}. Track performance, technical indicators, and market trends.`} />
+      </Head>
+
+      <main className="container mx-auto px-4 max-w-8xl">
+        {error ? (
+          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-red-700 dark:text-red-400">
+            {error}
+          </div>
+        ) : (
+          <>
+            {/* Breadcrumb Navigation */}
+            <div className="mb-6">
+              <button
+                onClick={() => router.push('/us-markets')}
+                className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              >
+                <ArrowLeftIcon className="w-4 h-4 mr-1" />
+                <span className="cursor-pointer">Back to US Markets</span>
+              </button>
+            </div>
+
+            {/* Header with name and price info */}
+            <div className="mb-6">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
               {index.name}
+                    <span className="ml-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 py-1 px-2 rounded">
+                      {index.symbol}
+                    </span>
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg max-w-3xl mx-auto px-4">
+                  <p className="text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">
               {index.description}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Last updated: {lastUpdated}
-            </p>
-          </header>
-
-          {/* Current Stats Section */}
-          <section aria-label="Current Statistics" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              <article className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">Current Price</h2>
-                <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
-                  ${currentStats.price?.toLocaleString() ?? 'Loading...'}
                 </div>
-                {currentStats.change !== null && currentStats.changePercent !== null && (
-                  <div className={`flex items-center text-base sm:text-lg mt-1 ${currentStats.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    <span>{currentStats.change >= 0 ? '+' : ''}{currentStats.change.toFixed(2)}</span>
-                    <span className="ml-2">({currentStats.changePercent.toFixed(2)}%)</span>
+                
+                <div className="text-right">
+                  <div className="flex items-center justify-end">
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">
+                      {currentStats.price !== null ? currentStats.price.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      }) : 'Loading...'}
+                    </p>
+                    
+                    {currentStats.change !== null && (
+                      <div className={`ml-3 flex items-center ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                        {isPositive ? (
+                          <ArrowUpIcon className="h-5 w-5 mr-1" />
+                        ) : (
+                          <ArrowDownIcon className="h-5 w-5 mr-1" />
+                        )}
+                        <span className="font-medium tabular-nums">
+                          {isPositive ? '+' : ''}{currentStats.change.toFixed(2)} ({isPositive ? '+' : ''}{currentStats.changePercent?.toFixed(2)}%)
+                        </span>
                   </div>
                 )}
-              </article>
-              <article className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">Year to Date</h2>
-                {currentStats.yearToDateChange !== null && currentStats.yearToDatePercent !== null && (
-                  <div className={`text-xl sm:text-2xl font-bold mt-2 ${currentStats.yearToDateChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {currentStats.yearToDateChange >= 0 ? '+' : ''}{currentStats.yearToDatePercent.toFixed(2)}%
                   </div>
-                )}
-              </article>
-              <article className="lg:col-span-2 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">52 Week Range</h2>
-                <PriceGauge
-                  currentPrice={currentStats.price}
-                  lowPrice={currentStats.low52Week}
-                  highPrice={currentStats.high52Week}
-                />
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Volume</div>
-                    <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                      {currentStats.volume ? `${(currentStats.volume / 1000000).toFixed(1)}M` : 'N/A'}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Volatility</div>
-                    <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                      {technicalIndicators?.atr ? `${technicalIndicators.atr.toFixed(2)}` : 'N/A'}
-                    </div>
-                  </div>
+                  
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    As on {lastUpdated || 'Loading...'}
+                  </p>
                 </div>
-              </article>
+              </div>
             </div>
-          </section>
 
-          {/* Chart Section */}
-          <section aria-label="Historical Performance" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6">Historical Performance</h2>
-            <div className="h-64 sm:h-96">
+            {/* Other US Markets Quick View */}
+            <div className="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <div className="flex flex-wrap justify-between gap-4">
+                {Object.entries(indexInfo)
+                  .filter(([key]) => key !== symbol)
+                  .slice(0, 3)
+                  .map(([key, info]) => {
+                    const indexData = otherIndices[key];
+                    const isPositiveChange = indexData && indexData.change >= 0;
+                    
+                    return (
+                      <div 
+                        key={key}
+                        className="flex-1 min-w-[220px] cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
+                        onClick={() => router.push(`/us-markets/${key}`)}
+                      >
+                        <div className="flex items-center">
+                          <div 
+                            className={`w-2 h-2 rounded-full mr-2 ${
+                              key === 'sp500' ? 'bg-green-600' : 
+                              key === 'nasdaq' ? 'bg-blue-600' : 
+                              key === 'dow-jones' ? 'bg-red-600' : 
+                              key === 'russell2000' ? 'bg-purple-600' :
+                              key === 'dollar-index' ? 'bg-teal-600' : 'bg-gray-600'
+                            }`}
+                          ></div>
+                          <span className="font-medium text-gray-900 dark:text-white">{info.name}</span>
+                        </div>
+                        {indexData ? (
+                          <div className="mt-1 flex items-baseline justify-between">
+                            <span className="text-lg font-bold tabular-nums">
+                              {indexData.price.toLocaleString(undefined, { 
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2 
+                              })}
+                            </span>
+                            <div className={`flex items-center ${
+                              isPositiveChange ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                            }`}>
+                              {isPositiveChange ? (
+                                <ArrowUpIcon className="h-3 w-3 mr-1" />
+                              ) : (
+                                <ArrowDownIcon className="h-3 w-3 mr-1" />
+                              )}
+                              <span className="text-sm">
+                                {isPositiveChange ? '+' : ''}
+                                {indexData.change.toFixed(2)} 
+                                ({isPositiveChange ? '+' : ''}
+                                {indexData.changePercent.toFixed(2)}%)
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-1 flex items-center justify-between">
+                            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* Chart section with time interval selectors */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {index.name} Graph
+                </h2>
+                
+                <div className="flex space-x-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                  {['1D', '1W', '1M', '3M', '6M', '1Y'].map((range) => (
+                  <button
+                    key={range}
+                    className={`px-2 py-1 text-sm rounded-md cursor-pointer ${timeRange === range 
+                      ? 'bg-white dark:bg-gray-600 shadow-sm font-medium' 
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                    onClick={() => setTimeRange(range as TimeRangeType)}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+            </div>
+              
+              {loading ? (
+                <div className="h-[400px] flex items-center justify-center">
+                  <div className="animate-spin h-10 w-10 border-4 border-gray-300 dark:border-gray-600 rounded-full border-t-blue-600"></div>
+                </div>
+              ) : (
+                <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={historicalData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                <ComposedChart 
+                  data={historicalData} 
+                      margin={{ top: 15, right: 65, left: 20, bottom: 5 }}
+                >
+                  <defs>
+                        <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={chartColor.fill} stopOpacity={0.2} />
+                          <stop offset="95%" stopColor={chartColor.fill} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                   <XAxis 
                     dataKey="date" 
-                    tick={{ fontSize: 12 }}
-                    interval="preserveEnd"
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
+                        scale="auto"
+                        tickFormatter={(date) => {
+                          const d = new Date(date);
+                          return timeRange === '1D' 
+                            ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                        }}
+                        minTickGap={30}
                   />
                   <YAxis 
-                    tick={{ fontSize: 12 }}
-                    width={60}
+                        domain={['auto', 'auto']}
                     tickFormatter={(value) => value.toLocaleString()}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="value" name="Price" stroke={index.color} strokeWidth={2} dot={false} />
-                  {technicalIndicators && (
-                    <>
-                      <Line type="monotone" dataKey="ma50" name="50 MA" stroke="#8884d8" dot={false} strokeWidth={1} />
-                      <Line type="monotone" dataKey="ma200" name="200 MA" stroke="#82ca9d" dot={false} strokeWidth={1} />
-                      <Line type="monotone" dataKey="ema20" name="20 EMA" stroke="#ffc658" dot={false} strokeWidth={1} />
-                    </>
+                        formatter={(value: number) => [value.toLocaleString(undefined, { 
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                        }), 'Price']}
+                        labelFormatter={formatDate}
+                        contentStyle={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          borderRadius: '6px',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                          border: 'none'
+                        }}
+                      />
+                      
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                        stroke={chartColor.stroke} 
+                        strokeWidth={2}
+                    fillOpacity={1}
+                        fill="url(#colorGradient)" 
+                      />
+                      
+                      {/* Reference line for current price */}
+                      {currentStats.price && (
+                        <ReferenceLine 
+                          y={currentStats.price} 
+                          stroke="#888888" 
+                        strokeDasharray="3 3"
+                          label={{ 
+                            value: `${currentStats.price.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}`, 
+                            position: 'right',
+                            fill: '#555555',
+                            fontSize: 12,
+                          }}
+                        />
                   )}
-                </LineChart>
+                </ComposedChart>
               </ResponsiveContainer>
+            </div> 
+              )}
             </div>
-          </section>
+
+            {/* Price range indicators - displayed side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* 52-Week Range */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  52-Week Range
+                </h2>
+                <PriceGauge 
+                  currentPrice={currentStats.price} 
+                  lowPrice={currentStats.low52Week}
+                  highPrice={currentStats.high52Week}
+                />
+              </div>
+
+              {/* Day Range */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Day Range
+                </h2>
+                <PriceGauge 
+                  currentPrice={currentStats.price} 
+                  lowPrice={currentStats.dailyLow}
+                  highPrice={currentStats.dailyHigh}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* Market Stats */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Market Stats
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Previous Close */}
+                  <div className="border-b border-gray-100 dark:border-gray-700 pb-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Previous Close</p>
+                    <p className="text-base font-medium text-gray-900 dark:text-white">
+                      {currentStats.price && currentStats.change 
+                        ? (currentStats.price - currentStats.change).toLocaleString(undefined, { 
+                            minimumFractionDigits: 2, 
+                            maximumFractionDigits: 2 
+                          }) 
+                        : '-'}
+                    </p>
+                  </div>
+                  
+                  {/* Day Range */}
+                  <div className="border-b border-gray-100 dark:border-gray-700 pb-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Day Range</p>
+                    <p className="text-base font-medium text-gray-900 dark:text-white">
+                      {currentStats.dailyLow && currentStats.dailyHigh 
+                        ? `${currentStats.dailyLow.toLocaleString(undefined, { 
+                            minimumFractionDigits: 2, 
+                            maximumFractionDigits: 2 
+                          })} - ${currentStats.dailyHigh.toLocaleString(undefined, { 
+                            minimumFractionDigits: 2, 
+                            maximumFractionDigits: 2 
+                          })}` 
+                        : '-'}
+                    </p>
+                </div>
+                
+                  {/* 52 Week Range */}
+                  <div className="border-b border-gray-100 dark:border-gray-700 pb-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">52 Week Range</p>
+                    <p className="text-base font-medium text-gray-900 dark:text-white">
+                      {currentStats.low52Week && currentStats.high52Week 
+                        ? `${currentStats.low52Week.toLocaleString(undefined, { 
+                            minimumFractionDigits: 2, 
+                            maximumFractionDigits: 2 
+                          })} - ${currentStats.high52Week.toLocaleString(undefined, { 
+                            minimumFractionDigits: 2, 
+                            maximumFractionDigits: 2 
+                          })}` 
+                        : '-'}
+                    </p>
+                    </div>
+                  
+                  {/* Volume */}
+                  <div className="border-b border-gray-100 dark:border-gray-700 pb-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Volume</p>
+                    <p className="text-base font-medium text-gray-900 dark:text-white">
+                      {currentStats.volume ? formatLargeNumber(currentStats.volume) : '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional future feature can be added here */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Index Performance
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Daily Change</p>
+                    <p className={`text-xl font-bold ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                      {currentStats.changePercent ? `${isPositive ? '+' : ''}${currentStats.changePercent.toFixed(2)}%` : '-'}
+                    </p>
+                  </div>
+                  <div className="text-center p-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">YTD Change</p>
+                    <p className={`text-xl font-bold ${ytdStats.yearToDatePercent && ytdStats.yearToDatePercent > 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                      {ytdStats.yearToDatePercent ? `${ytdStats.yearToDatePercent > 0 ? '+' : ''}${ytdStats.yearToDatePercent.toFixed(2)}%` : '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           {/* Technical Indicators Section */}
-          <section aria-label="Technical Indicators" className="mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6">Technical Indicators</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {technicalIndicators && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-8">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Technical Indicators
+              </h2>
+              
+              {loading ? (
+                <div className="animate-pulse grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  ))}
+                </div>
+              ) : (
                 <>
+                  {technicalIndicators ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {/* Moving Averages */}
-                  <div className="space-y-3 sm:space-y-4 bg-white dark:bg-gray-800 p-4 rounded-xl">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-300">Moving Averages</h3>
                     <TechnicalIndicatorCard
                       title="50-Day MA"
                       value={technicalIndicators.ma50}
@@ -539,31 +848,15 @@ export default function IndexDetail() {
                       value={technicalIndicators.ema20}
                       description="Short-term trend with more weight on recent prices"
                     />
-                  </div>
 
                   {/* Momentum Indicators */}
-                  <div className="space-y-3 sm:space-y-4 bg-white dark:bg-gray-800 p-4 rounded-xl">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-300">Momentum</h3>
                     <TechnicalIndicatorCard
                       title="RSI (14)"
                       value={technicalIndicators.rsi}
                       description="Overbought (>70) or Oversold (<30)"
                     />
-                    <TechnicalIndicatorCard
-                      title="Stochastic %K"
-                      value={technicalIndicators.stochasticK}
-                      description="Fast stochastic indicator"
-                    />
-                    <TechnicalIndicatorCard
-                      title="Stochastic %D"
-                      value={technicalIndicators.stochasticD}
-                      description="Slow stochastic indicator"
-                    />
-                  </div>
 
                   {/* Volatility Indicators */}
-                  <div className="space-y-3 sm:space-y-4 bg-white dark:bg-gray-800 p-4 rounded-xl">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-300">Volatility</h3>
                     <TechnicalIndicatorCard
                       title="Bollinger Upper"
                       value={technicalIndicators.bollingerUpper}
@@ -574,44 +867,36 @@ export default function IndexDetail() {
                       value={technicalIndicators.bollingerLower}
                       description="Lower band (2 std dev)"
                     />
-                    <TechnicalIndicatorCard
-                      title="ATR (14)"
-                      value={technicalIndicators.atr}
-                      description="Average True Range - Volatility measure"
-                    />
-                  </div>
 
                   {/* Trend Indicators */}
-                  <div className="space-y-3 sm:space-y-4 bg-white dark:bg-gray-800 p-4 rounded-xl">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-300">Trend</h3>
                     <TechnicalIndicatorCard
                       title="MACD"
                       value={technicalIndicators.macdLine}
                       description="Moving Average Convergence Divergence"
                     />
                     <TechnicalIndicatorCard
-                      title="Signal Line"
+                        title="MACD Signal"
                       value={technicalIndicators.signalLine}
                       description="9-day EMA of MACD"
                     />
-                    <TechnicalIndicatorCard
-                      title="OBV"
-                      value={technicalIndicators.obv}
-                      description="On Balance Volume"
-                    />
                   </div>
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-400">
+                      Technical indicators not available for the selected time range
+                    </p>
+                  )}
                 </>
               )}
             </div>
-          </section>
 
           {/* Market Movers Section */}
-          <section aria-label="Market Movers" className="mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6">Market Movers</h2>
-            <MarketMovers index={index.symbol} />
-          </section>
+            <div className="mt-8">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Market Movers</h2>
+              <MarketMovers index={symbol === 'sp500' ? 'sp500' : 'dow-jones'} />
+            </div>
+          </>
+        )}
         </main>
       </div>
-    </>
   );
 } 

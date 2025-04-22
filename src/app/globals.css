@@ -146,3 +146,12 @@ body {
     @apply text-black bg-white;
   }
 }
+
+/* Remove or comment out any lines using template literals in CSS */
+/* For example, lines like:
+   .bg-\${info.color} {
+     background-color: ${info.color};
+   }
+   
+   These will cause CSS parsing errors
+*/

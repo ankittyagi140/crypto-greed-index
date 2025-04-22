@@ -1,83 +1,34 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 import Providers from '../components/Providers';
 import Script from 'next/script';
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { Toaster } from 'react-hot-toast';
+import ScrollToTop from '@/components/ScrollToTop';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  colorScheme: 'dark light',
+};
 
 export const metadata: Metadata = {
-  title: "Crypto Fear & Greed Index Today | Bitcoin Market Sentiment Analysis",
-  description: "Make smarter crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
-  keywords: [
-    "crypto fear and greed index",
-    "bitcoin fear and greed index",
-    "cryptocurrency sentiment",
-    "bitcoin market sentiment",
-    "crypto market analysis",
-    "btc fear and greed",
-    "crypto trading signals",
-    "bitcoin market psychology",
-    "cryptocurrency trading tools",
-    "bitcoin dominance",
-    "market sentiment indicator",
-    "crypto market mood",
-    "bitcoin trading signals",
-    "crypto market trends",
-    "crypto fear and greed index today",
-    "fear and greed index today",
-    "BTCD"
-  ].join(", "),
-  authors: [{ name: "Crypto Greed Index" }],
-  creator: "Crypto Greed Index",
-  publisher: "Crypto Greed Index",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
   metadataBase: new URL('https://www.cryptogreedindex.com'),
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    title: "Crypto Fear & Greed Index | Live Bitcoin Market Sentiment",
-    description: "Make better crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
-    url: 'https://www.cryptogreedindex.com',
-    siteName: 'Crypto Greed Index',
-    images: [
-      {
-        url: '/cryptogreedindex.png',
-        width: 1200,
-        height: 630,
-        alt: 'Crypto Fear & Greed Index - Live Market Sentiment',
-      },
-    ],
-    locale: 'en_US',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: "Crypto Fear & Greed Index | Live Bitcoin Market Sentiment",
-    description: "Make better crypto investment decisions with our real-time Fear & Greed Index. Get live Bitcoin sentiment analysis, market psychology insights, and trading signals updated every 5 minutes.",
-    images: ['/cryptogreedindex.png'],
-    creator: '@cryptogreedindex',
-  },
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
-  manifest: '/manifest.json',
+  title: 'Crypto Fear and Greed Index | Live Crypto Market Sentiment',
+  description:
+    'Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions',
+  keywords:
+    'crypto fear and greed index, crypto sentiment index, bitcoin market emotion, cnn fear and greed indicator, crypto trading psychology, stock market emotion tracker, crypto fear index today, bitcoin investor sentiment',
+  authors: [{ name: 'cryptogreedindex.com' }],
+  creator: 'cryptogreedindex.com',
+  publisher: 'cryptogreedindex.com',
   robots: {
     index: true,
     follow: true,
@@ -89,15 +40,50 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://cryptogreedindex.com',
+    siteName: 'Crypto Fear & Greed Index',
+    title: 'Crypto Fear and Greed Index | Live Market Sentiment',
+    description:
+      'Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions',
+    images: [
+      {
+        url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
+        width: 1200,
+        height: 630,
+        alt: 'Crypto Fear & Greed Index',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Crypto Fear and Greed Index | Live Market Sentiment',
+    description:
+      'Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions',
+    images: ['https://www.cryptogreedindex.com/cryptogreedindex.png'],
+    creator: '@AnkiTyagi007',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
+  },
+  manifest: '/manifest.json',
+  alternates: {
+    canonical: 'https://www.cryptogreedindex.com',
+  },
   verification: {
     google: 'YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI',
   },
 };
 
+const schemaDateModified = new Date().toISOString(); // For consistent reuse
+
 function ThemeInitializer() {
   return (
     <Script
-      id="theme-script"
+      id="cfi-theme-script"
       strategy="beforeInteractive"
       dangerouslySetInnerHTML={{
         __html: `
@@ -116,22 +102,19 @@ function ThemeInitializer() {
   );
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" dir="ltr" className={inter.className} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        <ThemeInitializer />
         <meta name="google-site-verification" content="YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI" />
+        <ThemeInitializer />
+        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-W9J9F0HR2F"
           strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="cfi-google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -139,32 +122,213 @@ export default function RootLayout({
             gtag('config', 'G-W9J9F0HR2F');
           `}
         </Script>
+
+        {/* Schema.org: Website */}
         <Script
-          id="structured-data"
+          id="cfi-schema-website"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Crypto Fear and Greed Index",
+              url: "https://www.cryptogreedindex.com",
+              description:
+                "Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate:
+                    "https://www.cryptogreedindex.com/search?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+
+        {/* Schema.org: Organization */}
+        <Script
+          id="cfi-schema-organization"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "CryptoGreedIndex",
+              url: "https://www.cryptogreedindex.com",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://www.cryptogreedindex.com/cryptogreedindex.png",
+                width: 1200,
+                height: 630,
+                caption: "Crypto Fear & Greed Index Logo",
+              },
+              sameAs: ["https://twitter.com/AnkiTyagi007"],
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "customer service",
+                url: "https://www.cryptogreedindex.com/contact",
+              },
+            }),
+          }}
+        />
+
+        {/* Schema.org: WebPage + Dataset */}
+        <Script
+          id="cfi-schema-webpage"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebPage",
-              "name": "Crypto Fear & Greed Index | Real-time Market Sentiment Analysis",
-              "description": "Track the cryptocurrency market sentiment with real-time Fear & Greed Index updates.",
-              "url": "https://www.cryptogreedindex.com",
-              "image": "https://www.cryptogreedindex.com/cryptogreedindex.png"
-            })
+              name: "Crypto Fear and Greed Index | Live Market Sentiment Analysis",
+              description:
+                "Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions",
+              url: "https://www.cryptogreedindex.com",
+              image: "https://www.cryptogreedindex.com/cryptogreedindex.png",
+              mainEntity: {
+                "@type": "Dataset",
+                name: "Crypto Fear and Greed Index Data",
+                description:
+                  "Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions",
+                keywords:
+                  "crypto fear and greed index, market sentiment, crypto analysis",
+                variableMeasured: [
+                  {
+                    "@type": "PropertyValue",
+                    name: "Crypto Fear & Greed",
+                    description: "Cryptocurrency market sentiment indicator",
+                  },
+                  {
+                    "@type": "PropertyValue",
+                    name: "CNN Fear & Greed",
+                    description: "Traditional market sentiment indicator",
+                  },
+                ],
+              },
+              author: {
+                "@type": "Organization",
+                name: "CryptoGreedIndex",
+                url: "https://www.cryptogreedindex.com",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "CryptoGreedIndex",
+                logo: {
+                  "@type": "ImageObject",
+                  url: "https://www.cryptogreedindex.com/cryptogreedindex.png",
+                },
+              },
+              inLanguage: "en-US",
+              isAccessibleForFree: true,
+              license: "https://www.cryptogreedindex.com/terms",
+              dateModified: schemaDateModified,
+              datePublished: "2024-01-01T00:00:00Z",
+              breadcrumb: {
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  {
+                    "@type": "ListItem",
+                    position: 1,
+                    name: "Home",
+                    item: "https://www.cryptogreedindex.com",
+                  },
+                ],
+              },
+            }),
           }}
         />
+
+        {/* Schema.org: FAQ */}
+        <Script
+          id="cfi-schema-faq"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "What is the Crypto Fear and Greed Index?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "The Crypto Fear and Greed Index is a market sentiment indicator that measures investor emotions, ranging from 0 (extreme fear) to 100 (extreme greed).",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "How does the Crypto Fear and Greed Index work?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "The Crypto Fear and Greed Index analyzes multiple factors including market volatility, trading volume, social media sentiment, and market dominance to gauge overall cryptocurrency market sentiment.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What's the difference between Crypto and CNN Fear & Greed Index?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "While both measure market sentiment, the Crypto Fear & Greed Index focuses on cryptocurrency markets, while CNN's index tracks traditional stock markets using different metrics.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+
+        {/* Google Ads */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693"
+          crossOrigin="anonymous"
+        />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
-        suppressHydrationWarning
-      >
+      <body className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <Providers>
           <div className="flex flex-col min-h-screen">
-            <Header/>
-            <main className="flex-grow w-full max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">{children}</main>
-            <Footer/>
+            <Header />
+            <main className="flex-grow w-full max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">
+              {children}
+            </main>
+            <Footer />
           </div>
         </Providers>
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+          gutter={8}
+          toastOptions={{
+            duration: 5000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 3000,
+              style: {
+                background: '#059669',
+                color: '#fff',
+              },
+            },
+            error: {
+              duration: 4000,
+              style: {
+                background: '#DC2626',
+                color: '#fff',
+              },
+            },
+            loading: {
+              style: {
+                background: '#2563EB',
+                color: '#fff',
+              },
+            },
+          }}
+        />
+        <ScrollToTop />
       </body>
     </html>
   );

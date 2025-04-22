@@ -17,6 +17,12 @@ interface MarketIndex {
   low52Week: number;
   historicalData?: { date: string; value: number; }[];
   regularMarketTime?: Date;
+  weekChange?: number;
+}
+
+interface IndexCardProps {
+  index: MarketIndex;
+  isMarketOpen: boolean;
 }
 
 export default function USMarketOverview() {
@@ -55,7 +61,7 @@ export default function USMarketOverview() {
       setLoading(true);
       const response = await fetch('/api/market-indices');
       const result = await response.json();
-      
+
       if (result.success && result.data) {
         setIndices(result.data.indices);
         setLastUpdated(result.data.lastUpdated);
@@ -69,86 +75,207 @@ export default function USMarketOverview() {
     }
   }, []);
 
-  const IndexCard = ({ index }: { index: MarketIndex }) => {
-    // Get current time in UTC
-    const now = new Date();
-    const marketClosed = !index.regularMarketTime || 
-      (now.getTime() - new Date(index.regularMarketTime).getTime()) > 15 * 60 * 1000;
+  const useMarketStatus = () => {
+    const [isMarketOpen, setIsMarketOpen] = useState(false);
 
-    const formattedTime = index.regularMarketTime 
-      ? new Date(index.regularMarketTime).toLocaleTimeString(undefined, {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        })
-      : '';
+    const checkMarketStatus = useCallback(() => {
+      const now = new Date();
+      const nyTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+      const day = nyTime.getDay();
+      const hours = nyTime.getHours();
+      const minutes = nyTime.getMinutes();
+      const currentTime = hours * 60 + minutes;
+
+      // Check if it's a weekday (Monday = 1, Friday = 5)
+      if (day >= 1 && day <= 5) {
+        // Regular market hours: 9:30 AM - 4:00 PM ET
+        const marketOpen = 9 * 60 + 30; // 9:30 AM
+        const marketClose = 16 * 60; // 4:00 PM
+
+        // Pre-market: 4:00 AM - 9:30 AM ET
+        const preMarketOpen = 4 * 60; // 4:00 AM
+
+        // After-hours: 4:00 PM - 8:00 PM ET
+        const afterHoursClose = 20 * 60; // 8:00 PM
+
+        if (currentTime >= marketOpen && currentTime < marketClose) {
+          return { isOpen: true, status: 'Regular Hours' };
+        } else if (currentTime >= preMarketOpen && currentTime < marketOpen) {
+          return { isOpen: true, status: 'Pre-Market' };
+        } else if (currentTime >= marketClose && currentTime < afterHoursClose) {
+          return { isOpen: true, status: 'After Hours' };
+        }
+      }
+
+      return { isOpen: false, status: 'Closed' };
+    }, []);
+
+    useEffect(() => {
+      const updateMarketStatus = () => {
+        const status = checkMarketStatus();
+        setIsMarketOpen(status.isOpen);
+      };
+
+      // Initial check
+      updateMarketStatus();
+
+      // Update every minute
+      const interval = setInterval(updateMarketStatus, 60000);
+
+      return () => clearInterval(interval);
+    }, [checkMarketStatus]);
+
+    return { isMarketOpen, checkMarketStatus };
+  };
+
+  const IndexCard = ({ index, isMarketOpen }: IndexCardProps) => {
+    const { checkMarketStatus } = useMarketStatus();
+    const { status } = checkMarketStatus();
+    const isPositive = index.change >= 0;
+
+    // Calculate week change if not provided
+    const weekChangeValue = index.weekChange ?? (() => {
+      if (index.historicalData && index.historicalData.length >= 2) {
+        const latest = index.historicalData[index.historicalData.length - 1].value;
+        const oldest = index.historicalData[0].value;
+        return ((latest - oldest) / oldest) * 100;
+      }
+      return null;
+    })();
+
+    const getStatusColor = (status: string) => {
+      switch (status) {
+        case 'Regular Hours':
+          return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        case 'Pre-Market':
+          return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        case 'After Hours':
+          return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+        default:
+          return 'bg-gray-900/10 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400';
+      }
+    };
 
     return (
-      <article 
-        className="relative bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-all duration-200 cursor-pointer"
+      <article
         onClick={() => router.push(getRouteForSymbol(index.symbol))}
         aria-label={`${index.name} Market Index`}
+        className={`
+          relative overflow-hidden rounded-xl shadow-lg 
+          hover:shadow-xl transition-all duration-300 cursor-pointer transform 
+          hover:scale-[1.02]
+          ${isPositive
+            ? 'bg-gradient-to-br from-green-50/50 to-white dark:from-green-900/20 dark:to-gray-800'
+            : 'bg-gradient-to-br from-red-50/50 to-white dark:from-red-900/20 dark:to-gray-800'
+          }
+          ${!isMarketOpen ? 'opacity-90' : ''}
+        `}
       >
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                {index.name}
-              </h3>
-              {marketClosed && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-gray-900 text-white rounded">
-                  CLOSED
-                </span>
-              )}
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {index.price.toLocaleString()}
-          </p>
-          <div className={`flex items-center ${index.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {index.change >= 0 ? (
-              <ArrowUpIcon className="h-4 w-4 mr-1" />
-            ) : (
-              <ArrowDownIcon className="h-4 w-4 mr-1" />
-            )}
-            <span className="text-sm font-medium">
-              {index.change >= 0 ? '+' : ''}{index.change.toFixed(2)} ({index.changePercent.toFixed(2)}%)
+        <div className="relative p-6">
+          {/* Move status badge to top-right corner */}
+          <div className="absolute top-2 right-2">
+            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(status)}`}>
+              {status}
             </span>
           </div>
-          {formattedTime && (
-            <p className="text-xs text-gray-500 mt-1">
-              As of {formattedTime}
+
+          {/* Header without status badge */}
+          <div className="mb-2">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight pr-24">
+              {index.name}
+            </h3>
+          </div>
+
+          {/* Price and Change */}
+          <div className="flex items-baseline gap-3 mb-2">
+            <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight tabular-nums">
+              {index.price.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}
             </p>
-          )}
-          <div className="flex justify-between mt-4">
+            <div className={`
+              flex items-center
+              ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
+            `}>
+              {isPositive ? (
+                <ArrowUpIcon className="h-5 w-5 mr-1" />
+              ) : (
+                <ArrowDownIcon className="h-5 w-5 mr-1" />
+              )}
+              <span className="text-sm font-bold tabular-nums">
+                {isPositive ? '+' : ''}{index.change.toFixed(2)} ({Math.abs(index.changePercent).toFixed(2)}%)
+              </span>
+            </div>
+          </div>
+
+          {/* Time */}
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-4">
+            As of {new Date(index.regularMarketTime || '').toLocaleTimeString()}
+          </p>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-3 gap-4 mt-4">
             <div>
-              <p className="text-xs text-gray-500">YTD</p>
-              <p className={`text-sm font-medium ${index.ytdChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {index.ytdChange.toFixed(2)}%
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                YTD
+              </p>
+              <p className={`
+                text-sm font-bold tabular-nums
+                ${index.ytdChange >= 0
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
+                }
+              `}>
+                {index.ytdChange >= 0 ? '+' : ''}{index.ytdChange.toFixed(2)}%
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Volume</p>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                Volume
+              </p>
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums">
                 {(index.volume / 1000000).toFixed(1)}M
               </p>
             </div>
-          </div>
-          {index.historicalData && index.historicalData.length > 0 && (
-            <div className="absolute top-4 right-4 w-24 h-12 opacity-25">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={index.historicalData}>
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke={index.change >= 0 ? '#22c55e' : '#ef4444'}
-                    strokeWidth={1.5}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                52W Range
+              </p>
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100 tabular-nums">
+                {Math.round(((index.high52Week - index.low52Week) / index.low52Week) * 100)}%
+              </p>
             </div>
-          )}
+          </div>
+
+          {/* Chart - Moved slightly down */}
+          <div className="absolute top-12 right-4 w-28 h-16">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={index.historicalData}>
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke={isPositive ? '#22c55e' : '#ef4444'}
+                  strokeWidth={1.5}
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            {weekChangeValue !== null && (
+              <div className="absolute -bottom-4 right-0 text-xs font-medium">
+                <span className="text-gray-500 dark:text-gray-400">7D:</span>{' '}
+                <span className={
+                  weekChangeValue >= 0
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                }>
+                  {weekChangeValue >= 0 ? '+' : ''}
+                  {weekChangeValue.toFixed(2)}%
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </article>
     );
@@ -165,7 +292,6 @@ export default function USMarketOverview() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">US Markets Overview</h2>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
           Real-time performance of major US market indices and Dollar Index
         </p>
@@ -179,9 +305,14 @@ export default function USMarketOverview() {
         <LoadingSkeleton />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {indices.map((index) => (
-            <IndexCard key={index.symbol} index={index} />
-          ))}
+          {indices.map((index) => {
+            const now = new Date();
+            const marketClosed = !index.regularMarketTime ||
+              (now.getTime() - new Date(index.regularMarketTime).getTime()) > 15 * 60 * 1000;
+            return (
+              <IndexCard key={index.symbol} index={index} isMarketOpen={!marketClosed} />
+            );
+          })}
         </div>
       )}
     </div>
