@@ -146,6 +146,37 @@ const TechnicalIndicatorCard = ({ title, value, description }: { title: string; 
   </div>
 );
 
+// Define types for API responses
+interface SuccessfulApiResult {
+  indexKey: string;
+  data: {
+    success: boolean;
+    data: {
+      currentStats: {
+        price: number;
+        change: number;
+        changePercent: number;
+      }
+    }
+  };
+  success: true;
+}
+
+interface FailedApiResult {
+  indexKey: string;
+  error: Error;
+  success: false;
+}
+
+type ApiResult = SuccessfulApiResult | FailedApiResult;
+
+// Define type for other indices data
+interface IndexData {
+  price: number;
+  change: number;
+  changePercent: number;
+}
+
 export default function IndexDetail() {
   const router = useRouter();
   const params = useParams();
@@ -173,12 +204,12 @@ export default function IndexDetail() {
   });
   const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
-  const [marketBreadth, setMarketBreadth] = useState({
-    advancing: 0,
-    declining: 0,
-    unchanged: 0,
-    total: 0
+  const [ytdStats, setYtdStats] = useState({
+    yearToDateChange: null as number | null,
+    yearToDatePercent: null as number | null
   });
+  // Add state for other indices data
+  const [otherIndices, setOtherIndices] = useState<Record<string, IndexData>>({});
 
   // Calculate technical indicators
   const calculateEMA = useCallback((prices: number[], period: number): number => {
@@ -291,23 +322,39 @@ export default function IndexDetail() {
     };
   }, [calculateEMA]);
 
+  // Add a separate function to fetch YTD data
+  const fetchYtdData = useCallback(async () => {
+    if (!symbol) return;
+    
+    try {
+      // Fetch year data for current index to calculate YTD
+      const ytdResponse = await fetch(`/api/us-markets/${symbol}?timeRange=1Y`);
+      const ytdResult = await ytdResponse.json();
+      
+      if (ytdResult.success) {
+        setYtdStats({
+          yearToDateChange: ytdResult.data.currentStats.yearToDateChange,
+          yearToDatePercent: ytdResult.data.currentStats.yearToDatePercent
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching YTD data:', error);
+    }
+  }, [symbol]);
+
   // Memoize the fetchData function with useCallback
   const fetchData = useCallback(async () => {
     if (!symbol) return;
     
-      try {
-        setLoading(true);
-        setError(null);
-        const loadingToast = toast.loading('Fetching market data...', {
-          position: 'top-right',
-        });
+    try {
+      setLoading(true);
+      setError(null);
+      const loadingToast = toast.loading('Fetching market data...', {
+        position: 'top-right',
+      });
       
-      // Fetch both market data and market breadth data in parallel
-      const [marketDataResponse, marketBreadthResponse] = await Promise.all([
-        fetch(`/api/us-markets/${symbol}?timeRange=${timeRange}`),
-        fetch(`/api/market-breadth/${symbol.replace('dow-jones', 'dow').replace('sp500', 'sp')}`)
-      ]);
-      
+      // Only fetch market data when time range changes
+      const marketDataResponse = await fetch(`/api/us-markets/${symbol}?timeRange=${timeRange}`);
       const marketDataResult = await marketDataResponse.json();
       
       if (!marketDataResult.success) {
@@ -315,45 +362,88 @@ export default function IndexDetail() {
       }
 
       const { historicalData, currentStats, lastUpdated } = marketDataResult.data;
-        setHistoricalData(historicalData);
-        setCurrentStats(currentStats);
-        setLastUpdated(lastUpdated);
-      
-      // Process market breadth data if available
-      if (marketBreadthResponse.ok) {
-        const breadthData = await marketBreadthResponse.json();
-        if (breadthData.success && breadthData.data) {
-          setMarketBreadth(breadthData.data);
-        }
-      }
+      setHistoricalData(historicalData);
+      setCurrentStats(currentStats);
+      setLastUpdated(lastUpdated);
         
-        // Calculate technical indicators after setting historical data
-        const indicators = calculateIndicators(historicalData);
-        setTechnicalIndicators(indicators);
+      // Calculate technical indicators after setting historical data
+      const indicators = calculateIndicators(historicalData);
+      setTechnicalIndicators(indicators);
 
-        toast.success('Market data updated', {
-          id: loadingToast,
-          duration: 2000,
-        });
-      } catch (err) {
+      toast.success('Market data updated', {
+        id: loadingToast,
+        duration: 2000,
+      });
+    } catch (err) {
       console.error('Error fetching data:', err);
       setError('Failed to load market data. Please try again later.');
       toast.error('Failed to load market data. Please try again later.', {
-          duration: 4000,
-        });
-      } finally {
-        setLoading(false);
-      }
+        duration: 4000,
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [symbol, timeRange, calculateIndicators]); // Only include dependencies that are used in the function
 
   useEffect(() => {
     if (!symbol) return;
 
-      fetchData();
+    fetchData();
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     
-      return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [fetchData, symbol]); // Add symbol to dependency array
+
+  // Add a separate useEffect for YTD data that only depends on symbol
+  useEffect(() => {
+    fetchYtdData();
+    // No need for interval here as YTD doesn't change that frequently
+  }, [fetchYtdData]);
+
+  // Function to fetch data for other indices
+  const fetchOtherIndices = useCallback(async () => {
+    if (!symbol) return;
+    
+    try {
+      // Create an array of indices to fetch, excluding the current one
+      const indicesToFetch = Object.keys(indexInfo).filter(key => key !== symbol);
+      
+      // Fetch data for each index
+      const results = await Promise.all(
+        indicesToFetch.map(indexKey => 
+          fetch(`/api/us-markets/${indexKey}?timeRange=1D`)
+            .then(res => res.json())
+            .then(data => ({ indexKey, data, success: true } as SuccessfulApiResult))
+            .catch(err => ({ indexKey, error: err as Error, success: false } as FailedApiResult))
+        )
+      );
+      
+      // Process the results
+      const indexData: Record<string, IndexData> = {};
+      
+      results.forEach((result: ApiResult) => {
+        if (result.success && result.data && result.data.success) {
+          indexData[result.indexKey] = {
+            price: result.data.data.currentStats.price,
+            change: result.data.data.currentStats.change,
+            changePercent: result.data.data.currentStats.changePercent
+          };
+        }
+      });
+      
+      setOtherIndices(indexData);
+    } catch (error) {
+      console.error('Error fetching other indices data:', error);
+    }
+  }, [symbol]); // Remove indexInfo from dependencies
+
+  // Add useEffect to fetch other indices data
+  useEffect(() => {
+    fetchOtherIndices();
+    const interval = setInterval(fetchOtherIndices, 5 * 60 * 1000); // Refresh every 5 minutes
+    
+    return () => clearInterval(interval);
+  }, [fetchOtherIndices]);
 
   // Format large numbers with abbreviations
   const formatLargeNumber = (num: number) => {
@@ -447,6 +537,70 @@ export default function IndexDetail() {
                     As on {lastUpdated || 'Loading...'}
                   </p>
                 </div>
+              </div>
+            </div>
+
+            {/* Other US Markets Quick View */}
+            <div className="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <div className="flex flex-wrap justify-between gap-4">
+                {Object.entries(indexInfo)
+                  .filter(([key]) => key !== symbol)
+                  .slice(0, 3)
+                  .map(([key, info]) => {
+                    const indexData = otherIndices[key];
+                    const isPositiveChange = indexData && indexData.change >= 0;
+                    
+                    return (
+                      <div 
+                        key={key}
+                        className="flex-1 min-w-[220px] cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
+                        onClick={() => router.push(`/us-markets/${key}`)}
+                      >
+                        <div className="flex items-center">
+                          <div 
+                            className={`w-2 h-2 rounded-full mr-2 ${
+                              key === 'sp500' ? 'bg-green-600' : 
+                              key === 'nasdaq' ? 'bg-blue-600' : 
+                              key === 'dow-jones' ? 'bg-red-600' : 
+                              key === 'russell2000' ? 'bg-purple-600' :
+                              key === 'dollar-index' ? 'bg-teal-600' : 'bg-gray-600'
+                            }`}
+                          ></div>
+                          <span className="font-medium text-gray-900 dark:text-white">{info.name}</span>
+                        </div>
+                        {indexData ? (
+                          <div className="mt-1 flex items-baseline justify-between">
+                            <span className="text-lg font-bold tabular-nums">
+                              {indexData.price.toLocaleString(undefined, { 
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2 
+                              })}
+                            </span>
+                            <div className={`flex items-center ${
+                              isPositiveChange ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                            }`}>
+                              {isPositiveChange ? (
+                                <ArrowUpIcon className="h-3 w-3 mr-1" />
+                              ) : (
+                                <ArrowDownIcon className="h-3 w-3 mr-1" />
+                              )}
+                              <span className="text-sm">
+                                {isPositiveChange ? '+' : ''}
+                                {indexData.change.toFixed(2)} 
+                                ({isPositiveChange ? '+' : ''}
+                                {indexData.changePercent.toFixed(2)}%)
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-1 flex items-center justify-between">
+                            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             </div>
 
@@ -551,16 +705,31 @@ export default function IndexDetail() {
               )}
             </div>
 
-            {/* Price range indicator */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                52-Week Range
-              </h2>
-              <PriceGauge 
-                currentPrice={currentStats.price} 
-                lowPrice={currentStats.low52Week}
-                highPrice={currentStats.high52Week}
-              />
+            {/* Price range indicators - displayed side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* 52-Week Range */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  52-Week Range
+                </h2>
+                <PriceGauge 
+                  currentPrice={currentStats.price} 
+                  lowPrice={currentStats.low52Week}
+                  highPrice={currentStats.high52Week}
+                />
+              </div>
+
+              {/* Day Range */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Day Range
+                </h2>
+                <PriceGauge 
+                  currentPrice={currentStats.price} 
+                  lowPrice={currentStats.dailyLow}
+                  highPrice={currentStats.dailyHigh}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -622,85 +791,28 @@ export default function IndexDetail() {
                       {currentStats.volume ? formatLargeNumber(currentStats.volume) : '-'}
                     </p>
                   </div>
-                  
-                  {/* YTD Change % */}
-                  <div className="border-b border-gray-100 dark:border-gray-700 pb-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">YTD Change</p>
-                    <p className={`text-base font-medium ${
-                      currentStats.yearToDatePercent && currentStats.yearToDatePercent > 0 
-                        ? 'text-green-600 dark:text-green-500' 
-                        : currentStats.yearToDatePercent && currentStats.yearToDatePercent < 0 
-                          ? 'text-red-600 dark:text-red-500' 
-                          : 'text-gray-900 dark:text-white'
-                    }`}>
-                      {currentStats.yearToDatePercent 
-                        ? `${currentStats.yearToDatePercent > 0 ? '+' : ''}${currentStats.yearToDatePercent.toFixed(2)}%` 
-                        : '-'}
-                    </p>
-                </div>
-
-                  {/* 1 Month Change % */}
-                  <div className="border-b border-gray-100 dark:border-gray-700 pb-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">1 Month Change</p>
-                    <p className={`text-base font-medium ${
-                      currentStats.monthChangePercent && currentStats.monthChangePercent > 0 
-                        ? 'text-green-600 dark:text-green-500' 
-                        : currentStats.monthChangePercent && currentStats.monthChangePercent < 0 
-                          ? 'text-red-600 dark:text-red-500' 
-                          : 'text-gray-900 dark:text-white'
-                    }`}>
-                      {currentStats.monthChangePercent 
-                        ? `${currentStats.monthChangePercent > 0 ? '+' : ''}${currentStats.monthChangePercent.toFixed(2)}%` 
-                        : '-'}
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              {/* Advance/Decline Card */}
+              {/* Additional future feature can be added here */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Advance / Decline
+                  Index Performance
                 </h2>
-                
-                {loading ? (
-                  <div className="animate-pulse space-y-4">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Daily Change</p>
+                    <p className={`text-xl font-bold ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                      {currentStats.changePercent ? `${isPositive ? '+' : ''}${currentStats.changePercent.toFixed(2)}%` : '-'}
+                    </p>
                   </div>
-                ) : (
-                  <div>
-                    {marketBreadth.total > 0 ? (
-                      <>
-                        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-green-500 to-green-400" 
-                            style={{ width: `${(marketBreadth.advancing / marketBreadth.total) * 100}%` }}
-                          ></div>
-                        </div>
-                        <div className="flex justify-between mt-2">
-                          <div className="text-green-600 dark:text-green-500">
-                            <div className="text-xl font-bold">{marketBreadth.advancing}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Advancing</div>
-                          </div>
-                          <div className="text-gray-500 dark:text-gray-400">
-                            <div className="text-xl font-bold text-center">{marketBreadth.unchanged}</div>
-                            <div className="text-xs">Unchanged</div>
-                          </div>
-                          <div className="text-red-600 dark:text-red-500">
-                            <div className="text-xl font-bold text-right">{marketBreadth.declining}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Declining</div>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-                        <p>Market breadth data not available</p>
-                      </div>
-                    )}
+                  <div className="text-center p-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">YTD Change</p>
+                    <p className={`text-xl font-bold ${ytdStats.yearToDatePercent && ytdStats.yearToDatePercent > 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                      {ytdStats.yearToDatePercent ? `${ytdStats.yearToDatePercent > 0 ? '+' : ''}${ytdStats.yearToDatePercent.toFixed(2)}%` : '-'}
+                    </p>
                   </div>
-                )}
+                </div>
               </div>
             </div>
 

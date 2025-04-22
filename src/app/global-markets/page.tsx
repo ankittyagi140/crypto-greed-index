@@ -200,14 +200,6 @@ const IndexRow = ({ data }: { data: IndexData }) => {
   const utcDay = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   
   // Log the current time for debugging
-  if (country === 'India') {
-    console.log('Current UTC time:', {
-      hours: now.getUTCHours(),
-      minutes: now.getUTCMinutes(),
-      utcHours,
-      date: now.toISOString()
-    });
-  }
 
   // Calculate week change
   const calculateWeekChange = () => {

@@ -77,6 +77,8 @@ interface MarketIndex {
   yearHighPrice: number;
   openPrice: number;
   previousClose: number;
+  dayHigh: number;
+  dayLow: number;
   historicalData?: { date: string; value: number; }[];
   regularMarketTime?: Date;
   weekChange?: number;
@@ -339,10 +341,10 @@ function USMarketsTable() {
                     </div>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    {index.high52Week.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {index.dayHigh ? index.dayHigh.toLocaleString(undefined, { minimumFractionDigits: 2 }) : "-"}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    {index.low52Week.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {index.dayLow ? index.dayLow.toLocaleString(undefined, { minimumFractionDigits: 2 }) : "-"}
                   </td>
                   <td className="py-3 px-4 text-right">
                     {index.openPrice ? index.openPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : index.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
