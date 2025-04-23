@@ -113,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-W9J9F0HR2F"
           strategy="afterInteractive"
+          async
         />
         <Script id="cfi-google-analytics" strategy="afterInteractive">
           {`
@@ -281,8 +282,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Google Ads */}
         <Script
-          async
+          id="google-adsense"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693"
+          strategy="lazyOnload"
           crossOrigin="anonymous"
         />
       </head>
