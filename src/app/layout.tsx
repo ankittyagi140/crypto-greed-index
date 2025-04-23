@@ -280,12 +280,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        {/* Google Ads */}
-        <Script
+        {/* Google Ads - using dangerouslySetInnerHTML to avoid data-nscript attribute */}
+        <script
+          async
           id="google-adsense"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693"
-          strategy="lazyOnload"
           crossOrigin="anonymous"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693"
         />
       </head>
       <body className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
