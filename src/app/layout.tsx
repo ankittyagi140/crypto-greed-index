@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from '@/components/ScrollToTop';
+import ClientAdsense from '@/components/ClientAdsense';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -279,14 +280,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-
-        {/* Google Ads - using dangerouslySetInnerHTML to avoid data-nscript attribute */}
-        <script
-          async
-          id="google-adsense"
-          crossOrigin="anonymous"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693"
-        />
       </head>
       <body className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <Providers>
@@ -331,6 +324,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <ScrollToTop />
+        <ClientAdsense />
       </body>
     </html>
   );
