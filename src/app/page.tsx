@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import LazyChartSection from '@/components/LazyChartSection';
+import LazyChartSection from '../components/LazyChartSection';
 import Link from 'next/link';
 import {
   ChartBarIcon,
@@ -27,7 +27,7 @@ import {
 
 // Lazy load components with custom loading states
 
-const FAQSection = dynamic(() => import('@/components/FAQSection'), {
+const FAQSection = dynamic(() => import('../components/FAQSection'), {
   loading: () => (
     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
       <div className="max-w-3xl mx-auto space-y-6">
@@ -51,17 +51,17 @@ const FAQSection = dynamic(() => import('@/components/FAQSection'), {
 });
 
 // Add lazy loading for other components
-const GaugeIndicator = dynamic(() => import('@/components/GaugeIndicator'), {
+const GaugeIndicator = dynamic(() => import('../components/GaugeIndicator'), {
   loading: () => <div className="animate-pulse bg-gray-100 dark:bg-gray-800 h-64 rounded-full"></div>,
   ssr: false
 });
 
-const FearAndGreedChart = dynamic(() => import('@/components/FearAndGreedChart'), {
+const FearAndGreedChart = dynamic(() => import('../components/FearAndGreedChart'), {
   loading: () => <div className="animate-pulse bg-gray-100 dark:bg-gray-800 h-[400px] rounded-lg"></div>,
   ssr: false
 });
 
-const HistoricalValues = dynamic(() => import('@/components/HistoricalValues'), {
+const HistoricalValues = dynamic(() => import('../components/HistoricalValues'), {
   loading: () => (
     <div className="animate-pulse space-y-4 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
       <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
@@ -77,7 +77,7 @@ const HistoricalValues = dynamic(() => import('@/components/HistoricalValues'), 
 });
 
 // Add intersection observer for lazy loading market cards
-const MarketCard = dynamic(() => import('@/components/MarketCard'), {
+const MarketCard = dynamic(() => import('../components/MarketCard'), {
   loading: () => (
     <div className="animate-pulse bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4"></div>

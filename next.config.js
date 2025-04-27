@@ -26,6 +26,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'static.coinstats.app',
+        port: '',
+        pathname: '/**',
+      },
     ],
     domains: ['www.cryptogreedindex.com'],
   },

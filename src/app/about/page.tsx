@@ -77,7 +77,7 @@ export default function About() {
                 <div className="flex items-center mb-4">
                   <MapIcon className="h-6 w-6 text-indigo-500 mr-2" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Global Markets</h3>
-            </div>
+                </div>
                 <p className="text-gray-600 dark:text-gray-400">
                   Access comprehensive global market data including total market cap, 24h volume, and market trends across different regions.
                 </p>
@@ -121,12 +121,12 @@ export default function About() {
             <ul className="list-disc pl-6 text-gray-600 dark:text-gray-400 mb-6">
               <li>
                 <a 
-                  href="https://www.coingecko.com/api/documentation" 
+                  href="https://coinstats.app/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
-                  CoinGecko API
+                  CoinStats API
                 </a> - For cryptocurrency market data, prices, and market cap information
               </li>
               <li>

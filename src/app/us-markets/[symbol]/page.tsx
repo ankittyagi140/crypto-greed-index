@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area, ComposedChart } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart } from 'recharts';
 import { useParams } from 'next/navigation';
-import MarketMovers from '@/components/MarketMovers';
+import MarketMovers from '../../../components/MarketMovers';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { ArrowUpIcon, ArrowDownIcon, ArrowLeftIcon } from '@heroicons/react/24/solid';
 import Head from 'next/head';
+import React from 'react';
 
 const indexInfo = {
   'sp500': {
@@ -33,12 +34,6 @@ const indexInfo = {
     symbol: '^RUT',
     description: 'The Russell 2000 tracks 2,000 small-cap US companies.',
     color: '#7B1FA2'
-  },
-  'dollar-index': {
-    name: 'US Dollar Index',
-    symbol: 'DX-Y.NYB',
-    description: 'The US Dollar Index measures the value of the USD against a basket of major world currencies.',
-    color: '#00796B'
   }
 };
 
@@ -177,6 +172,368 @@ interface IndexData {
   changePercent: number;
 }
 
+// Add a skeleton component for the chart
+const ChartSkeleton = () => (
+  <div className="p-2 sm:p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg w-full">
+    <div className="flex flex-wrap justify-between items-center mb-4">
+      <div>
+        {/* Price skeleton */}
+        <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+        <div className="flex items-center mt-1">
+          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+        </div>
+      </div>
+      
+      <div className="mt-2 sm:mt-0">
+        {/* Dropdown selector skeleton */}
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+      </div>
+    </div>
+    
+    {/* Chart area skeleton */}
+    <div className="h-60 sm:h-72 md:h-80 lg:h-96 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse">
+      <div className="h-full w-full p-4">
+        {/* Y-axis ticks */}
+        <div className="flex flex-col justify-between h-5/6 w-full">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center">
+              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-10 mb-1"></div>
+              <div className="h-px bg-gray-300 dark:bg-gray-600 w-full ml-2"></div>
+            </div>
+          ))}
+        </div>
+        
+        {/* X-axis ticks */}
+        <div className="flex justify-between mt-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-10"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Add cache constants and utilities
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const DATA_CACHE_KEY_PREFIX = 'market_data_cache_';
+const OTHER_INDICES_CACHE_KEY = 'other_indices_cache';
+const YTD_CACHE_KEY_PREFIX = 'ytd_data_cache_';
+
+// Memoized chart component with its own state management
+const IndexChartContainer = React.memo(({ 
+  symbol,
+  initialData,
+  initialTimeRange,
+  calculateIndicators
+}: { 
+  symbol: string,
+  initialData: HistoricalData[],
+  initialTimeRange: TimeRangeType,
+  calculateIndicators: (data: HistoricalData[]) => TechnicalIndicators | null
+}) => {
+  const [chartData, setChartData] = useState<HistoricalData[]>(initialData);
+  const [timeRange, setTimeRange] = useState<TimeRangeType>(initialTimeRange);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // If initialData is empty, create a simple dataset with just today's data point
+  useEffect(() => {
+    if (initialData.length === 0) {
+      // Find the price from indexInfo to create a fallback chart
+      const now = new Date();
+      const twoHoursAgo = new Date(now.getTime() - (2 * 60 * 60 * 1000));
+      
+      // Create a simple dataset with just two points to show a flat line
+      const fallbackData: HistoricalData[] = [
+        {
+          date: twoHoursAgo.toISOString(),
+          value: 0 // This will be updated by the parent component's currentStats
+        },
+        {
+          date: now.toISOString(),
+          value: 0 // This will be updated by the parent component's currentStats
+        }
+      ];
+      
+      setChartData(fallbackData);
+    } else {
+      setChartData(initialData);
+    }
+  }, [initialData]);
+  
+  // Wrap formatDateByTimeRange and formatDateForTooltip in useCallback
+  const formatDateByTimeRange = useCallback((date: string, timeRange: TimeRangeType) => {
+    try {
+      const d = new Date(date);
+      if (timeRange === '1D') {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } else {
+        return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+    } catch (error) {
+      console.error('Error formatting date by time range:', error, date);
+      return date;
+    }
+  }, []);
+
+  // Format date for tooltip based on the selected time range
+  const formatDateForTooltip = useCallback((date: string, timeRange: TimeRangeType) => {
+    try {
+      const d = new Date(date);
+      if (timeRange === '1D') {
+        return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } else if (timeRange === '1W' || timeRange === '1M') {
+        return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+      } else {
+        return d.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+    } catch (error) {
+      console.error('Error formatting date for tooltip:', error, date);
+      return date;
+    }
+  }, []);
+
+  // Updated function with caching
+  const handleTimeRangeChange = useCallback(async (newTimeRange: TimeRangeType) => {
+    if (newTimeRange === timeRange) return;
+    
+    setTimeRange(newTimeRange);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Check cache first
+      const cacheKey = `${DATA_CACHE_KEY_PREFIX}${symbol}_${newTimeRange}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      
+      if (cachedData) {
+        try {
+          const parsedCache = JSON.parse(cachedData);
+          const now = Date.now();
+          const cacheTime = new Date(parsedCache.timestamp).getTime();
+          
+          if (now - cacheTime < CACHE_DURATION) {
+            console.log(`Using cached data for ${symbol} with timeRange ${newTimeRange}`);
+            setChartData(parsedCache.historicalData);
+            calculateIndicators(parsedCache.historicalData);
+            setLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.error('Error parsing cached data:', error);
+          // Continue with API call if cache fails
+        }
+      }
+      
+      // If no valid cache, fetch from API
+      console.log(`Fetching chart data for ${symbol} with timeRange ${newTimeRange}`);
+      const response = await fetch(`/api/us-markets/${symbol}?timeRange=${newTimeRange}`, {
+        cache: 'no-store', // Prevent browser caching
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        if (!result.data.historicalData || result.data.historicalData.length === 0) {
+          throw new Error(`No data available for ${symbol} with timeRange ${newTimeRange}`);
+        }
+        
+        setChartData(result.data.historicalData);
+        calculateIndicators(result.data.historicalData);
+        
+        // Save to cache
+        localStorage.setItem(cacheKey, JSON.stringify({
+          historicalData: result.data.historicalData,
+          timestamp: new Date().toISOString()
+        }));
+      } else {
+        throw new Error(result.error || 'Failed to fetch market data');
+      }
+    } catch (err) {
+      console.error('Error fetching time range data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update chart data');
+      toast.error('Failed to update chart data');
+    } finally {
+      setLoading(false);
+    }
+  }, [timeRange, symbol, calculateIndicators]);
+
+  const chartColor = getChartColor(chartData);
+
+  // Check if we have valid data
+  const hasValidData = chartData && chartData.length > 0;
+  const lastValue = hasValidData ? chartData[chartData.length - 1]?.value : null;
+  const firstValue = hasValidData ? chartData[0]?.value : null;
+  const changeValue = hasValidData && firstValue !== null && lastValue !== null ? lastValue - firstValue : null;
+  const changePercent = hasValidData && firstValue !== null && lastValue !== null && firstValue !== 0 ? 
+    (lastValue - firstValue) / firstValue * 100 : null;
+
+  return (
+    <div className="p-2 sm:p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg w-full">
+      <div className="flex flex-wrap justify-between items-center mb-4">
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+            {lastValue !== null ? 
+              `$${lastValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 
+              'Data not available'}
+          </h3>
+          <div className="flex items-center mt-1">
+            {changeValue !== null && changePercent !== null ? (
+              <span className={`flex items-center text-sm font-medium ${
+                changeValue >= 0 
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
+              }`}>
+                {changeValue >= 0 ? (
+                  <ArrowUpIcon className="h-4 w-4 mr-1" />
+                ) : (
+                  <ArrowDownIcon className="h-4 w-4 mr-1" />
+                )}
+                {Math.abs(changeValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+                ({Math.abs(changePercent).toFixed(2)}%)
+              </span>
+            ) : (
+              <span className="text-sm text-gray-500">Change not available</span>
+            )}
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+              Today
+            </span>
+          </div>
+        </div>
+        
+        <div className="mt-2 sm:mt-0 space-y-2">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-end">
+              <select 
+                value={timeRange}
+                onChange={(e) => handleTimeRangeChange(e.target.value as TimeRangeType)}
+                className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                disabled={loading}
+              >
+                <option value="1D">1D</option>
+                <option value="1W">1W</option>
+                <option value="1M">1M</option>
+                <option value="3M">3M</option>
+                <option value="6M">6M</option>
+                <option value="1Y">1Y</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+          <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+        </div>
+      )}
+      
+      <div className="h-60 sm:h-72 md:h-80 lg:h-96 w-full">
+        {loading ? (
+          <div className="h-full w-full">
+            <div className="animate-pulse w-full h-full bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+              <div className="h-full w-full p-4">
+                {/* Y-axis ticks */}
+                <div className="flex flex-col justify-between h-5/6 w-full">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-center">
+                      <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-10 mb-1"></div>
+                      <div className="h-px bg-gray-300 dark:bg-gray-600 w-full ml-2"></div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* X-axis ticks */}
+                <div className="flex justify-between mt-4">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-10"></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : hasValidData ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={chartData}>
+              <defs>
+                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartColor.fill} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={chartColor.fill} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis 
+                dataKey="date" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 12, fill: 'gray' }}
+                tickFormatter={(value) => formatDateByTimeRange(value, timeRange)}
+              />
+              <YAxis 
+                domain={['auto', 'auto']} 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 12, fill: 'gray' }}
+              />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+                  borderColor: '#E5E7EB',
+                  borderRadius: '0.375rem'
+                }}
+                formatter={(value: number, name: string) => {
+                  if (name === 'value') return ['Price', `$${value.toLocaleString(undefined, {minimumFractionDigits: 2})}`];
+                  if (name === 'ma50') return ['MA50', `$${value.toLocaleString(undefined, {minimumFractionDigits: 2})}`];
+                  if (name === 'ma200') return ['MA200', `$${value.toLocaleString(undefined, {minimumFractionDigits: 2})}`];
+                  if (name === 'ma100') return ['MA100', `$${value.toLocaleString(undefined, {minimumFractionDigits: 2})}`];
+                  if (name === 'ema20') return ['EMA20', `$${value.toLocaleString(undefined, {minimumFractionDigits: 2})}`];
+                  if (name === 'volume') {
+                    const formattedValue = value > 1000000 
+                      ? `${(value / 1000000).toFixed(2)}M`
+                      : value > 1000 
+                        ? `${(value / 1000).toFixed(2)}K` 
+                        : value.toFixed(2);
+                    return ['Volume', formattedValue];
+                  }
+                  return [name, value.toLocaleString(undefined, {minimumFractionDigits: 2})];
+                }}
+                labelFormatter={(value) => formatDateForTooltip(value, timeRange)}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="value" 
+                stroke={chartColor.stroke} 
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorValue)"
+                activeDot={{ r: 5 }}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full w-full flex items-center justify-center border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div className="text-center text-gray-500 dark:text-gray-400">
+              <p>No chart data available</p>
+              <p className="text-sm mt-2">Try selecting a different time range</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+IndexChartContainer.displayName = 'IndexChartContainer';
+
 export default function IndexDetail() {
   const router = useRouter();
   const params = useParams();
@@ -184,7 +541,7 @@ export default function IndexDetail() {
   const index = indexInfo[symbol as keyof typeof indexInfo];
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<TimeRangeType>('1D');
+  const [timeRange] = useState<TimeRangeType>('1D');
   const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
   const [currentStats, setCurrentStats] = useState({
     price: null as number | null,
@@ -203,13 +560,27 @@ export default function IndexDetail() {
     volume: null as number | null
   });
   const [technicalIndicators, setTechnicalIndicators] = useState<TechnicalIndicators | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
   const [ytdStats, setYtdStats] = useState({
     yearToDateChange: null as number | null,
     yearToDatePercent: null as number | null
   });
-  // Add state for other indices data
   const [otherIndices, setOtherIndices] = useState<Record<string, IndexData>>({});
+
+  // Redirect from dollar-index to another index since we don't have historical data
+  useEffect(() => {
+    if (symbol === 'dollar-index') {
+      router.push('/us-markets/sp500');
+    }
+  }, [symbol, router]);
+
+  // Helper function to check if cache is valid
+  const isDataCacheValid = useCallback((cacheData: { timestamp: string | number | Date }) => {
+    if (!cacheData) return false;
+    
+    const now = Date.now();
+    const cacheTime = new Date(cacheData.timestamp).getTime();
+    return now - cacheTime < CACHE_DURATION;
+  }, []);
 
   // Calculate technical indicators
   const calculateEMA = useCallback((prices: number[], period: number): number => {
@@ -228,12 +599,37 @@ export default function IndexDetail() {
 
     const prices = data.map(d => d.value);
     const length = prices.length;
+    
+    // If we have minimal data (like our fallback 2-point dataset), return simplified indicators
+    if (length < 5) {
+      const currentPrice = prices[prices.length - 1];
+      return {
+        ma50: currentPrice,
+        ma100: currentPrice,
+        ma200: currentPrice,
+        ema20: currentPrice,
+        rsi: 50, // Neutral RSI
+        macdLine: 0,
+        signalLine: 0,
+        histogram: 0,
+        support: currentPrice * 0.98, // Simple 2% estimate
+        resistance: currentPrice * 1.02, // Simple 2% estimate
+        bollingerUpper: currentPrice * 1.02,
+        bollingerMiddle: currentPrice,
+        bollingerLower: currentPrice * 0.98,
+        stochasticK: 50,
+        stochasticD: 50,
+        atr: currentPrice * 0.01, // 1% of price
+        obv: 0
+      };
+    }
+    
     const volumes = data.map(d => d.volume || 0);
 
     // Calculate Moving Averages
-    const ma50 = prices.slice(-50).reduce((a, b) => a + b, 0) / Math.min(50, length);
-    const ma100 = prices.slice(-100).reduce((a, b) => a + b, 0) / Math.min(100, length);
-    const ma200 = prices.slice(-200).reduce((a, b) => a + b, 0) / Math.min(200, length);
+    const ma50 = prices.slice(-Math.min(50, length)).reduce((a, b) => a + b, 0) / Math.min(50, length);
+    const ma100 = prices.slice(-Math.min(100, length)).reduce((a, b) => a + b, 0) / Math.min(100, length);
+    const ma200 = prices.slice(-Math.min(200, length)).reduce((a, b) => a + b, 0) / Math.min(200, length);
 
     // Calculate EMA-20
     const multiplier = 2 / (20 + 1);
@@ -246,8 +642,8 @@ export default function IndexDetail() {
     const changes = prices.slice(1).map((price, i) => price - prices[i]);
     const gains = changes.filter(change => change > 0);
     const losses = changes.filter(change => change < 0).map(loss => Math.abs(loss));
-    const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / 14 : 0;
-    const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / 14 : 0;
+    const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / Math.min(14, gains.length) : 0;
+    const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / Math.min(14, losses.length) : 0;
     const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
     const rsi = 100 - (100 / (1 + rs));
 
@@ -322,93 +718,172 @@ export default function IndexDetail() {
     };
   }, [calculateEMA]);
 
-  // Add a separate function to fetch YTD data
-  const fetchYtdData = useCallback(async () => {
+  // Enhanced fetchData with caching
+  const fetchData = useCallback(async (forceRefresh = false) => {
     if (!symbol) return;
     
-    try {
-      // Fetch year data for current index to calculate YTD
-      const ytdResponse = await fetch(`/api/us-markets/${symbol}?timeRange=1Y`);
-      const ytdResult = await ytdResponse.json();
+    console.log(`Fetching market data for ${symbol}, timeRange: ${timeRange}, forceRefresh: ${forceRefresh}`);
+    
+    // Try to get from cache unless force refresh is requested
+    if (!forceRefresh) {
+      const cacheKey = `${DATA_CACHE_KEY_PREFIX}${symbol}_${timeRange}`;
+      const cachedData = localStorage.getItem(cacheKey);
       
-      if (ytdResult.success) {
-        setYtdStats({
-          yearToDateChange: ytdResult.data.currentStats.yearToDateChange,
-          yearToDatePercent: ytdResult.data.currentStats.yearToDatePercent
-        });
+      if (cachedData) {
+        try {
+          const parsedCache = JSON.parse(cachedData);
+          if (isDataCacheValid(parsedCache)) {
+            console.log(`Using cached data for ${symbol} with timeRange ${timeRange}`);
+            setHistoricalData(parsedCache.historicalData);
+            setCurrentStats(parsedCache.currentStats);
+            
+            // Calculate technical indicators with cached data
+            const indicators = calculateIndicators(parsedCache.historicalData);
+            setTechnicalIndicators(indicators);
+            
+            setLoading(false);
+            return;
+          } else {
+            console.log(`Cache expired for ${symbol}, fetching fresh data`);
+          }
+        } catch (error) {
+          console.error('Error parsing cached data:', error);
+          // Continue with fetching fresh data if cache parsing fails
+        }
+      } else {
+        console.log(`No cache found for ${symbol}, fetching fresh data`);
       }
-    } catch (error) {
-      console.error('Error fetching YTD data:', error);
     }
-  }, [symbol]);
-
-  // Memoize the fetchData function with useCallback
-  const fetchData = useCallback(async () => {
-    if (!symbol) return;
     
-    try {
-      setLoading(true);
-      setError(null);
-      const loadingToast = toast.loading('Fetching market data...', {
-        position: 'top-right',
+      try {
+        setLoading(true);
+        setError(null);
+        const loadingToast = toast.loading('Fetching market data...', {
+          position: 'top-right',
+        });
+      
+      console.log(`Making API request to /api/us-markets/${symbol}?timeRange=${timeRange}`);
+      const marketDataResponse = await fetch(`/api/us-markets/${symbol}?timeRange=${timeRange}`, {
+        // Add cache control to prevent browser caching issues
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
       
-      // Only fetch market data when time range changes
-      const marketDataResponse = await fetch(`/api/us-markets/${symbol}?timeRange=${timeRange}`);
+      if (!marketDataResponse.ok) {
+        throw new Error(`API request failed with status ${marketDataResponse.status}: ${marketDataResponse.statusText}`);
+      }
+      
       const marketDataResult = await marketDataResponse.json();
+      console.log(`API response for ${symbol}:`, marketDataResult);
       
       if (!marketDataResult.success) {
         throw new Error(marketDataResult.error || 'Failed to fetch market data');
       }
 
-      const { historicalData, currentStats, lastUpdated } = marketDataResult.data;
-      setHistoricalData(historicalData);
-      setCurrentStats(currentStats);
-      setLastUpdated(lastUpdated);
+      const { historicalData, currentStats } = marketDataResult.data;
+      
+      if (!historicalData || !Array.isArray(historicalData) || historicalData.length === 0) {
+        throw new Error(`Invalid or empty historical data received for ${symbol}`);
+      }
+      
+      // Cache the fresh data
+      const cacheKey = `${DATA_CACHE_KEY_PREFIX}${symbol}_${timeRange}`;
+      localStorage.setItem(cacheKey, JSON.stringify({
+        historicalData,
+        currentStats,
+        timestamp: new Date().toISOString()
+      }));
+      
+      console.log(`Successfully fetched and cached data for ${symbol}`);
+        setHistoricalData(historicalData);
+        setCurrentStats(currentStats);
         
-      // Calculate technical indicators after setting historical data
-      const indicators = calculateIndicators(historicalData);
-      setTechnicalIndicators(indicators);
+        // Calculate technical indicators after setting historical data
+        const indicators = calculateIndicators(historicalData);
+        setTechnicalIndicators(indicators);
 
-      toast.success('Market data updated', {
-        id: loadingToast,
-        duration: 2000,
-      });
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('Failed to load market data. Please try again later.');
-      toast.error('Failed to load market data. Please try again later.', {
-        duration: 4000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [symbol, timeRange, calculateIndicators]); // Only include dependencies that are used in the function
+        toast.success('Market data updated', {
+          id: loadingToast,
+          duration: 2000,
+        });
+      } catch (err) {
+      console.error(`Error fetching data for ${symbol}:`, err);
+      setError(`Failed to load market data for ${symbol}. ${err instanceof Error ? err.message : 'Please try again later.'}`);
+      toast.error(`Failed to load market data for ${symbol}. Please try again later.`, {
+          duration: 4000,
+        });
+      } finally {
+        setLoading(false);
+      }
+  }, [symbol, timeRange, calculateIndicators, isDataCacheValid]);
 
-  useEffect(() => {
+  // Enhanced fetchYtdData with caching
+  const fetchYtdData = useCallback(async () => {
     if (!symbol) return;
 
-    fetchData();
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    const cacheKey = `${YTD_CACHE_KEY_PREFIX}${symbol}`;
+    const cachedData = localStorage.getItem(cacheKey);
     
-    return () => clearInterval(interval);
-  }, [fetchData, symbol]); // Add symbol to dependency array
+    if (cachedData) {
+      try {
+        const parsedCache = JSON.parse(cachedData);
+        if (isDataCacheValid(parsedCache)) {
+          console.log(`Using cached YTD data for ${symbol}`);
+          setYtdStats(parsedCache.ytdStats);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing cached YTD data:', error);
+      }
+    }
+    
+    try {
+      const ytdResponse = await fetch(`/api/us-markets/${symbol}?timeRange=1Y`);
+      const ytdResult = await ytdResponse.json();
+      
+      if (ytdResult.success) {
+        const newYtdStats = {
+          yearToDateChange: ytdResult.data.currentStats.yearToDateChange,
+          yearToDatePercent: ytdResult.data.currentStats.yearToDatePercent
+        };
+        
+        setYtdStats(newYtdStats);
+        
+        localStorage.setItem(cacheKey, JSON.stringify({
+          ytdStats: newYtdStats,
+          timestamp: new Date().toISOString()
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching YTD data:', error);
+    }
+  }, [symbol, isDataCacheValid]);
 
-  // Add a separate useEffect for YTD data that only depends on symbol
-  useEffect(() => {
-    fetchYtdData();
-    // No need for interval here as YTD doesn't change that frequently
-  }, [fetchYtdData]);
-
-  // Function to fetch data for other indices
+  // Enhanced fetchOtherIndices with caching
   const fetchOtherIndices = useCallback(async () => {
     if (!symbol) return;
     
+    const cachedData = localStorage.getItem(OTHER_INDICES_CACHE_KEY);
+    
+    if (cachedData) {
+      try {
+        const parsedCache = JSON.parse(cachedData);
+        if (isDataCacheValid(parsedCache)) {
+          console.log('Using cached other indices data');
+          setOtherIndices(parsedCache.otherIndices);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing cached other indices data:', error);
+      }
+    }
+    
     try {
-      // Create an array of indices to fetch, excluding the current one
       const indicesToFetch = Object.keys(indexInfo).filter(key => key !== symbol);
       
-      // Fetch data for each index
       const results = await Promise.all(
         indicesToFetch.map(indexKey => 
           fetch(`/api/us-markets/${indexKey}?timeRange=1D`)
@@ -418,7 +893,6 @@ export default function IndexDetail() {
         )
       );
       
-      // Process the results
       const indexData: Record<string, IndexData> = {};
       
       results.forEach((result: ApiResult) => {
@@ -432,17 +906,89 @@ export default function IndexDetail() {
       });
       
       setOtherIndices(indexData);
+      
+      localStorage.setItem(OTHER_INDICES_CACHE_KEY, JSON.stringify({
+        otherIndices: indexData,
+        timestamp: new Date().toISOString()
+      }));
     } catch (error) {
       console.error('Error fetching other indices data:', error);
     }
-  }, [symbol]); // Remove indexInfo from dependencies
+  }, [symbol, isDataCacheValid]);
 
-  // Add useEffect to fetch other indices data
+  // Update all useEffects to use the optimized fetch functions
+  useEffect(() => {
+    if (!symbol) {
+      console.log('No symbol provided, skipping data fetch');
+      return;
+    }
+
+    console.log(`Setting up data fetching for ${symbol}`);
+    
+    // Clear any previous data to ensure we show loading state
+    setHistoricalData([]);
+    setCurrentStats({
+      price: null,
+      change: null,
+      changePercent: null,
+      weekChange: null,
+      weekChangePercent: null,
+      monthChange: null,
+      monthChangePercent: null,
+      yearToDateChange: null,
+      yearToDatePercent: null,
+      high52Week: null,
+      low52Week: null,
+      dailyHigh: null,
+      dailyLow: null,
+      volume: null
+    });
+    setTechnicalIndicators(null);
+    setLoading(true);
+    
+    // Function to attempt data fetching with retries
+    const fetchWithRetry = async (retryCount = 0, maxRetries = 3) => {
+      try {
+        await fetchData(retryCount > 0); // Force refresh on retry attempts
+        console.log(`Data fetch for ${symbol} successful`);
+      } catch (error) {
+        console.error(`Fetch attempt ${retryCount + 1} failed for ${symbol}:`, error);
+        if (retryCount < maxRetries) {
+          console.log(`Retrying fetch for ${symbol} (attempt ${retryCount + 2}/${maxRetries + 1})`);
+          setTimeout(() => fetchWithRetry(retryCount + 1, maxRetries), 2000);
+        } else {
+          console.error(`All retry attempts failed for ${symbol}`);
+          setLoading(false);
+          setError(`Failed to load ${index?.name || symbol} data after multiple attempts. Please try again later.`);
+        }
+      }
+    };
+    
+    // Start the fetch process
+    fetchWithRetry();
+    
+    // Set up regular refresh
+    const interval = setInterval(() => {
+      console.log(`Running scheduled data refresh for ${symbol}`);
+      fetchData(true); // Force refresh every interval
+    }, 5 * 60 * 1000); // Every 5 minutes
+    
+    return () => {
+      console.log(`Cleaning up data fetching for ${symbol}`);
+      clearInterval(interval);
+    };
+  }, [fetchData, symbol, index?.name]);
+
+  useEffect(() => {
+    fetchYtdData();
+    // YTD doesn't change frequently, no need for interval
+  }, [fetchYtdData]);
+
   useEffect(() => {
     fetchOtherIndices();
-    const interval = setInterval(fetchOtherIndices, 5 * 60 * 1000); // Refresh every 5 minutes
+    const interval = setInterval(fetchOtherIndices, 5 * 60 * 1000);
     
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
   }, [fetchOtherIndices]);
 
   // Format large numbers with abbreviations
@@ -457,88 +1003,91 @@ export default function IndexDetail() {
     return num.toString();
   };
 
-  // Format date for chart tooltip
-  const formatDate = (date: string) => {
-    const d = new Date(date);
-    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
   const isPositive = currentStats.change !== null ? currentStats.change >= 0 : false;
-  const chartColor = getChartColor(historicalData);
 
   if (!index) {
     return null;
   }
 
   return (
-    <div className="min-h-screen py-8 bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       <Head>
         <title>{index.name} Live Chart | US Markets</title>
         <meta name="description" content={`Live chart and data for ${index.name}. Track performance, technical indicators, and market trends.`} />
       </Head>
 
-      <main className="container mx-auto px-4 max-w-8xl">
+      <main className="container mx-auto px-0 sm:px-6 py-4 sm:py-12 w-full">
+        <header className="mb-4 sm:mb-8 flex items-center gap-2 px-2 sm:px-0">
+          <button
+            onClick={() => router.push('/us-markets')}
+            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            aria-label="Back to US Markets"
+          >
+            <ArrowLeftIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+          </button>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center">
+            {index?.name || 'Market Index'}
+          </h1>
+        </header>
+
         {error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-red-700 dark:text-red-400">
-            {error}
-          </div>
-        ) : (
-          <>
-            {/* Breadcrumb Navigation */}
-            <div className="mb-6">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+            <p className="text-red-700 dark:text-red-400">{error}</p>
               <button
                 onClick={() => router.push('/us-markets')}
-                className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              className="mt-2 text-sm font-medium text-red-700 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 cursor-pointer"
               >
-                <ArrowLeftIcon className="w-4 h-4 mr-1" />
-                <span className="cursor-pointer">Back to US Markets</span>
+              Return to US Markets
               </button>
             </div>
-
-            {/* Header with name and price info */}
-            <div className="mb-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-              {index.name}
-                    <span className="ml-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 py-1 px-2 rounded">
-                      {index.symbol}
-                    </span>
-            </h1>
-                  <p className="text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">
-              {index.description}
-            </p>
+        ) : loading ? (
+          <div className="space-y-4 px-2 sm:px-0 w-full">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4"></div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2 sm:p-6 w-full">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-40 mb-4"></div>
+                <ChartSkeleton />
                 </div>
                 
-                <div className="text-right">
-                  <div className="flex items-center justify-end">
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">
-                      {currentStats.price !== null ? currentStats.price.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      }) : 'Loading...'}
-                    </p>
-                    
-                    {currentStats.change !== null && (
-                      <div className={`ml-3 flex items-center ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
-                        {isPositive ? (
-                          <ArrowUpIcon className="h-5 w-5 mr-1" />
-                        ) : (
-                          <ArrowDownIcon className="h-5 w-5 mr-1" />
-                        )}
-                        <span className="font-medium tabular-nums">
-                          {isPositive ? '+' : ''}{currentStats.change.toFixed(2)} ({isPositive ? '+' : ''}{currentStats.changePercent?.toFixed(2)}%)
-                        </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                ))}
                   </div>
-                )}
                   </div>
-                  
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    As on {lastUpdated || 'Loading...'}
-                  </p>
                 </div>
+        ) : (
+          <div className="space-y-6 px-0 sm:px-0 w-full">
+            {/* Price Overview */}
+            <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2 sm:p-6 w-full" aria-labelledby="price-overview">
+              <h2 id="price-overview" className="text-xl font-bold text-gray-800 dark:text-white mb-4 px-2 sm:px-0">
+                Price Overview
+                </h2>
+                
+              <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-6 w-full">
+                <div className="lg:col-span-1 w-full">
+                  {/* Replace chart section with the new isolated component */}
+                  {(historicalData.length > 0 || currentStats.price !== null) && (
+                    <IndexChartContainer
+                      symbol={symbol}
+                      initialData={historicalData.length > 0 ? historicalData : [
+                        {
+                          date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                          value: currentStats.price || 0
+                        },
+                        {
+                          date: new Date().toISOString(),
+                          value: currentStats.price || 0
+                        }
+                      ]}
+                      initialTimeRange={timeRange}
+                      calculateIndicators={calculateIndicators}
+                    />
+                  )}
               </div>
             </div>
+            </section>
 
             {/* Other US Markets Quick View */}
             <div className="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
@@ -562,8 +1111,7 @@ export default function IndexDetail() {
                               key === 'sp500' ? 'bg-green-600' : 
                               key === 'nasdaq' ? 'bg-blue-600' : 
                               key === 'dow-jones' ? 'bg-red-600' : 
-                              key === 'russell2000' ? 'bg-purple-600' :
-                              key === 'dollar-index' ? 'bg-teal-600' : 'bg-gray-600'
+                              key === 'russell2000' ? 'bg-purple-600' : 'bg-gray-600'
                             }`}
                           ></div>
                           <span className="font-medium text-gray-900 dark:text-white">{info.name}</span>
@@ -572,8 +1120,8 @@ export default function IndexDetail() {
                           <div className="mt-1 flex items-baseline justify-between">
                             <span className="text-lg font-bold tabular-nums">
                               {indexData.price.toLocaleString(undefined, { 
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2 
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
                               })}
                             </span>
                             <div className={`flex items-center ${
@@ -596,127 +1144,26 @@ export default function IndexDetail() {
                           <div className="mt-1 flex items-center justify-between">
                             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
                             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                          </div>
-                        )}
+            </div> 
+              )}
                       </div>
                     );
                   })}
               </div>
             </div>
 
-            {/* Chart section with time interval selectors */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-8">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {index.name} Graph
-                </h2>
-                
-                <div className="flex space-x-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                  {['1D', '1W', '1M', '3M', '6M', '1Y'].map((range) => (
-                  <button
-                    key={range}
-                    className={`px-2 py-1 text-sm rounded-md cursor-pointer ${timeRange === range 
-                      ? 'bg-white dark:bg-gray-600 shadow-sm font-medium' 
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
-                    onClick={() => setTimeRange(range as TimeRangeType)}
-                  >
-                    {range}
-                  </button>
-                ))}
-              </div>
-            </div>
-              
-              {loading ? (
-                <div className="h-[400px] flex items-center justify-center">
-                  <div className="animate-spin h-10 w-10 border-4 border-gray-300 dark:border-gray-600 rounded-full border-t-blue-600"></div>
-                </div>
-              ) : (
-                <div className="h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart 
-                  data={historicalData} 
-                      margin={{ top: 15, right: 65, left: 20, bottom: 5 }}
-                >
-                  <defs>
-                        <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={chartColor.fill} stopOpacity={0.2} />
-                          <stop offset="95%" stopColor={chartColor.fill} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                  <XAxis 
-                    dataKey="date" 
-                        scale="auto"
-                        tickFormatter={(date) => {
-                          const d = new Date(date);
-                          return timeRange === '1D' 
-                            ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                            : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                        }}
-                        minTickGap={30}
-                  />
-                  <YAxis 
-                        domain={['auto', 'auto']}
-                    tickFormatter={(value) => value.toLocaleString()}
-                  />
-                  <Tooltip
-                        formatter={(value: number) => [value.toLocaleString(undefined, { 
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                        }), 'Price']}
-                        labelFormatter={formatDate}
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          borderRadius: '6px',
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                          border: 'none'
-                        }}
-                      />
-                      
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                        stroke={chartColor.stroke} 
-                        strokeWidth={2}
-                    fillOpacity={1}
-                        fill="url(#colorGradient)" 
-                      />
-                      
-                      {/* Reference line for current price */}
-                      {currentStats.price && (
-                        <ReferenceLine 
-                          y={currentStats.price} 
-                          stroke="#888888" 
-                        strokeDasharray="3 3"
-                          label={{ 
-                            value: `${currentStats.price.toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}`, 
-                            position: 'right',
-                            fill: '#555555',
-                            fontSize: 12,
-                          }}
-                        />
-                  )}
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div> 
-              )}
-            </div>
-
             {/* Price range indicators - displayed side by side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               {/* 52-Week Range */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  52-Week Range
-                </h2>
-                <PriceGauge 
-                  currentPrice={currentStats.price} 
-                  lowPrice={currentStats.low52Week}
-                  highPrice={currentStats.high52Week}
-                />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                52-Week Range
+              </h2>
+              <PriceGauge 
+                currentPrice={currentStats.price} 
+                lowPrice={currentStats.low52Week}
+                highPrice={currentStats.high52Week}
+              />
               </div>
 
               {/* Day Range */}
@@ -811,8 +1258,8 @@ export default function IndexDetail() {
                     <p className={`text-xl font-bold ${ytdStats.yearToDatePercent && ytdStats.yearToDatePercent > 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
                       {ytdStats.yearToDatePercent ? `${ytdStats.yearToDatePercent > 0 ? '+' : ''}${ytdStats.yearToDatePercent.toFixed(2)}%` : '-'}
                     </p>
-                  </div>
-                </div>
+                        </div>
+                          </div>
               </div>
             </div>
 
@@ -894,7 +1341,62 @@ export default function IndexDetail() {
               <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Market Movers</h2>
               <MarketMovers index={symbol === 'sp500' ? 'sp500' : 'dow-jones'} />
             </div>
-          </>
+
+            {/* SEO-Friendly Index Information */}
+            <div className="mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+                {index?.name || 'Market Index'} Overview
+              </h2>
+              
+              {symbol === 'sp500' && (
+                <div className="text-gray-700 dark:text-gray-300 space-y-4">
+                  <p>The S&P 500 (Standard & Poor&apos;s 500) is one of the most widely followed equity indices in the world, measuring the stock performance of 500 large companies listed on stock exchanges in the United States. It covers approximately 80% of available U.S. market capitalization, making it an excellent indicator of the overall U.S. stock market and economy.</p>
+                  
+                  <p>Created in 1957, the S&P 500 is a market-capitalization-weighted index, meaning that companies with larger market values have a greater impact on the index&apos;s movements. This differs from the Dow Jones Industrial Average, which is price-weighted. The S&P 500 is maintained by S&P Dow Jones Indices, a joint venture majority-owned by S&P Global.</p>
+                  
+                  <p>For investors, the S&P 500 serves as a crucial benchmark for portfolio performance and a key barometer of U.S. economic health. Many index funds and ETFs track the S&P 500, allowing investors to gain exposure to a diverse range of large American companies across all 11 market sectors: Communication Services, Consumer Discretionary, Consumer Staples, Energy, Financials, Health Care, Industrials, Information Technology, Materials, Real Estate, and Utilities.</p>
+                  
+                  <p>Companies must meet specific criteria to be included in the S&P 500, including market capitalization requirements, financial viability standards, and sufficient public float. The index is rebalanced quarterly, with additions and removals reflecting changes in company performance and market conditions.</p>
+                </div>
+              )}
+              
+              {symbol === 'nasdaq' && (
+                <div className="text-gray-700 dark:text-gray-300 space-y-4">
+                  <p>The NASDAQ Composite is a stock market index that includes nearly all companies listed on the Nasdaq stock exchange. Launched in 1971, it has become synonymous with technology and innovation, as it contains many of the world&apos;s largest technology companies and is heavily weighted toward the tech sector.</p>
+                  
+                  <p>Unlike the S&P 500 or Dow Jones Industrial Average, which are selective in their component stocks, the NASDAQ Composite includes over 3,000 companies. It is a market-capitalization-weighted index, meaning larger companies have a greater influence on its performance.</p>
+                  
+                  <p>The NASDAQ Composite is widely regarded as a key indicator of the technology sector&apos;s health and has historically been more volatile than broader market indices due to its tech concentration. Companies across various tech segments are represented, including software, semiconductors, telecommunications, biotechnology, and internet services.</p>
+                  
+                  <p>For investors, the NASDAQ Composite provides insights into growth-oriented sectors and emerging technologies. Its performance often reflects trends in innovation, digital transformation, and technological disruption across the global economy. Many investors use NASDAQ-tracking index funds or ETFs to gain exposure to the growth potential of the technology sector.</p>
+                </div>
+              )}
+              
+              {symbol === 'dow-jones' && (
+                <div className="text-gray-700 dark:text-gray-300 space-y-4">
+                  <p>The Dow Jones Industrial Average (DJIA), often referred to simply as &quot;the Dow,&quot; is one of the oldest and most recognizable stock market indices in the world. Created in 1896 by Charles Dow, it originally tracked just 12 industrial companies but has evolved to include 30 large, established American companies that represent diverse sectors of the U.S. economy.</p>
+                  
+                  <p>Unlike many other indices, the Dow is price-weighted rather than market-capitalization-weighted, meaning that higher-priced stocks have a greater influence on the index regardless of their total market value. The index is maintained by S&P Dow Jones Indices, a joint venture majority-owned by S&P Global.</p>
+                  
+                  <p>Despite tracking only 30 companies, the Dow serves as a significant barometer for the U.S. stock market and broader economy due to the size and importance of its components. These &quot;blue-chip&quot; companies are typically household names with strong financial foundations and long histories of stable performance.</p>
+                  
+                  <p>The composition of the Dow changes over time to reflect the evolving nature of the U.S. economy. When originally created, it mainly consisted of industrial companies, but today it includes representatives from sectors such as technology, healthcare, financial services, and consumer goods. Changes to the index components are made by the Dow Jones Index Committee based on factors like company reputation, growth history, and sector representation.</p>
+                </div>
+              )}
+              
+              {symbol === 'russell2000' && (
+                <div className="text-gray-700 dark:text-gray-300 space-y-4">
+                  <p>The Russell 2000 Index is a small-cap stock market index that measures the performance of approximately 2,000 smallest companies in the Russell 3000 Index. Created in 1984 by the Frank Russell Company, it represents about 10% of the total market capitalization of the Russell 3000 Index.</p>
+                  
+                  <p>As a market-capitalization-weighted index focusing on smaller U.S. companies, the Russell 2000 provides investors with insight into a different segment of the market than large-cap indices like the S&P 500 or Dow Jones Industrial Average. Small-cap stocks often behave differently than large-cap stocks, potentially offering different risk and return characteristics.</p>
+                  
+                  <p>The Russell 2000 is widely regarded as a key benchmark for small-cap investment performance. Many investors and fund managers use it to gauge the health of smaller businesses in the U.S. economy. Small-cap companies are typically more sensitive to domestic economic conditions and may respond differently to economic cycles than larger multinational corporations.</p>
+                  
+                  <p>The index is reconstituted annually to ensure it accurately represents the small-cap segment of the U.S. equity market. As companies grow, they may graduate from the Russell 2000 to the Russell 1000 (which tracks larger companies), while others may be added to the index as they meet the criteria for inclusion.</p>
+                </div>
+              )}
+            </div>
+          </div>
         )}
         </main>
       </div>

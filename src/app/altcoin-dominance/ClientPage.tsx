@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import AltcoinDominance from '@/components/AltcoinDominance';
-import AltcoinMetrics from '@/components/AltcoinMetrics';
+import AltcoinDominance from '../../components/AltcoinDominance';
+import AltcoinMetrics from '../../components/AltcoinMetrics';
 
 interface DominanceData {
   date: string;

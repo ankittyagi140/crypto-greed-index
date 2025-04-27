@@ -1,7 +1,7 @@
 'use client';
 
-import BTCDominance from '@/components/BTCDominance';
-import BitcoinMetrics from '@/components/BitcoinMetrics';
+import BTCDominance from '../../components/BTCDominance';
+import BitcoinMetrics from '../../components/BitcoinMetrics';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 

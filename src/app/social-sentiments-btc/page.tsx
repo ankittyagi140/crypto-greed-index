@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import LazyChartSection from "@/components/LazyChartSection"
-import { SocialSentimentSkeleton } from "@/components/ChartSkeletons";
+import LazyChartSection from "../../components/LazyChartSection"
+import { SocialSentimentSkeleton } from "../../components/ChartSkeletons";
 import dynamic from "next/dynamic";
 import { toast } from "react-hot-toast";
 
@@ -27,7 +27,7 @@ interface SentimentDataPoint {
     };
 }
 
-const SocialSentiment = dynamic(() => import('@/components/SocialSentiment'), {
+const SocialSentiment = dynamic(() => import('../../components/SocialSentiment'), {
     loading: () => <SocialSentimentSkeleton />,
     ssr: false
 });

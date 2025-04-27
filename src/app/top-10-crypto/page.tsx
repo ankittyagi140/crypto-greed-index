@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
-import { formatNumber, formatPercentage } from '@/utils/formatters';
+import { formatNumber, formatPercentage } from '../../utils/formatters';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 

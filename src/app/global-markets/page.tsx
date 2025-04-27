@@ -4,13 +4,10 @@ import { useState, useEffect } from 'react';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
 import { toast } from 'react-hot-toast';
 import {
-  ArrowUpIcon,
-  ArrowDownIcon,
   GlobeAsiaAustraliaIcon,
   GlobeAmericasIcon,
   GlobeEuropeAfricaIcon,
   SunIcon,
-  ClockIcon
 } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -211,25 +208,6 @@ const IndexRow = ({ data }: { data: IndexData }) => {
 
   currentStats.weekChange = calculateWeekChange();
 
-  // Format date safely
-  const formatTime = (dateVal: string | Date | number | null | undefined) => {
-    try {
-      if (!dateVal) return "";
-      const date = new Date(dateVal);
-      // Check if date is valid
-      if (isNaN(date.getTime())) return "";
-      
-      return date.toLocaleTimeString(undefined, {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    } catch (e) {
-      console.error("Error formatting date:", e);
-      return "";
-    }
-  };
-
   // Check if market is open based on trading hours and last update
   const isMarketOpen = () => {
     // If it's Saturday or Sunday, market is closed
@@ -322,83 +300,62 @@ const IndexRow = ({ data }: { data: IndexData }) => {
     return null;
   };
 
-  const isOpen = isMarketOpen();
-  const isPositive = currentStats.change >= 0;
-  const statusClass = isOpen ? "text-green-500" : "text-red-500";
-  const flagCode = countryToFlagCode[country] || '';
-
-  // Add a tooltip to show market hours
-  const marketHours = getMarketHours();
-  const marketHoursText = marketHours ? 
-    `Market hours: ${marketHours.start}:00-${marketHours.end}:00 UTC` : 
-    'Market hours not available';
-
+  // Return the JSX with updated padding for mobile
   return (
-    <tr className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
-      <td className="py-3 px-4 whitespace-nowrap">
-        <div className="flex items-center">
-          <div className="mr-2" title={marketHoursText}>
-            <ClockIcon className={`h-4 w-4 ${statusClass}`} />
-          </div>
-          {flagCode && (
-            <div className="mr-2">
+    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+      <td className="py-2 sm:py-3 px-2 sm:px-4">
+        <div className="flex items-center space-x-2">
+          {country && countryToFlagCode[country] && (
+            <div className="w-5 h-5 inline-block relative">
               <Image
-                src={`https://flagcdn.com/16x12/${flagCode}.png`} 
-                width={16} 
-                height={12} 
+                src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${countryToFlagCode[country].toUpperCase()}.svg`}
                 alt={`${country} flag`}
-                className="inline-block"
-                unoptimized
+                width={20}
+                height={15}
+                className="rounded-sm"
               />
             </div>
           )}
           <div>
-            <div className="flex items-center">
-              <span className="font-medium text-gray-900 dark:text-white">{name}</span>
+            <div className="font-medium text-gray-900 dark:text-white flex items-center gap-1.5">
+              <span>
+                {name}
+              </span>
+              {isMarketOpen() && (
+                <span className="flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+              )}
             </div>
-            <div className="text-xs text-gray-500">
-              {formatTime(currentStats.regularMarketTime)} {country}
-            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">{country}</div>
           </div>
         </div>
       </td>
-      <td className="py-3 px-4">
-        <div style={{ width: 100, height: 30 }}>
-          {historicalData && historicalData.length > 0 ? (
-            <Sparklines data={historicalData.map(item => item.value)} width={100} height={30}>
-              <SparklinesLine color={isPositive ? "#22c55e" : "#ef4444"} />
+      <td className="py-2 sm:py-3 px-2 sm:px-4">
+        <div className="w-20 h-12">
+          {historicalData && historicalData.length > 0 && (
+            <Sparklines data={historicalData.map(item => item.value)} svgHeight={40} svgWidth={80}>
+              <SparklinesLine color={currentStats.change >= 0 ? "#10B981" : "#EF4444"} />
             </Sparklines>
-          ) : (
-            <div className="w-full h-full bg-gray-100 dark:bg-gray-700 rounded" />
           )}
         </div>
       </td>
-      <td className="py-3 px-4 font-medium text-right">
+      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right font-medium text-gray-900 dark:text-white">
         {currentStats.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
       </td>
-      <td className="py-3 px-4">
-        <div className={`flex items-center justify-end whitespace-nowrap ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {isPositive ? (
-              <ArrowUpIcon className="h-4 w-4 mr-1 flex-shrink-0" />
-            ) : (
-              <ArrowDownIcon className="h-4 w-4 mr-1 flex-shrink-0" />
-            )}
-          <span className="font-medium">
-            {isPositive ? '+' : ''}{currentStats.change.toFixed(2)}
-            </span>
-        </div>
+      <td className={`py-2 sm:py-3 px-2 sm:px-4 text-right font-medium ${currentStats.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        {currentStats.change >= 0 ? '+' : ''}{currentStats.change.toLocaleString(undefined, { minimumFractionDigits: 2 })}
       </td>
-      <td className="py-3 px-4">
-        <div className={`text-right ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-          {isPositive ? '+' : ''}{currentStats.changePercent.toFixed(2)}%
-        </div>
+      <td className={`py-2 sm:py-3 px-2 sm:px-4 text-right font-medium ${currentStats.changePercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        {currentStats.changePercent >= 0 ? '+' : ''}{currentStats.changePercent.toFixed(2)}%
       </td>
-      <td className="py-3 px-4 text-right">{currentStats.dailyRange.high.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-      <td className="py-3 px-4 text-right">{currentStats.dailyRange.low.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-      <td className="py-3 px-4 text-right">{currentStats.open.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-      <td className="py-3 px-4 text-right">{currentStats.previousClose.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-      <td className="py-3 px-4 text-right">{currentStats.fiftyTwoWeekRange.high.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-      <td className="py-3 px-4 text-right">{currentStats.fiftyTwoWeekRange.low.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">{currentStats.dailyRange.high.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">{currentStats.dailyRange.low.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">{currentStats.open.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">{currentStats.previousClose.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">{currentStats.fiftyTwoWeekRange.high.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">{currentStats.fiftyTwoWeekRange.low.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
     </tr>
   );
 };
@@ -407,48 +364,48 @@ const RegionSection = ({ title, data }: { title: string; data: IndexData[] }) =>
   const IconComponent = REGION_ICONS[title as keyof typeof REGION_ICONS];
 
   return (
-    <section className="mb-10 sm:mb-14" aria-labelledby={`region-${title.toLowerCase().replace(/\s+/g, '-')}`}>
-      <div className="flex items-center gap-2 mb-4">
+    <section className="mb-6 sm:mb-14" aria-labelledby={`region-${title.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className="flex items-center gap-2 mb-4 px-2 sm:px-4">
         {IconComponent && <IconComponent className="h-6 w-6 text-gray-600 dark:text-gray-400" aria-hidden="true" />}
         <h2 id={`region-${title.toLowerCase().replace(/\s+/g, '-')}`} className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
           {title}
         </h2>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto -mx-0">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead>
             <tr>
-              <th scope="col" className="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Name
               </th>
-              <th scope="col" className="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 7D Chart
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 LTP
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Change
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Chg%
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 High
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Low
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Open
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Prev. Close
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 52 W High
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th scope="col" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 52 W Low
               </th>
             </tr>
@@ -534,8 +491,8 @@ export default function GlobalMarkets() {
 
   return (
     <div className="min-h-screen">
-      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-8xl">
-        <header className="text-center mb-8 sm:mb-12">
+      <main className="container mx-auto px-0 sm:px-6 py-4 sm:py-12 max-w-8xl">
+        <header className="text-center mb-4 sm:mb-12 px-2 sm:px-0">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4">
             Global Markets Today
           </h1>
@@ -547,7 +504,7 @@ export default function GlobalMarkets() {
           </p>
         </header>
 
-        <nav aria-label="Market regions" className="mb-8">
+        <nav aria-label="Market regions" className="mb-4 sm:mb-8 px-2 sm:px-0">
           <ul className="flex flex-wrap justify-center gap-4">
             {Object.keys(marketData).map((region) => (
               <li key={region}>
@@ -562,13 +519,13 @@ export default function GlobalMarkets() {
           </ul>
         </nav>
 
-        <div role="region" aria-label="Global market data" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+        <div role="region" aria-label="Global market data" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-0 sm:p-6">
           {Object.entries(marketData).map(([region, indices]) => (
             <RegionSection key={region} title={region} data={indices} />
           ))}
         </div>
 
-        <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-8 sm:mt-12 text-center text-sm text-gray-500 dark:text-gray-400 px-2 sm:px-0">
           <p>Data is updated every 5 minutes. Market hours are in UTC.</p>
           <p className="mt-2">
             <Link
