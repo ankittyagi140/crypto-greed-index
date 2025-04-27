@@ -3,11 +3,10 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Providers from '../components/Providers';
 import Script from 'next/script';
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 import { Toaster } from 'react-hot-toast';
-import ScrollToTop from '@/components/ScrollToTop';
-import ClientAdsense from '@/components/ClientAdsense';
+import ScrollToTop from '../components/ScrollToTop';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,13 +21,13 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cryptogreedindex.com'),
-  title: 'Crypto Fear and Greed Index | Live Crypto Market Sentiment',
+  title: 'Crypto Fear and Greed Index | Bitcoin Sentiment Tracker Live',
   description:
-    'Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions',
+    'Live Crypto Fear and Greed Index for Bitcoin and cryptocurrencies. Track crypto sentiment, Bitcoin fear levels, and market emotions updated every 5 minutes. Analyze fear and greed index today and stay ahead in crypto trading.',
   keywords:
-    'crypto fear and greed index, crypto sentiment index, bitcoin market emotion, cnn fear and greed indicator, crypto trading psychology, stock market emotion tracker, crypto fear index today, bitcoin investor sentiment',
+    'crypto fear and greed index, bitcoin fear and greed index, fear and greed index today, crypto sentiment index, market fear and greed index, crypto fear index, fear and greed index live, bitcoin market sentiment, greed and fear index crypto, crypto market emotion tracker',
   authors: [{ name: 'cryptogreedindex.com' }],
-  creator: 'cryptogreedindex.com',
+  creator: 'www.linkedin.com/in/atyagi-js',
   publisher: 'cryptogreedindex.com',
   robots: {
     index: true,
@@ -46,9 +45,9 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://cryptogreedindex.com',
     siteName: 'Crypto Fear & Greed Index',
-    title: 'Crypto Fear and Greed Index | Live Market Sentiment',
+    title: 'Crypto Fear and Greed Index | Bitcoin Sentiment Tracker Live',
     description:
-      'Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions',
+      'Live Crypto Fear and Greed Index for Bitcoin and cryptocurrencies. Track crypto sentiment, Bitcoin fear levels, and market emotions updated every 5 minutes. Analyze fear and greed index today and stay ahead in crypto trading.',
     images: [
       {
         url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
@@ -60,11 +59,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Crypto Fear and Greed Index | Live Market Sentiment',
+    title: 'Crypto Fear and Greed Index | Bitcoin Sentiment Tracker Live',
     description:
-      'Live Crypto Fear and Greed Index for Bitcoin, crypto, and stocks. Monitor market sentiment updated every 5 minutes to make informed decisions',
+      'Live Crypto Fear and Greed Index for Bitcoin and cryptocurrencies. Track crypto sentiment, Bitcoin fear levels, and market emotions updated every 5 minutes. Analyze fear and greed index today and stay ahead in crypto trading.',
     images: ['https://www.cryptogreedindex.com/cryptogreedindex.png'],
-    creator: '@AnkiTyagi007',
+    creator: 'www.linkedin.com/in/atyagi-js',
   },
   icons: {
     icon: '/favicon.ico',
@@ -78,6 +77,7 @@ export const metadata: Metadata = {
     google: 'YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI',
   },
 };
+
 
 const schemaDateModified = new Date().toISOString(); // For consistent reuse
 
@@ -324,7 +324,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <ScrollToTop />
-        <ClientAdsense />
       </body>
     </html>
   );

@@ -9,9 +9,12 @@ interface Coin {
   market_cap: number;
   market_cap_rank: number;
   price_change_percentage_24h: number;
+  price_change_percentage_7d?: number;
+  price_change_percentage_1h?: number;
   total_volume: number;
   high_24h: number;
   low_24h: number;
+  sparkline_data?: number[];
 }
 
 interface UseCoinsReturn {

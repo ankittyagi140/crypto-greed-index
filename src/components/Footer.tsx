@@ -197,7 +197,7 @@ export default function Footer() {
               © {new Date().getFullYear()} CryptoGreedIndex.com. All rights reserved.
             </p>
             <p className="text-gray-400 text-xs mt-2 md:mt-0">
-              Market data powered by <a href="https://www.coingecko.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">CoinGecko</a>
+              Market data powered by <a href="https://coinstats.app/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">CoinStats</a>
             </p>
           </div>
         </div>

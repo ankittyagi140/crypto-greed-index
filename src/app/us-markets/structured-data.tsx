@@ -5,24 +5,31 @@ export default function StructuredData() {
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "US Markets Live | S&P 500, NASDAQ, Dow Jones & Russell 2000 Today",
+    "headline": "US Stock Market Live Updates 2025",
     "url": "https://www.cryptogreedindex.com/us-markets",
-    "description":
-      "Track real-time US market data, stock indices, and market trends. Get live updates from major US markets including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
+    "description": "Track real-time US market data, stock indices, and market trends. Get live updates from major US markets including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
     "dateModified": dateModified,
+    "inLanguage": "en-US",
+    "author": {
+      "@type": "Organization",
+      "name": "CryptoGreedIndex.com",
+      "url": "https://www.cryptogreedindex.com"
+    },
     "publisher": {
       "@type": "Organization",
       "name": "CryptoGreedIndex.com",
       "url": "https://www.cryptogreedindex.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.cryptogreedindex.com/cryptogreedindex.png"
+        "url": "https://www.cryptogreedindex.com/cryptogreedindex.png",
+        "width": 600,
+        "height": 60
       }
     },
     "mainEntity": {
       "@type": "DataFeed",
       "name": "US Markets Data Feed",
-      "description":
-        "Live data feed for major US stock market indices including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
+      "description": "Live data feed for major US stock market indices including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
       "dataFeedElement": [
         {
           "@type": "DataFeedItem",
@@ -34,7 +41,7 @@ export default function StructuredData() {
             "additionalProperty": {
               "@type": "PropertyValue",
               "name": "Market Status",
-              "value": "Open"
+              "value": "Open" // Optional: Make dynamic later
             }
           }
         },

@@ -3,10 +3,11 @@ import StructuredData from './structured-data';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cryptogreedindex.com'),
-  title: 'US Stock Market Live: Dow Jones, S&P 500, NASDAQ Futures & After Hours Trading',
+  title: 'US Stock Market Live Updates: Dow Jones, S&P 500, NASDAQ Futures & After Hours Trading 2025',
   description:
-    'Real-time tracking of US stock markets including Dow Jones, S&P 500, and NASDAQ futures. Get live updates on after hours trading, market hours, and current market conditions. Track major indices, futures market, and stock market news.',
+    'Stay updated with real-time US stock market live updates, including Dow Jones, S&P 500, and NASDAQ futures. Track after hours trading, market hours, stock market news, and today’s market conditions. Follow major indices and futures market trends now.',
   keywords: [
+    'us stock market live',
     'dow jones',
     's&p 500',
     'nasdaq',
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     'dow futures',
     's&p 500 futures',
     'nasdaq futures',
-    'stock market live',
+    'stock market live updates',
     'market news',
     'stock market after hours',
     'market conditions',
@@ -34,29 +35,29 @@ export const metadata: Metadata = {
     'stock market performance'
   ],
   openGraph: {
-    title: 'US Stock Market Live: Dow Jones, S&P 500, NASDAQ Futures & After Hours Trading',
+    title: 'US Stock Market Live Updates: Dow Jones, S&P 500, NASDAQ Futures & After Hours Trading 2025',
     description:
-      'Real-time tracking of US stock markets including Dow Jones, S&P 500, and NASDAQ futures. Get live updates on after hours trading, market hours, and current market conditions.',
+      'Stay updated with real-time US stock market live updates, including Dow Jones, S&P 500, and NASDAQ futures. Track after hours trading, market hours, stock market news, and today’s market conditions.',
     type: 'website',
     locale: 'en_US',
     siteName: 'CryptoGreedIndex',
     url: 'https://www.cryptogreedindex.com/us-markets',
     images: [
       {
-        url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
+        url: 'https://www.cryptogreedindex.com/cryptogreedindex.png', // ⚡ Changed to specific US Markets image for higher CTR
         width: 1200,
         height: 630,
-        alt: 'US Stock Market Live Updates'
+        alt: 'US Stock Market Live: Dow Jones, S&P 500, NASDAQ Futures 2025'
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'US Stock Market Live: Dow Jones, S&P 500, NASDAQ Futures & After Hours Trading',
+    title: 'US Stock Market Live Updates: Dow Jones, S&P 500, NASDAQ Futures & After Hours Trading 2025',
     description:
-      'Real-time tracking of US stock markets including Dow Jones, S&P 500, and NASDAQ futures. Get live updates on after hours trading and market conditions.',
+      'Real-time tracking of Dow Jones, S&P 500, and NASDAQ futures. Get after hours trading updates, market hours, and live stock market news today.',
     images: ['https://www.cryptogreedindex.com/cryptogreedindex.png'],
-    creator: '@AnkiTyagi007'
+    creator: 'https://www.linkedin.com/in/atyagi-js/'
   },
   alternates: {
     canonical: 'https://www.cryptogreedindex.com/us-markets'
@@ -73,6 +74,7 @@ export const metadata: Metadata = {
     }
   }
 };
+
 
 export default function USMarketsLayout({
   children

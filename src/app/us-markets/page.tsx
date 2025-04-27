@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -12,13 +12,14 @@ import {
 import { Sparklines, SparklinesLine } from 'react-sparklines';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { isMarketOpen, getRefreshInterval } from '../../utils/marketHours';
 
 // Dynamically import components with loading fallbacks
-const MarketMovers = dynamic(() => import('@/components/MarketMovers'), {
+const MarketMovers = dynamic(() => import('../../components/MarketMovers'), {
   loading: () => <MarketMoversSkeletonLoader />
 });
 
-const TopCompaniesByMarketCap = dynamic(() => import('@/components/TopCompaniesByMarketCap'), {
+const TopCompaniesByMarketCap = dynamic(() => import('../../components/TopCompaniesByMarketCap'), {
   loading: () => <TopCompaniesByMarketCapSkeletonLoader />
 });
 
@@ -215,7 +216,6 @@ function USMarketsTable() {
       '^DJI': 'dow-jones',
       '^GSPC': 'sp500',
       '^IXIC': 'nasdaq',
-      'DX-Y.NYB': 'dollar-index',
       '^RUT': 'russell2000',
     };
 
@@ -372,7 +372,14 @@ function USMarketsTable() {
 }
 
 export default function USMarkets() {
-  const fetchData = async () => {
+  const [lastUpdateTime, setLastUpdateTime] = useState<number | null>(null);
+  
+  const fetchData = useCallback(async () => {
+    // Only fetch if market is open or we haven't fetched yet
+    if (!isMarketOpen() && lastUpdateTime) {
+      return;
+    }
+    
     const loadingToast = toast.loading('Updating market data...', {
       position: 'top-right',
     });
@@ -386,6 +393,7 @@ export default function USMarkets() {
         throw new Error(marketData.error || moversData.error);
       }
 
+      setLastUpdateTime(Date.now());
       toast.success('Market data updated', {
         id: loadingToast,
         duration: 2000,
@@ -398,19 +406,26 @@ export default function USMarkets() {
         duration: 4000,
       });
     }
-  };
+  }, [lastUpdateTime]);
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5 * 60 * 1000); // Refresh every 5 minutes
-    return () => clearInterval(interval);
-  }, []);
+    
+    // Set up interval for updates - only if market is open
+    const intervalId = setInterval(() => {
+      if (isMarketOpen()) {
+        fetchData();
+      }
+    }, getRefreshInterval());
+    
+    return () => clearInterval(intervalId);
+  }, [fetchData]);
 
   return (
     <>
-      <main className="min-h-screen py-12 bg-white">
-        <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-8xl">
-          <header className="text-center mb-8">
+      <main className="min-h-screen py-4 sm:py-12 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-0 sm:px-4 py-2 sm:py-8 max-w-8xl">
+          <header className="text-center mb-4 sm:mb-8 px-2 sm:px-0">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-3">
               US Markets Live
             </h1>
@@ -422,7 +437,7 @@ export default function USMarkets() {
             </p>
           </header>
 
-          <nav aria-label="Market sections" className="mb-8">
+          <nav aria-label="Market sections" className="mb-4 sm:mb-8 px-2 sm:px-0">
             <ul className="flex flex-wrap justify-center gap-4">
               <li>
                 <a href="#market-overview" className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
@@ -443,30 +458,30 @@ export default function USMarkets() {
           </nav>
 
           <div className="space-y-4 sm:space-y-8">
-            <section id="market-overview" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6" aria-labelledby="market-overview-title">
-           
+            <section id="market-overview" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-0 sm:p-6" aria-labelledby="market-overview-title">
+             
               <Suspense fallback={<USMarketsTableSkeleton />}>
                 <USMarketsTable />
               </Suspense>
             </section>
 
-            <section id="top-companies" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6" aria-labelledby="top-companies-title">
-              <h2 id="top-companies-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4">Top Companies by Market Cap</h2>
+            <section id="top-companies" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-0 sm:p-6" aria-labelledby="top-companies-title">
+              <h2 id="top-companies-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4 px-4 sm:px-0">Top Companies by Market Cap</h2>
               <Suspense fallback={<TopCompaniesByMarketCapSkeletonLoader />}>
                 <TopCompaniesByMarketCap />
               </Suspense>
             </section>
 
-            <section id="market-movers" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6" aria-labelledby="market-movers-title">
-              <h2 id="market-movers-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4">Market Movers</h2>
+            <section id="market-movers" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden p-0" aria-labelledby="market-movers-title">
+              <h2 id="market-movers-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4 px-4 sm:px-6">Market Movers</h2>
               <Suspense fallback={<MarketMoversSkeletonLoader />}>
                 <MarketMovers index="sp500" />
               </Suspense>
             </section>
           </div>
         </div>
-        <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Data is updated every 5 minutes. Market hours are in UTC.</p>
+        <div className="mt-8 sm:mt-12 text-center text-sm text-gray-500 dark:text-gray-400 px-2 sm:px-0">
+          <p>Data is updated every 5 minutes. Market hours are in EST/EDT.</p>
           <p className="mt-2">
             <Link
               href="/about"

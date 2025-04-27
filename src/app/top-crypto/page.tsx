@@ -23,7 +23,7 @@ export const metadata: Metadata = {
         url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
         width: 1200,
         height: 630,
-        alt: 'Top 100 Cryptocurrencies',
+        alt: 'Top 100 Cryptocurrencies 2025 - Live Rankings and Prices',
       },
     ],
     locale: 'en_US',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: "Top Cryptocurrencies by Market Cap | Live Prices & Rankings 2025",
     description: "Track real-time cryptocurrency rankings, prices, and market cap. Compare top 10, top 50, and top 100 cryptocurrencies. Live charts, trading volume, and 24h changes for Bitcoin, Ethereum, and more.",
     images: ['https://www.cryptogreedindex.com/cryptogreedindex.png'],
-    creator: '@AnkiTyagi007',
+    creator: 'https://www.linkedin.com/in/atyagi-js/',
   },
   alternates: {
     canonical: 'https://www.cryptogreedindex.com/top-crypto',
@@ -51,9 +51,10 @@ export const metadata: Metadata = {
     },
   },
   referrer: 'origin-when-cross-origin',
-  creator: 'Crypto Greed Index',
+  creator: 'https://www.linkedin.com/in/atyagi-js/', // 🔥 Now linked to your professional LinkedIn
   publisher: 'Crypto Greed Index',
 };
+
 
 export default function TopCoinsPage() {
   return <ClientPage />;

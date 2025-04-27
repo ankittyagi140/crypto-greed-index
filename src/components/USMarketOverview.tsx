@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
+import { isMarketOpen, shouldFetchMarketData, getRefreshInterval } from '@/utils/marketHours';
 
 interface MarketIndex {
   symbol: string;
@@ -29,6 +30,8 @@ export default function USMarketOverview() {
   const [indices, setIndices] = useState<MarketIndex[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState('');
+  const [lastUpdateTime, setLastUpdateTime] = useState<number | null>(null);
+  const [marketStatus, setMarketStatus] = useState<'open' | 'closed'>('closed');
   const router = useRouter();
 
   const LoadingSkeleton = () => (
@@ -57,6 +60,12 @@ export default function USMarketOverview() {
   };
 
   const fetchIndices = useCallback(async () => {
+    // Check if we should fetch data
+    if (!shouldFetchMarketData(lastUpdateTime, true, indices.length > 0)) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       setLoading(true);
       const response = await fetch('/api/market-indices');
@@ -65,6 +74,8 @@ export default function USMarketOverview() {
       if (result.success && result.data) {
         setIndices(result.data.indices);
         setLastUpdated(result.data.lastUpdated);
+        setLastUpdateTime(Date.now());
+        setMarketStatus(isMarketOpen() ? 'open' : 'closed');
       } else {
         console.error('Invalid market indices data:', result);
       }
@@ -73,7 +84,7 @@ export default function USMarketOverview() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [lastUpdateTime, indices.length]);
 
   const useMarketStatus = () => {
     const [isMarketOpen, setIsMarketOpen] = useState(false);
@@ -282,11 +293,16 @@ export default function USMarketOverview() {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(fetchIndices, 60000);
     fetchIndices();
-    return () => {
-      clearInterval(intervalId);
-    };
+    
+    // Set up interval for updates - only if market is open
+    const intervalId = setInterval(() => {
+      if (isMarketOpen()) {
+        fetchIndices();
+      }
+    }, getRefreshInterval());
+    
+    return () => clearInterval(intervalId);
   }, [fetchIndices]);
 
   return (
@@ -304,16 +320,26 @@ export default function USMarketOverview() {
       {loading ? (
         <LoadingSkeleton />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {indices.map((index) => {
-            const now = new Date();
-            const marketClosed = !index.regularMarketTime ||
-              (now.getTime() - new Date(index.regularMarketTime).getTime()) > 15 * 60 * 1000;
-            return (
-              <IndexCard key={index.symbol} index={index} isMarketOpen={!marketClosed} />
-            );
-          })}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {indices.map((index) => {
+              const now = new Date();
+              const marketClosed = !index.regularMarketTime ||
+                (now.getTime() - new Date(index.regularMarketTime).getTime()) > 15 * 60 * 1000;
+              return (
+                <IndexCard key={index.symbol} index={index} isMarketOpen={!marketClosed} />
+              );
+            })}
+          </div>
+          {marketStatus === 'closed' && indices.length > 0 && (
+            <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-2">
+              <div className="flex items-center justify-center">
+                <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
+                Market is closed. Data shown is from last trading session.
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

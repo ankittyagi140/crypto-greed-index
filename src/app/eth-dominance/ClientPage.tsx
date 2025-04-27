@@ -1,7 +1,7 @@
 'use client';
 
-import ETHDominance from '@/components/ETHDominance';
-import EthereumMetrics from '@/components/EthereumMetrics';
+import ETHDominance from '../../components/ETHDominance';
+import EthereumMetrics from '../../components/EthereumMetrics';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 

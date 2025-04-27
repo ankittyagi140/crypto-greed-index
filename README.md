@@ -1,6 +1,27 @@
 # Crypto Greed Index
 
-A modern web application that displays the Crypto Fear & Greed Index, providing real-time insights into market sentiment. Built with Next.js and featuring beautiful visualizations.
+A comprehensive cryptocurrency market sentiment analysis platform that displays the Crypto Fear & Greed Index, providing real-time insights into market sentiment. This powerful tool helps traders and investors make more informed decisions by visualizing market psychology through advanced metrics and interactive dashboards.
+
+**Live App:** [CryptoGreedIndex.com](https://www.cryptogreedindex.com)
+
+## What is the Crypto Greed Index?
+
+The Crypto Greed Index measures the emotional driving force behind cryptocurrency market movements, quantifying investor sentiment on a scale from extreme fear to extreme greed. By analyzing multiple data sources including volatility, market momentum, social media sentiment, and trading volume, this index provides a valuable contrarian indicator:
+
+- **Extreme Fear (0-25)**: Often signals that investors are overly worried, potentially representing buying opportunities
+- **Fear (26-45)**: Indicates caution in the market
+- **Neutral (46-55)**: Balanced market sentiment
+- **Greed (56-75)**: Signals bullish investor psychology
+- **Extreme Greed (76-100)**: May indicate the market is due for a correction
+
+## Why Use CryptoGreedIndex.com?
+
+- **Comprehensive Analysis**: Access to fear & greed metrics combined with price correlation data
+- **Multi-Timeframe Views**: Track sentiment across different time periods (daily, weekly, monthly)
+- **Interactive Visualizations**: Beautiful, responsive charts powered by modern web technologies
+- **Market Context**: View fear & greed data alongside critical market indicators like Bitcoin dominance and total market capitalization
+- **Mobile Optimized**: Full functionality across all devices
+- **Fast & Reliable**: Built with performance in mind - updates every 12 hours with reliable data
 
 ## Features
 
@@ -10,6 +31,10 @@ A modern web application that displays the Crypto Fear & Greed Index, providing 
 - Modern UI with Tailwind CSS
 - Toast notifications for important updates
 - Responsive design for all devices
+- Historical data comparison
+- Social sentiment analysis
+- Market dominance tracking
+- Bitcoin price correlation
 
 ## Tech Stack
 

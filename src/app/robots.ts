@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       disallow: '/api/',
       },
-    sitemap: 'https://cryptogreedindex.com/sitemap.xml',
+    sitemap: 'https://www.cryptogreedindex.com/sitemap.xml',
   }
 } 

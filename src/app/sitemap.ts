@@ -21,6 +21,11 @@ const PAGES = {
     priority: 1,
     changeFrequency: 'always' as const,
   },
+  TOP_CRYPTO: {
+    path: 'top-crypto',
+    priority: 1,
+    changeFrequency: 'always' as const,
+  },
   FEAR_GREED_VS_BTC: {
     path: 'fear-greed-vs-btc',
     priority: 1,
@@ -95,6 +100,8 @@ const PAGES = {
 
 async function getTopCoins() {
   try {
+    // Using the correct CoinStats API endpoint - v1 coinstats endpoint does not match what we expected
+    // Use CoinGecko API instead as it's more reliable for this purpose
     const response = await fetch(
       'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&sparkline=false',
       { next: { revalidate: 3600 } } // Cache for 1 hour
@@ -105,6 +112,11 @@ async function getTopCoins() {
     }
 
     const coins = await response.json();
+    if (!Array.isArray(coins)) {
+      console.error('Unexpected API response format:', coins);
+      return [];
+    }
+    
     return coins.map((coin: { id: string }) => coin.id);
   } catch (error) {
     console.error('Error fetching coins for sitemap:', error);
@@ -134,7 +146,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Generate coin pages
   const topCoins = await getTopCoins();
   const coinPages = topCoins.map((coinId: string) => ({
-    url: `${BASE_URL}/${coinId}`,
+    url: `${BASE_URL}/coins/${coinId}`,
     lastModified: now,
     changeFrequency: 'daily' as const,
     priority: 0.8,

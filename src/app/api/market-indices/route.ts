@@ -28,7 +28,7 @@ const INDICES = {
   '^DJI': 'Dow Jones Industrial Average',
   '^IXIC': 'NASDAQ Composite',
   '^GSPC': 'S&P 500',
-  'DX-Y.NYB': 'US Dollar Index'
+  '^RUT': 'Russell 2000'
 };
 
 export async function GET() {

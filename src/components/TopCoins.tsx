@@ -66,7 +66,7 @@ export default function TopCoins() {
       {coins.map((coin) => (
         <Link
           key={coin.id}
-          href={`/coin/${coin.id}`}
+          href={`/coins/${coin.id}`}
           className="block bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow duration-200"
         >
           <div className="flex items-center justify-between">

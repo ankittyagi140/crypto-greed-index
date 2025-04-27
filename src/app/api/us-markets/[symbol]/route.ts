@@ -60,19 +60,30 @@ async function fetchIntradayData(symbol: string, timeRange: '1D' | '1W') {
     }
 
     const data = await response.json();
+    
+    // Check if we have valid data in the response
+    if (!data.chart?.result?.[0]?.timestamp || 
+        !data.chart?.result?.[0]?.indicators?.quote?.[0]?.close) {
+      console.warn(`Missing data for ${symbol}, returning empty array`);
+      return [];
+    }
+    
     const timestamps = data.chart.result[0].timestamp;
     const quotes = data.chart.result[0].indicators.quote[0];
-    const { high, low, close } = quotes;
+    const high = quotes.high || [];
+    const low = quotes.low || [];
+    const close = quotes.close || [];
 
     return timestamps.map((timestamp: number, index: number) => ({
       date: new Date(timestamp * 1000),
-      close: close[index] || close[index - 1], // Use previous close if current is null
-      high: high[index] || high[index - 1],    // Use previous high if current is null
-      low: low[index] || low[index - 1]        // Use previous low if current is null
+      close: close[index] || close[index - 1] || 0, // Use previous close if current is null
+      high: high[index] || high[index - 1] || 0,    // Use previous high if current is null
+      low: low[index] || low[index - 1] || 0        // Use previous low if current is null
     }));
   } catch (error) {
     console.error('Error fetching intraday data:', error);
-    throw error;
+    // Return empty array on error instead of throwing
+    return [];
   }
 }
 
@@ -90,13 +101,18 @@ async function fetchIndexData(symbol: string, timeRange: string = '1Y') {
           })
     ]);
 
-    if (!quote || !historical) {
-      throw new Error(`Failed to fetch data for ${symbol}`);
+    if (!quote) {
+      throw new Error(`Failed to fetch quote data for ${symbol}`);
     }
+    
+    // Use an empty array if historical data is missing or empty
+    const validHistorical = historical && Array.isArray(historical) && historical.length > 0 
+      ? historical 
+      : [];
 
     // Get year start date for YTD calculations
     const yearStartDate = new Date(new Date().getFullYear(), 0, 1);
-    const yearStartData = historical.find((data: HistoricalDataItem) => 
+    const yearStartData = validHistorical.find((data: HistoricalDataItem) => 
       new Date(data.date).getTime() >= yearStartDate.getTime()
     );
 
@@ -110,7 +126,7 @@ async function fetchIndexData(symbol: string, timeRange: string = '1Y') {
     // Calculate week change (7 days)
     const weekAgoDate = new Date();
     weekAgoDate.setDate(weekAgoDate.getDate() - 7);
-    const weekAgoData = historical.find((data: HistoricalDataItem) => 
+    const weekAgoData = validHistorical.find((data: HistoricalDataItem) => 
       new Date(data.date).getTime() >= weekAgoDate.getTime()
     );
     const weekChange = regularMarketPrice - (weekAgoData?.close || regularMarketPrice);
@@ -119,7 +135,7 @@ async function fetchIndexData(symbol: string, timeRange: string = '1Y') {
     // Calculate month change (30 days)
     const monthAgoDate = new Date();
     monthAgoDate.setDate(monthAgoDate.getDate() - 30);
-    const monthAgoData = historical.find((data: HistoricalDataItem) => 
+    const monthAgoData = validHistorical.find((data: HistoricalDataItem) => 
       new Date(data.date).getTime() >= monthAgoDate.getTime()
     );
     const monthChange = regularMarketPrice - (monthAgoData?.close || regularMarketPrice);
@@ -129,19 +145,10 @@ async function fetchIndexData(symbol: string, timeRange: string = '1Y') {
     const dailyHigh = quote.regularMarketDayHigh || regularMarketPrice;
     const dailyLow = quote.regularMarketDayLow || regularMarketPrice;
 
-    // Format historical data with appropriate date formatting based on time range
-    const formattedHistorical = historical.map((item: HistoricalDataItem) => ({
-      date: isIntraday
-        ? new Date(item.date).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          })
-        : new Date(item.date).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          }),
+    // Format historical data with ISO string for dates
+    const formattedHistorical = validHistorical.map((item: HistoricalDataItem) => ({
+      // Store date as ISO string to ensure consistency
+      date: new Date(item.date).toISOString(),
       value: item.close
     }));
 
@@ -198,8 +205,14 @@ export async function GET(
     });
   } catch (error) {
     console.error('Error in market index API:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch market data' },
+      { 
+        success: false, 
+        error: 'Failed to fetch market data',
+        details: errorMessage,
+        symbol: params ? (await params).symbol : 'unknown'
+      },
       { status: 500 }
     );
   }

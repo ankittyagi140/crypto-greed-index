@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import TimeRangeSelector from '@/components/TimeRangeSelector';
-import { HistoricalChartSkeleton, BTCComparisonSkeleton } from '@/components/ChartSkeletons';
-import LazyChartSection from '@/components/LazyChartSection';
+import TimeRangeSelector from '../../components/TimeRangeSelector';
+import { HistoricalChartSkeleton, BTCComparisonSkeleton } from '../../components/ChartSkeletons';
+import LazyChartSection from '../../components/LazyChartSection';
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 interface FearGreedData {
@@ -34,7 +34,7 @@ interface DotProps {
   index?: number;
 }
 
-const BTCComparison = dynamic(() => import('@/components/BTCComparison'), {
+const BTCComparison = dynamic(() => import('../../components/BTCComparison'), {
   loading: () => <BTCComparisonSkeleton />,
   ssr: false
 });
