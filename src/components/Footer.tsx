@@ -148,7 +148,7 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">Connect</h3>
             <div className="flex items-center space-x-4 mb-6">
               <a
-                href="https://x.com/CryptoGreedIndx"
+                href="https://x.com/AnkiTyagi007"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-blue-400 transition-colors"

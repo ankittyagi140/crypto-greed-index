@@ -22,5 +22,5 @@ interface ChartClientWrapperProps {
 }
 
 export default function ChartClientWrapper({ coinId, period }: ChartClientWrapperProps) {
-  return <CoinChart coinId={coinId} period={period} />;
+  return <CoinChart coinId={coinId} initialPeriod={period} />;
 } 
