@@ -109,6 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="google-site-verification" content="YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI" />
+        <meta name="google-adsense-account" content="ca-pub-1332831285527693" />
         <ThemeInitializer />
         {/* Google Analytics */}
         <Script

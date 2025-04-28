@@ -43,7 +43,7 @@ const PERIODS = [
 
 interface CoinChartProps {
   coinId: string;
-  period?: string;
+  initialPeriod?: string;
 }
 
 interface ChartData {
@@ -51,16 +51,22 @@ interface ChartData {
   c: number[];
 }
 
-const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
+// Define an interface for API responses that might have a chart property
+interface ChartApiResponse {
+  chart?: Array<[number, number]>;
+}
+
+const CoinChart: React.FC<CoinChartProps> = ({ coinId, initialPeriod = '24h' }) => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState(period);
+  const [period, setPeriod] = useState(initialPeriod);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [priceChange, setPriceChange] = useState<number>(0);
+  const [priceChange] = useState<number>(0);
   const chartRef = useRef<ChartJS<'line'>>(null);
   
   // Helper function to generate mock chart data for demonstration
   const generateMockChartData = useCallback((period: string, endTime: number): ChartData => {
+    // Calculate the number of data points based on the period
     const dataPoints = period === '24h' ? 24 : 
                       period === '1w' ? 7 : 
                       period === '1m' ? 30 : 
@@ -68,188 +74,103 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
                       period === '6m' ? 180 : 
                       period === '1y' ? 365 : 100;
     
-    const timeStep = period === '24h' ? 3600 : // 1 hour in seconds
-                    period === '1w' ? 86400 : // 1 day in seconds
-                    period === '1m' ? 86400 : // 1 day in seconds
-                    period === '3m' ? 86400*3 : // 3 days in seconds
-                    period === '6m' ? 86400*6 : // 6 days in seconds
-                    period === '1y' ? 86400*7 : 86400; // 1 week in seconds
+    // Calculate time step in seconds
+    const timeStep = period === '24h' ? 3600 : // 1 hour
+                    period === '1w' ? 86400 : // 1 day
+                    period === '1m' ? 86400 : // 1 day
+                    period === '3m' ? 86400*3 : // 3 days
+                    period === '6m' ? 86400*6 : // 6 days
+                    period === '1y' ? 86400*7 : // 7 days
+                    86400; // default 1 day
     
-    // Set realistic starting prices based on coin ID
-    let startPrice = 100;
-    let volatility = 0.02; // Default 2% volatility
-    let trend = 0.002; // Default slight upward trend
+    // Generate timestamps going back from the end time
+    const timestamps = Array.from({ length: dataPoints }, (_, i) => 
+      endTime - (dataPoints - i - 1) * timeStep
+    );
     
-    // Match common coin IDs with their approximate prices
-    switch(coinId.toLowerCase()) {
-      case 'bitcoin':
-        startPrice = 94000;
-        volatility = 0.015;
-        trend = 0.003;
-        break;
-      case 'ethereum':
-        startPrice = 1800;
-        volatility = 0.02;
-        trend = 0.005;
-        break;
-      case 'tether':
-      case 'usdc':
-      case 'usd-coin':
-        startPrice = 1;
-        volatility = 0.0005; // Very low volatility for stablecoins
-        trend = 0.0001;
-        break;
-      case 'binancecoin':
-      case 'bnb':
-        startPrice = 600;
-        volatility = 0.018;
-        break;
-      case 'ripple':
-      case 'xrp':
-        startPrice = 2.18;
-        volatility = 0.025;
-        break;
-      case 'solana':
-        startPrice = 148;
-        volatility = 0.03;
-        trend = 0.006;
-        break;
-      default:
-        startPrice = 100;
-    }
+    // Base price depends on the coin
+    const basePrice = coinId === 'bitcoin' ? 30000 : 
+                   coinId === 'ethereum' ? 1800 : 
+                   coinId === 'binancecoin' ? 250 : 
+                   coinId === 'solana' ? 40 : 100;
     
-    // For weekly data, create a more realistic pattern with weekend dips
-    let pricePattern: number[] = [];
-    if (period === '1w') {
-      // Typical weekly pattern: up Monday-Tuesday, down Wednesday, up Thursday, down Friday-Sunday
-      pricePattern = [0.005, 0.008, -0.003, 0.006, -0.002, -0.004, -0.001];
-    }
+    // Generate price data with slight trend and noise
+    let currentPrice = basePrice;
+    const trend = Math.random() > 0.5 ? 1.0005 : 0.9995; // Slight trend up or down
     
-    const timestamps: number[] = [];
-    const prices: number[] = [];
-    
-    let currentPrice = startPrice;
-    
-    for (let i = 0; i < dataPoints; i++) {
-      const timestamp = endTime - (dataPoints - i) * timeStep;
-      timestamps.push(timestamp);
+    const priceData = timestamps.map(() => {
+      // Apply trend
+      currentPrice = currentPrice * trend;
       
-      // Apply pattern if available, otherwise random walk with trend
-      if (period === '1w' && i < pricePattern.length) {
-        currentPrice = currentPrice * (1 + pricePattern[i]);
-      } else {
-        const randomChange = (Math.random() * 2 - 1) * volatility;
-        currentPrice = currentPrice * (1 + randomChange + trend);
-      }
-      
-      // Ensure stablecoins stay very close to $1
-      if (coinId.toLowerCase() === 'tether' || coinId.toLowerCase() === 'usdc' || coinId.toLowerCase() === 'usd-coin') {
-        currentPrice = 0.99 + Math.random() * 0.02; // Random between $0.99 and $1.01
-      }
-      
-      prices.push(currentPrice);
-    }
+      // Add noise (5% max variation)
+      const noise = currentPrice * 0.05 * (Math.random() - 0.5);
+      return currentPrice + noise;
+    });
     
+    // Return in ChartData format with t and c arrays
     return {
       t: timestamps,
-      c: prices
+      c: priceData
     };
   }, [coinId]);
 
-  useEffect(() => {
-    const fetchChartData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // CoinStats API key
-        const COINSTATS_API_KEY = process.env.NEXT_PUBLIC_COINSTATS_API_KEY || 'BzGqUBQbt6Zmd/hI4E2iD2mloJWjj0Ub0ZBMbvh9IQY=';
-        
-        console.log(`Fetching chart data for ${coinId} with period ${selectedPeriod}`);
-        
-        // First try with CoinStats API
-        const response = await fetch(
-          `https://api.coinstats.app/public/v1/charts?period=${selectedPeriod}&coinId=${coinId}`,
-          {
-            headers: {
-              'X-API-KEY': COINSTATS_API_KEY,
-            }
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        // Validate chart data before processing
-        if (!data || !Array.isArray(data.chart) || data.chart.length === 0) {
-          console.error('Invalid or empty chart data from API');
-          setChartData(generateMockChartData(selectedPeriod, Math.floor(Date.now() / 1000)));
-          setIsLoading(false);
-          return;
-        }
-        
-        // Filter out any invalid data points with invalid timestamps
-        const validChartData = data.chart.filter(([timestamp, price]: [number, number]) => (
-          timestamp && !isNaN(timestamp) && price && !isNaN(price)
-        ));
-        
-        if (validChartData.length === 0) {
-          console.error('No valid data points in chart data');
-          setChartData(generateMockChartData(selectedPeriod, Math.floor(Date.now() / 1000)));
-          setIsLoading(false);
-          return;
-        }
-
-        const timestamps = validChartData.map(([timestamp]: [number, number]) => timestamp);
-        const prices = validChartData.map(([, price]: [number, number]) => price);
-        
-        const chartData = {
-          t: timestamps,
-          c: prices
-        };
-        
-        setChartData(chartData);
-        
-        // Calculate price change percentage
-        if (prices.length >= 2) {
-          const firstPrice = prices[0];
-          const lastPrice = prices[prices.length - 1];
-          const changePercent = ((lastPrice - firstPrice) / firstPrice) * 100;
-          setPriceChange(changePercent);
-        }
-        
-        setIsLoading(false);
-      } catch (err) {
-        console.error('Error fetching chart data:', err);
-        
-        // Generate mock data as a fallback for demonstration
-        const now = Math.floor(Date.now() / 1000);
-        const mockData = generateMockChartData(selectedPeriod, now);
-        
-        setChartData(mockData);
-        
-        if (mockData.c.length >= 2) {
-          const firstPrice = mockData.c[0];
-          const lastPrice = mockData.c[mockData.c.length - 1];
-          const changePercent = ((lastPrice - firstPrice) / firstPrice) * 100;
-          setPriceChange(changePercent);
-        }
-        
-        // Still show the error to the user
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(`Demo data is being shown. API error: ${errorMessage}`);
-        setIsLoading(false);
+  // Function to fetch chart data
+  const fetchChartData = useCallback(async () => {
+    if (!coinId) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const apiUrl = `/api/coins/${coinId}/charts?period=${period}`;
+      
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        throw new Error(`Error fetching chart data: ${response.statusText}`);
       }
-    };
+      
+      const data = await response.json();
+      
+      // For backward compatibility, also check for chart array structure
+      let chartPoints = Array.isArray(data) ? data : (data as ChartApiResponse).chart || [];
+      
+      // Filter out any invalid data points
+      chartPoints = chartPoints.filter((point: unknown) => 
+        Array.isArray(point) && point.length >= 2 && 
+        !isNaN(Number(point[0])) && !isNaN(Number(point[1]))
+      );
+      
+      if (chartPoints.length === 0) {
+        throw new Error('No valid chart data available');
+      }
+      
+      // Transform API data format (array of [timestamp, price] arrays) to ChartData format
+      const timestamps = chartPoints.map((point: [number, number]) => point[0]);
+      const prices = chartPoints.map((point: [number, number]) => point[1]);
+      
+      setChartData({ t: timestamps, c: prices });
+    } catch (err) {
+      console.error('Failed to fetch chart data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load chart data');
+      
+      // Fall back to mock data in development
+      if (process.env.NODE_ENV === 'development') {
+        const now = Math.floor(Date.now() / 1000);
+        setChartData(generateMockChartData(period, now));
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [coinId, period, generateMockChartData]);
 
+  // Initial data fetch and period change effect
+  useEffect(() => {
     fetchChartData();
-  }, [coinId, selectedPeriod, generateMockChartData]);
+  }, [fetchChartData, period]);
 
   const handlePeriodChange = (newPeriod: string) => {
-    setSelectedPeriod(newPeriod);
+    setPeriod(newPeriod);
   };
 
   // Format timestamp for tooltip
@@ -289,7 +210,7 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
     }
   };
 
-  // Format for X-axis labels
+  // Format for X-axis labels with improved readability based on period
   const formatXAxis = (timestamp: number): string => {
     if (!timestamp || isNaN(timestamp)) {
       return '';
@@ -313,36 +234,90 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
         return '';
       }
       
-      if (selectedPeriod === '24h') {
+      if (period === '24h') {
         return new Intl.DateTimeFormat('en-US', {
-          hour: '2-digit',
+          hour: 'numeric',
           minute: '2-digit',
+          hour12: true
         }).format(date);
-      } else if (selectedPeriod === '1w') {
+      } else if (period === '1w') {
         return new Intl.DateTimeFormat('en-US', {
           weekday: 'short',
+          day: 'numeric'
         }).format(date);
-      } else if (selectedPeriod === '1m') {
+      } else if (period === '1m') {
         return new Intl.DateTimeFormat('en-US', {
           month: 'short',
-          day: 'numeric',
+          day: 'numeric'
         }).format(date);
-      } else if (selectedPeriod === '3m' || selectedPeriod === '6m') {
-        return new Intl.DateTimeFormat('en-US', {
-          month: 'short',
-          day: 'numeric',
-        }).format(date);
+      } else if (period === '3m' || period === '6m') {
+        const day = date.getDate();
+        // Only show the month name for the 1st day of the month or important dates
+        if (day === 1 || day === 15) {
+          return new Intl.DateTimeFormat('en-US', {
+            month: 'short',
+            day: 'numeric'
+          }).format(date);
+        } else {
+          return day.toString();
+        }
       } else {
         // 1y or all
         return new Intl.DateTimeFormat('en-US', {
           month: 'short',
-          year: '2-digit',
+          year: '2-digit'
         }).format(date);
       }
     } catch (error) {
       console.error('Error formatting timestamp:', timestamp, error);
       return '';
     }
+  };
+
+  // Generate appropriate tick marks for the chart based on period
+  const getAppropriateTicksFromData = (): number[] => {
+    if (!chartData || !chartData.t || chartData.t.length === 0) return [];
+    
+    const dataLength = chartData.t.length;
+    const ticks: number[] = [];
+    
+    if (period === '24h') {
+      // For 24h, show every 4 hours
+      const hourlyInterval = Math.max(1, Math.floor(dataLength / 6));
+      for (let i = 0; i < dataLength; i += hourlyInterval) {
+        ticks.push(i);
+      }
+    } else if (period === '1w') {
+      // For 1w, try to show each day
+      const dailyInterval = Math.max(1, Math.floor(dataLength / 7));
+      for (let i = 0; i < dataLength; i += dailyInterval) {
+        ticks.push(i);
+      }
+    } else if (period === '1m') {
+      // For 1m, show approximately weekly points
+      const weeklyInterval = Math.max(1, Math.floor(dataLength / 4));
+      for (let i = 0; i < dataLength; i += weeklyInterval) {
+        ticks.push(i);
+      }
+    } else if (period === '3m' || period === '6m') {
+      // For 3m/6m, show approximately bi-weekly points
+      const biWeeklyInterval = Math.max(1, Math.floor(dataLength / 6));
+      for (let i = 0; i < dataLength; i += biWeeklyInterval) {
+        ticks.push(i);
+      }
+    } else {
+      // For 1y/all, show monthly points
+      const monthlyInterval = Math.max(1, Math.floor(dataLength / 12));
+      for (let i = 0; i < dataLength; i += monthlyInterval) {
+        ticks.push(i);
+      }
+    }
+    
+    // Always include the first and last point
+    if (ticks.length > 0 && ticks[0] !== 0) ticks.unshift(0);
+    if (ticks.length > 0 && ticks[ticks.length - 1] !== dataLength - 1) ticks.push(dataLength - 1);
+    
+    return ticks;
   };
 
   // Chart configuration
@@ -358,6 +333,12 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
         display: false,
       },
       tooltip: {
+        backgroundColor: 'rgba(30, 41, 59, 0.9)',
+        titleFont: { size: 13 },
+        bodyFont: { size: 14 },
+        padding: 12,
+        cornerRadius: 6,
+        displayColors: false,
         callbacks: {
           title: (context: TooltipItem<'line'>[]) => {
             if (context[0]?.raw !== undefined && chartData?.t) {
@@ -380,15 +361,13 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
         type: 'category',
         ticks: {
           maxRotation: 0,
-          autoSkip: true,
-          maxTicksLimit: 6,
+          autoSkip: false,
           callback: function(value: unknown, index: number) {
-            if (chartData?.t && index < chartData.t.length) {
-              const timestamp = chartData.t[Math.floor(index * chartData.t.length / 6)];
-              return formatXAxis(timestamp);
-            }
-            return '';
+            // Only show labels for specific indices calculated for even distribution
+            const ticks = getAppropriateTicksFromData();
+            return ticks.includes(index) ? chartData?.t ? formatXAxis(chartData.t[index]) : '' : '';
           },
+          color: 'rgba(100, 100, 100, 0.8)',
         },
         grid: {
           display: false,
@@ -401,10 +380,15 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
           callback: function(value: unknown) {
             return '$' + (value as number).toLocaleString();
           },
+          // Ensure y-axis has enough ticks to show the range properly
+          maxTicksLimit: 8,
         },
         grid: {
           color: 'rgba(200, 200, 200, 0.2)',
         },
+        // Set min and max based on data range
+        suggestedMin: chartData?.c ? Math.floor(Math.min(...chartData.c) * 0.95) : undefined,
+        suggestedMax: chartData?.c ? Math.ceil(Math.max(...chartData.c) * 1.05) : undefined,
       },
     },
     elements: {
@@ -420,7 +404,7 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
 
   // Format data for Chart.js
   const data = chartData ? {
-    labels: chartData.t.map((timestamp) => timestamp), // We'll format these in the ticks callback
+    labels: chartData.t.map((timestamp) => formatXAxis(timestamp)),
     datasets: [
       {
         label: 'Price',
@@ -435,6 +419,14 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
         },
         borderWidth: 2,
         fill: true,
+        cubicInterpolationMode: 'monotone' as const,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        pointBackgroundColor: priceChange >= 0 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+        pointHoverBackgroundColor: 'white',
+        pointHoverBorderWidth: 2,
+        pointHoverBorderColor: priceChange >= 0 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
       },
     ],
   } : {
@@ -447,6 +439,8 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
         backgroundColor: 'rgba(34, 197, 94, 0.2)',
         borderWidth: 2,
         fill: true,
+        cubicInterpolationMode: 'monotone' as const,
+        tension: 0.4,
       },
     ],
   };
@@ -471,7 +465,7 @@ const CoinChart: React.FC<CoinChartProps> = ({ coinId, period = '24h' }) => {
               key={p.value}
               onClick={() => handlePeriodChange(p.value)}
               className={`px-2 py-1 text-xs rounded-md transition ${
-                selectedPeriod === p.value
+                period === p.value
                   ? 'bg-white dark:bg-gray-600 shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
