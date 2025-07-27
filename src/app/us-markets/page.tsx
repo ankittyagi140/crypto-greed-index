@@ -230,32 +230,33 @@ function USMarketsTable() {
   return (
     <section className="mb-10 sm:mb-14">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4">
-        US Markets
+        S&P 500 and Major US Market Indices
       </h2>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" aria-label="S&P 500 and Major US Market Indices">
+          <caption className="sr-only">S&P 500, Dow Jones, NASDAQ, and Russell 2000 real-time market data</caption>
           <thead>
             <tr>
               <th scope="col" className="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Name
+                Index Name
               </th>
               <th scope="col" className="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 7D Chart
               </th>
               <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                LTP
+                Price
               </th>
               <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Change
               </th>
-              <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Chg%
+                                <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                % Change
               </th>
               <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                High
+                Day High
               </th>
               <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Low
+                Day Low
               </th>
               <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Open
@@ -264,10 +265,10 @@ function USMarketsTable() {
                 Prev. Close
               </th>
               <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                52 W High
+                52 Week High
               </th>
               <th scope="col" className="py-3 px-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                52 W Low
+                52 Week Low
               </th>
             </tr>
           </thead>
@@ -365,7 +366,7 @@ function USMarketsTable() {
         </table>
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
-        Last updated: {lastUpdated}
+        <span>Last updated: </span>{lastUpdated}
       </p>
     </section>
   );
@@ -406,9 +407,11 @@ export default function USMarkets() {
         duration: 4000,
       });
     }
-  }, [lastUpdateTime]);
+  // Removed the dependency on lastUpdateTime that was causing infinite loop
+  }, []);
 
   useEffect(() => {
+    // Initial data fetch
     fetchData();
     
     // Set up interval for updates - only if market is open
@@ -419,79 +422,140 @@ export default function USMarkets() {
     }, getRefreshInterval());
     
     return () => clearInterval(intervalId);
-  }, [fetchData]);
+  // Using empty dependency array to ensure the effect runs only once on mount
+  }, []);
 
   return (
     <>
-      <main className="min-h-screen py-4 sm:py-12 bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-0 sm:px-4 py-2 sm:py-8 max-w-8xl">
-          <header className="text-center mb-4 sm:mb-8 px-2 sm:px-0">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-3">
-              US Markets Live
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg">
-              Real-time performance of major US stock indices
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2" aria-live="polite">
-              Data updates every 5 minutes
-            </p>
-          </header>
+      {/* Market Stats Banner */}
+      <div className="w-full bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 border-b border-blue-700 dark:border-gray-700 shadow-lg">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-center">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl shadow-lg border border-white/20">
+              <ClockIcon className="h-5 w-5 text-blue-200" />
+              <span className="text-blue-100 font-semibold">US Markets Live</span>
+              <span className="text-blue-200 text-sm">•</span>
+              <span className="text-blue-200 text-sm">Data updates every 5 minutes</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <nav aria-label="Market sections" className="mb-4 sm:mb-8 px-2 sm:px-0">
-            <ul className="flex flex-wrap justify-center gap-4">
-              <li>
-                <a href="#market-overview" className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
-                  Market Overview
-                </a>
-              </li>
-              <li>
-                <a href="#top-companies" className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
-                  Top Companies
-                </a>
-              </li>
-              <li>
-                <a href="#market-movers" className="text-sm font-medium text-blue-600 hover:text-[#048F04] dark:text-gray-400 dark:hover:text-white">
-                  Market Movers
-                </a>
-              </li>
-            </ul>
+      <main className="min-h-screen py-8 sm:py-12 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4 py-8 sm:py-12 max-w-8xl">
+          {/* Header Section */}
+          <div className="text-center py-12 sm:py-16 lg:py-20 mb-12 relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20"></div>
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+            
+            <div className="relative z-10 max-w-5xl mx-auto">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-full mb-8 shadow-lg">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold">Live Market Data</span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-200 dark:to-indigo-200 bg-clip-text text-transparent mb-6 sm:mb-8 tracking-tight">
+                S&P 500 Live & US Markets Today
+              </h1>
+              <p className="text-xl text-gray-700 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed mb-8 font-medium">
+                Real-time performance of S&P 500, Dow Jones, NASDAQ and major US stock indices
+              </p>
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="font-medium">Real-time Data</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="font-medium">S&P 500 Index</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <span className="font-medium">Market Movers</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav aria-label="Market sections" className="mb-8 sm:mb-12 px-2 sm:px-0">
+            <div className="flex flex-wrap justify-center gap-2">
+              <a
+                href="#market-overview"
+                className="px-6 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800/30 dark:hover:to-indigo-800/30 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800/30 text-sm font-semibold text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-200"
+              >
+                S&P 500 & Index Overview
+              </a>
+              <a
+                href="#top-companies"
+                className="px-6 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800/30 dark:hover:to-indigo-800/30 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800/30 text-sm font-semibold text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-200"
+              >
+                Top S&P 500 Companies
+              </a>
+              <a
+                href="#market-movers"
+                className="px-6 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800/30 dark:hover:to-indigo-800/30 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800/30 text-sm font-semibold text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-200"
+              >
+                S&P 500 Market Movers
+              </a>
+            </div>
           </nav>
 
-          <div className="space-y-4 sm:space-y-8">
-            <section id="market-overview" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-0 sm:p-6" aria-labelledby="market-overview-title">
-             
-              <Suspense fallback={<USMarketsTableSkeleton />}>
-                <USMarketsTable />
-              </Suspense>
+          <div className="space-y-8 sm:space-y-12">
+            <section id="market-overview" className="bg-gradient-to-br from-white via-blue-50 to-indigo-50 dark:from-gray-800 dark:via-blue-900/20 dark:to-indigo-900/20 rounded-3xl shadow-2xl border border-blue-100 dark:border-blue-800/30 p-8 sm:p-10 relative overflow-hidden" aria-labelledby="market-overview-title">
+              {/* Background Pattern */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100/30 to-indigo-100/30 dark:from-blue-800/10 dark:to-indigo-800/10 rounded-full -mr-32 -mt-32"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-100/30 to-pink-100/30 dark:from-purple-800/10 dark:to-pink-800/10 rounded-full -ml-32 -mb-32"></div>
+              
+              <div className="relative z-10">
+                <header className="mb-6">
+                  <h2 id="market-overview-title" className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 dark:from-white dark:to-blue-200 bg-clip-text text-transparent">S&P 500 Index & US Markets Overview</h2>
+                </header>
+                <Suspense fallback={<USMarketsTableSkeleton />}>
+                  <USMarketsTable />
+                </Suspense>
+              </div>
             </section>
 
-            <section id="top-companies" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-0 sm:p-6" aria-labelledby="top-companies-title">
-              <h2 id="top-companies-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4 px-4 sm:px-0">Top Companies by Market Cap</h2>
-              <Suspense fallback={<TopCompaniesByMarketCapSkeletonLoader />}>
-                <TopCompaniesByMarketCap />
-              </Suspense>
+            <section id="top-companies" className="bg-gradient-to-br from-white via-blue-50 to-indigo-50 dark:from-gray-800 dark:via-blue-900/20 dark:to-indigo-900/20 rounded-3xl shadow-2xl border border-blue-100 dark:border-blue-800/30 p-8 sm:p-10 relative overflow-hidden" aria-labelledby="top-companies-title">
+              {/* Background Pattern */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100/30 to-indigo-100/30 dark:from-blue-800/10 dark:to-indigo-800/10 rounded-full -mr-32 -mt-32"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-100/30 to-pink-100/30 dark:from-purple-800/10 dark:to-pink-800/10 rounded-full -ml-32 -mb-32"></div>
+              
+              <div className="relative z-10">
+                <h2 id="top-companies-title" className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 dark:from-white dark:to-blue-200 bg-clip-text text-transparent mb-6">Top S&P 500 Companies by Market Cap</h2>
+                <Suspense fallback={<TopCompaniesByMarketCapSkeletonLoader />}>
+                  <TopCompaniesByMarketCap />
+                </Suspense>
+              </div>
             </section>
 
-            <section id="market-movers" className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden p-0" aria-labelledby="market-movers-title">
-              <h2 id="market-movers-title" className="text-xl font-bold text-gray-800 dark:text-white mb-4 px-4 sm:px-6">Market Movers</h2>
-              <Suspense fallback={<MarketMoversSkeletonLoader />}>
-                <MarketMovers index="sp500" />
-              </Suspense>
+            <section id="market-movers" className="bg-gradient-to-br from-white via-blue-50 to-indigo-50 dark:from-gray-800 dark:via-blue-900/20 dark:to-indigo-900/20 rounded-3xl shadow-2xl border border-blue-100 dark:border-blue-800/30 p-8 sm:p-10 relative overflow-hidden" aria-labelledby="market-movers-title">
+              {/* Background Pattern */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100/30 to-indigo-100/30 dark:from-blue-800/10 dark:to-indigo-800/10 rounded-full -mr-32 -mt-32"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-100/30 to-pink-100/30 dark:from-purple-800/10 dark:to-pink-800/10 rounded-full -ml-32 -mb-32"></div>
+              
+              <div className="relative z-10">
+                <h2 id="market-movers-title" className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 dark:from-white dark:to-blue-200 bg-clip-text text-transparent mb-6">S&P 500 Market Movers Today</h2>
+                <Suspense fallback={<MarketMoversSkeletonLoader />}>
+                  <MarketMovers index="sp500" />
+                </Suspense>
+              </div>
             </section>
           </div>
         </div>
-        <div className="mt-8 sm:mt-12 text-center text-sm text-gray-500 dark:text-gray-400 px-2 sm:px-0">
-          <p>Data is updated every 5 minutes. Market hours are in EST/EDT.</p>
-          <p className="mt-2">
+        <footer className="mt-12 sm:mt-16 text-center">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8 shadow-lg border border-blue-100 dark:border-blue-800/30">
+            <p className="text-gray-700 dark:text-gray-300 font-medium mb-4">S&P 500 and market data is updated every 5 minutes. Market hours are in EST/EDT.</p>
             <Link
               href="/about"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-              aria-label="Learn more about our data sources"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+              aria-label="Learn more about our S&P 500 and market data sources"
             >
               Learn more about our data sources
+              <span>→</span>
             </Link>
-          </p>
-        </div>
+          </div>
+        </footer>
       </main>
     </>
   );

@@ -2,10 +2,10 @@ export default function StructuredData() {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Global Markets Live | World Stock Markets & Indices Today',
-    headline: 'Global Markets Live | World Stock Markets & Indices Today',
+    name: 'Live Global Markets Overview | Stock Indices, Sentiment & Futures',
+    headline: 'Live Global Markets Overview | Stock Indices, Sentiment & Futures',
     description:
-      'Track real-time global market data, world stock indices, and international market trends. Get live updates from major world markets including Asia, Europe, Americas, and Middle East.',
+      'Follow live updates of world stock markets, global indices, and investor sentiment across Asia, Europe, Americas, and MENA. Real-time data on major global financial trends.',
     url: 'https://www.cryptogreedindex.com/global-markets',
     inLanguage: 'en',
     dateModified: new Date().toISOString(),
@@ -14,15 +14,15 @@ export default function StructuredData() {
       url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
       width: 1200,
       height: 630,
-      caption: 'Global Markets Overview'
+      caption: 'Global Markets Overview - Cryptogreedindex.com'
     },
     about: {
       '@type': 'Thing',
-      name: 'Global Financial Markets'
+      name: 'Global Stock Markets and Sentiment'
     },
     audience: {
       '@type': 'Audience',
-      audienceType: 'Retail Investors'
+      audienceType: 'Retail and Institutional Investors'
     },
     potentialAction: {
       '@type': 'SearchAction',
@@ -31,24 +31,24 @@ export default function StructuredData() {
     },
     mainEntity: {
       '@type': 'DataFeed',
-      name: 'Global Markets Data',
-      description: 'Real-time global market data and indices from major world markets',
+      name: 'Live Global Market Data',
+      description: 'Real-time feed of stock indices and sentiment across global regions.',
       temporalCoverage: `${new Date().getFullYear()}/P1Y`,
       creator: {
         '@type': 'Organization',
-        name: 'Cryptogreedindex.com',
+        name: 'CryptoGreedIndex',
         url: 'https://www.cryptogreedindex.com'
       },
       publisher: {
         '@type': 'Organization',
-        name: 'Cryptogreedindex.com',
+        name: 'CryptoGreedIndex',
         url: 'https://www.cryptogreedindex.com',
         logo: {
           '@type': 'ImageObject',
           url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
           width: 1200,
           height: 630,
-          caption: 'Cryptogreedindex.com Logo'
+          caption: 'CryptoGreedIndex Logo'
         }
       },
       dataFeedElement: [
@@ -113,18 +113,6 @@ export default function StructuredData() {
           }
         }
       ]
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Cryptogreedindex.com',
-      url: 'https://www.cryptogreedindex.com',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://www.cryptogreedindex.com/cryptogreedindex.png',
-        width: 1200,
-        height: 630,
-        caption: 'Cryptogreedindex.com Logo'
-      }
     }
   };
 
