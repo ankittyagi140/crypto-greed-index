@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'Top 10 Cryptocurrency Prices | Best Crypto Coins by Market Cap',
+  title: 'Top 10 Cryptocurrencies Prices | Best Crypto Coins by Market Cap',
   description: 'Live tracking of world\'s top 10 cryptocurrencies including Bitcoin, Ethereum, and trending coins. Real-time prices, market cap rankings, charts, and trading volumes. Updated every minute with CoinGecko data.',
-  keywords: 'top 10 cryptocurrency, best crypto coins, trending cryptocurrency now, world best cryptocurrency, top crypto coins, trending coins coingecko, world largest cryptocurrency, top 10 coins, cryptocurrency prices live, best crypto to invest',
+  keywords: 'top 10 cryptocurrency, best crypto coins, trending cryptocurrency now, top 10 cryptocurrencies, top crypto coins, trending coins coingecko, world largest cryptocurrency, top 10 coins, cryptocurrency prices live, best crypto to invest',
   openGraph: {
-    title: 'Top 10 Cryptocurrency Prices | Best Crypto Coins by Market Cap',
+    title: 'Top 10 Cryptocurrencies Prices | Best Crypto Coins by Market Cap',
     description: 'Live tracking of world\'s top 10 cryptocurrencies. Real-time prices, market cap rankings, charts, and trading volumes for Bitcoin, Ethereum, and other leading digital currencies.',
     type: 'website',
     locale: 'en_US',

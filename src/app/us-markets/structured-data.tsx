@@ -4,20 +4,32 @@ export default function StructuredData() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "US Markets Live | S&P 500, NASDAQ, Dow Jones & Russell 2000 Today",
-    "headline": "US Stock Market Live Updates 2025",
+    "name": "S&P 500, Dow Jones, NASDAQ Live Index Tracker | CryptoGreedIndex",
+    "headline": "Live US Stock Market Indices - S&P 500, Dow Jones, NASDAQ 2025",
+    "description": "Track real-time data of S&P 500, Dow Jones, NASDAQ, and Russell 2000. Get live updates on US stock market indices, futures, and ETF insights for informed investing.",
     "url": "https://www.cryptogreedindex.com/us-markets",
-    "description": "Track real-time US market data, stock indices, and market trends. Get live updates from major US markets including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
     "dateModified": dateModified,
     "inLanguage": "en-US",
+
     "author": {
       "@type": "Organization",
-      "name": "CryptoGreedIndex.com",
-      "url": "https://www.cryptogreedindex.com"
+      "name": "CryptoGreedIndex",
+      "url": "https://www.cryptogreedindex.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.cryptogreedindex.com/cryptogreedindex.png",
+        "width": 600,
+        "height": 60
+      },
+      "sameAs": [
+        "https://twitter.com/cryptogreedindex",
+        "https://www.linkedin.com/in/atyagi-js/"
+      ]
     },
+
     "publisher": {
       "@type": "Organization",
-      "name": "CryptoGreedIndex.com",
+      "name": "CryptoGreedIndex",
       "url": "https://www.cryptogreedindex.com",
       "logo": {
         "@type": "ImageObject",
@@ -26,23 +38,23 @@ export default function StructuredData() {
         "height": 60
       }
     },
+
     "mainEntity": {
       "@type": "DataFeed",
-      "name": "US Markets Data Feed",
-      "description": "Live data feed for major US stock market indices including S&P 500, NASDAQ, Dow Jones, and Russell 2000.",
+      "name": "Live Data Feed - US Stock Indices",
+      "description": "Live updates of US stock market indices: S&P 500, NASDAQ Composite, Dow Jones, and Russell 2000.",
       "dataFeedElement": [
         {
           "@type": "DataFeedItem",
           "dateModified": dateModified,
           "item": {
             "@type": "FinancialProduct",
-            "name": "S&P 500",
-            "category": "US Stock Market Index",
-            "additionalProperty": {
-              "@type": "PropertyValue",
-              "name": "Market Status",
-              "value": "Open" // Optional: Make dynamic later
-            }
+            "name": "S&P 500 Index",
+            "category": "Large-Cap US Stocks",
+            "additionalProperty": [
+              { "@type": "PropertyValue", "name": "Market Status", "value": "Open" },
+              { "@type": "PropertyValue", "name": "Index Type", "value": "Broad Market Index" }
+            ]
           }
         },
         {
@@ -50,13 +62,12 @@ export default function StructuredData() {
           "dateModified": dateModified,
           "item": {
             "@type": "FinancialProduct",
-            "name": "NASDAQ",
-            "category": "US Stock Market Index",
-            "additionalProperty": {
-              "@type": "PropertyValue",
-              "name": "Market Status",
-              "value": "Open"
-            }
+            "name": "NASDAQ Composite",
+            "category": "Tech-Focused US Stocks",
+            "additionalProperty": [
+              { "@type": "PropertyValue", "name": "Market Status", "value": "Open" },
+              { "@type": "PropertyValue", "name": "Index Type", "value": "Technology Index" }
+            ]
           }
         },
         {
@@ -64,13 +75,12 @@ export default function StructuredData() {
           "dateModified": dateModified,
           "item": {
             "@type": "FinancialProduct",
-            "name": "Dow Jones",
-            "category": "US Stock Market Index",
-            "additionalProperty": {
-              "@type": "PropertyValue",
-              "name": "Market Status",
-              "value": "Open"
-            }
+            "name": "Dow Jones Industrial Average",
+            "category": "Blue-Chip Stocks",
+            "additionalProperty": [
+              { "@type": "PropertyValue", "name": "Market Status", "value": "Open" },
+              { "@type": "PropertyValue", "name": "Index Type", "value": "Price-Weighted Index" }
+            ]
           }
         },
         {
@@ -79,13 +89,59 @@ export default function StructuredData() {
           "item": {
             "@type": "FinancialProduct",
             "name": "Russell 2000",
-            "category": "US Stock Market Index",
-            "additionalProperty": {
-              "@type": "PropertyValue",
-              "name": "Market Status",
-              "value": "Open"
-            }
+            "category": "Small-Cap US Stocks",
+            "additionalProperty": [
+              { "@type": "PropertyValue", "name": "Market Status", "value": "Open" },
+              { "@type": "PropertyValue", "name": "Index Type", "value": "Small-Cap Index" }
+            ]
           }
+        }
+      ]
+    },
+
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "S&P 500",
+        "description": "A stock market index tracking the performance of 500 leading publicly traded companies in the United States."
+      },
+      {
+        "@type": "Thing",
+        "name": "Stock Market Index",
+        "description": "A benchmark that measures the performance of a specific set of stocks to represent a segment of the market."
+      },
+      {
+        "@type": "Thing",
+        "name": "Futures Market",
+        "description": "A marketplace where futures contracts are bought and sold for future delivery."
+      },
+      {
+        "@type": "Thing",
+        "name": "NASDAQ",
+        "description": "A global electronic marketplace for buying and selling securities, focused on tech stocks."
+      }
+    ],
+
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.cryptogreedindex.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.cryptogreedindex.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "US Markets",
+          "item": "https://www.cryptogreedindex.com/us-markets"
         }
       ]
     }
