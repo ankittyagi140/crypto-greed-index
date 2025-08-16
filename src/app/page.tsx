@@ -406,6 +406,7 @@ export default function Home() {
 
             {/* Google AdSense Banner */}
             <div className="w-full mb-8">
+
               {/* add banner for home page */}
               <ins
                 className="adsbygoogle"
