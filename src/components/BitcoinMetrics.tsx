@@ -50,9 +50,9 @@ const getCongestionColor = (congestion: string): string => {
   }
 };
 
-const MetricCard = ({ title, value, change, isPositive }: { 
-  title: string; 
-  value: string; 
+const MetricCard = ({ title, value, change, isPositive }: {
+  title: string;
+  value: string;
   change?: string;
   isPositive?: boolean;
 }) => (
@@ -86,13 +86,13 @@ export default function BitcoinMetrics({ isDetailPage = false }: BitcoinMetricsP
         }
 
         setMetrics(result.data);
-        toast.success('Metrics updated successfully', { 
+        toast.success('Metrics updated successfully', {
           id: loadingToast,
           duration: 3000,
         });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load Bitcoin metrics';
-        toast.error(errorMessage, { 
+        toast.error(errorMessage, {
           id: loadingToast,
           duration: 4000,
         });
@@ -138,12 +138,27 @@ export default function BitcoinMetrics({ isDetailPage = false }: BitcoinMetricsP
   }
 
   return (
-    <div 
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-12 ${
-        !isDetailPage ? 'cursor-pointer transition-transform hover:scale-[1.02] hover:shadow-xl' : ''
-      }`}
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-12 ${!isDetailPage ? 'cursor-pointer transition-transform hover:scale-[1.02] hover:shadow-xl' : ''
+        }`}
       onClick={handleClick}
     >
+      {/* Google AdSense Banner */}
+      <div className="w-full mb-6">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
+        <ins
+          className="adsbygoogle"
+          style={{ display: 'block' }}
+          data-ad-format="fluid"
+          data-ad-layout-key="-6t+ed+2i-1n-4w"
+          data-ad-client="ca-pub-1332831285527693"
+          data-ad-slot="5132599025"
+        />
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({ });
+        </script>
+      </div>
+
       <div className="mb-6 flex flex-col gap-2">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
           Bitcoin Network Metrics

@@ -152,11 +152,11 @@ const FearAndGreedChart = () => {
   if (!data) return null;
 
   // Sort data in ascending order by date
-  const sortedFearGreed = [...data.fearGreed].sort((a, b) => 
+  const sortedFearGreed = [...data.fearGreed].sort((a, b) =>
     new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   );
-  
-  const sortedBtcPrice = [...data.btcPrice].sort((a, b) => 
+
+  const sortedBtcPrice = [...data.btcPrice].sort((a, b) =>
     new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   );
 
@@ -249,7 +249,7 @@ const FearAndGreedChart = () => {
           font: {
             size: window.innerWidth < 640 ? 10 : 12,
           },
-          callback: function(tickValue: number | string) {
+          callback: function (tickValue: number | string) {
             const value = Number(tickValue);
             if (value >= 1000) {
               return `$${(value / 1000).toFixed(0)}k`;
@@ -273,7 +273,7 @@ const FearAndGreedChart = () => {
       title: {
         display: true,
         text: [
-          data.timeRange ? 
+          data.timeRange ?
             `${format(new Date(data.timeRange.start), 'MMM d, yyyy')} - ${format(new Date(data.timeRange.end), 'MMM d, yyyy')}` :
             ''
         ],
@@ -284,7 +284,7 @@ const FearAndGreedChart = () => {
       },
       tooltip: {
         callbacks: {
-          label: function(this: TooltipModel<'bar' | 'line'>, tooltipItem: TooltipItem<'bar' | 'line'>) {
+          label: function (this: TooltipModel<'bar' | 'line'>, tooltipItem: TooltipItem<'bar' | 'line'>) {
             if (tooltipItem.datasetIndex === 0) {
               const value = tooltipItem.raw as number;
               let classification = '';
@@ -310,12 +310,12 @@ const FearAndGreedChart = () => {
   };
 
   return (
-    <div ref={containerRef} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl">
+    <div ref={containerRef} className="bg-white rounded-2xl shadow-lg p-8 mb-12 transition-all duration-300 hover:shadow-xl w-full">
       <div className="flex items-center gap-2 mb-2 sm:mb-4 justify-center">
-        <Image src="/bitcoin.svg" alt="Bitcoin" className="w-5 h-5 sm:w-6 sm:h-6" height={24} width={24}/>
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white text-center">BTC Fear & Greed Index vs Price</h2>
+        <Image src="/bitcoin.svg" alt="Bitcoin" className="w-5 h-5 sm:w-6 sm:h-6" height={24} width={24} />
+        <h2 className="text-2xl font-semibold text-slate-800 text-center">BTC Fear & Greed Index vs Price</h2>
       </div>
-      <div className="w-full h-[300px] sm:h-[400px]">
+      <div className="w-full h-[300px] sm:h-[400px] overflow-visible">
         <Chart type="bar" data={chartDataForChartJS} options={options} />
       </div>
     </div>

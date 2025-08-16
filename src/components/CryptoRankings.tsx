@@ -33,7 +33,7 @@ const MiniLineChart = ({ data, color = '#3B82F6' }: { data: number[], color?: st
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
-  
+
   const points = data.map((value, index) => {
     const x = (index / (data.length - 1)) * 100;
     const y = 100 - ((value - min) / range) * 100;
@@ -72,7 +72,7 @@ export default function CryptoRankings() {
     try {
       setLoading(true);
       const response = await fetch(`/api/crypto/top-by-${type}?sparkline=true`);
-      
+
       if (!response.ok) {
         if (response.status === 429) {
           throw new Error('Rate limit exceeded. Please try again in a minute.');
@@ -152,14 +152,14 @@ export default function CryptoRankings() {
     const points = [];
     const basePrice = price;
     const volatility = 0.02; // 2% volatility
-    
+
     for (let i = 0; i < 7; i++) {
       const randomChange = (Math.random() - 0.5) * volatility;
       const trend = change ? (change / 100) * (i / 6) : 0;
       const newPrice = basePrice * (1 + randomChange + trend);
       points.push(newPrice);
     }
-    
+
     return points;
   };
 
@@ -205,11 +205,10 @@ export default function CryptoRankings() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab.id
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id
                 ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-            }`}
+              }`}
           >
             <span>{tab.icon}</span>
             <span>{tab.label}</span>
@@ -242,7 +241,7 @@ export default function CryptoRankings() {
         {cryptoData.map((crypto, index) => {
           const sparklineData = crypto.sparkline_in_7d?.price || generateMockSparkline(crypto.current_price, crypto.price_change_percentage_24h);
           const chartColor = getChartColor(crypto.price_change_percentage_24h);
-          
+
           return (
             <Link
               key={crypto.id}
@@ -257,6 +256,8 @@ export default function CryptoRankings() {
                   <Image
                     src={crypto.image}
                     alt={crypto.name}
+                    height={40}
+                    width={40}
                     className="w-10 h-10 rounded-full"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
