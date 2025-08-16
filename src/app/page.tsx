@@ -406,7 +406,6 @@ export default function Home() {
 
             {/* Google AdSense Banner */}
             <div className="w-full mb-8">
-              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
               {/* add banner for home page */}
               <ins
                 className="adsbygoogle"

@@ -156,7 +156,6 @@ export default function BitcoinMetrics({ isDetailPage = false }: BitcoinMetricsP
     >
       {/* Google AdSense Banner */}
       <div className="w-full mb-6" onClick={(e) => e.stopPropagation()}>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
         <ins
           className="adsbygoogle"
           style={{ display: 'block' }}

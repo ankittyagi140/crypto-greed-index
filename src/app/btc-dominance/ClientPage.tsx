@@ -153,7 +153,6 @@ export default function ClientPage() {
           <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 sm:py-16 lg:py-20">
             {/* Google AdSense Banner */}
             <div className="w-full mb-8">
-              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
               {/* add banner for BTC dominance page */}
               <ins
                 className="adsbygoogle"
