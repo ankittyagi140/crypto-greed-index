@@ -9,17 +9,17 @@ interface BitcoinMetricsProps {
 }
 
 interface NetworkMetrics {
-  price: number;
-  marketCap: number;
-  activeAddresses: number;
-  hashRate: number;
-  difficulty: number;
+  price?: number;
+  marketCap?: number;
+  activeAddresses?: number;
+  hashRate?: number;
+  difficulty?: number;
   networkCongestion: 'low' | 'medium' | 'high';
-  priceChange24h: number;
+  priceChange24h?: number;
 }
 
 const formatNumber = (num: number | undefined): string => {
-  if (num === undefined) return '$0.00';
+  if (num === undefined || num === null || Number.isNaN(num)) return '$0.00';
   if (num >= 1e12) return `$${(num / 1e12).toFixed(2)}T`;
   if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
   if (num >= 1e6) return `$${(num / 1e6).toFixed(2)}M`;
@@ -28,12 +28,12 @@ const formatNumber = (num: number | undefined): string => {
 };
 
 const formatHashRate = (hashRate: number | undefined): string => {
-  if (hashRate === undefined) return '0 EH/s';
+  if (hashRate === undefined || hashRate === null || Number.isNaN(hashRate)) return '0 EH/s';
   return `${(hashRate / 1e18).toFixed(2)} EH/s`;
 };
 
 const formatDifficulty = (difficulty: number | undefined): string => {
-  if (difficulty === undefined) return '0 T';
+  if (difficulty === undefined || difficulty === null || Number.isNaN(difficulty)) return '0 T';
   return `${(difficulty / 1e12).toFixed(2)}T`;
 };
 
@@ -78,14 +78,25 @@ export default function BitcoinMetrics({ isDetailPage = false }: BitcoinMetricsP
         position: 'top-right',
       });
       try {
-        const response = await fetch('/api/bitcoin-metrics');
+        const response = await fetch('/api/bitcoin-metrics', { cache: 'no-store' });
         const result = await response.json();
 
         if (!response.ok) {
           throw new Error(result.error || 'Failed to fetch Bitcoin metrics');
         }
 
-        setMetrics(result.data);
+        const d = result.data || {};
+        const sanitized: NetworkMetrics = {
+          price: typeof d.price === 'number' ? d.price : undefined,
+          marketCap: typeof d.marketCap === 'number' ? d.marketCap : undefined,
+          priceChange24h: typeof d.priceChange24h === 'number' ? d.priceChange24h : undefined,
+          activeAddresses: Number.isFinite(d.activeAddresses) ? d.activeAddresses : 0,
+          hashRate: Number.isFinite(d.hashRate) ? d.hashRate : 0,
+          difficulty: Number.isFinite(d.difficulty) ? d.difficulty : 0,
+          networkCongestion: (d.networkCongestion as 'low' | 'medium' | 'high') || 'low',
+        };
+
+        setMetrics(sanitized);
         toast.success('Metrics updated successfully', {
           id: loadingToast,
           duration: 3000,
@@ -144,7 +155,7 @@ export default function BitcoinMetrics({ isDetailPage = false }: BitcoinMetricsP
       onClick={handleClick}
     >
       {/* Google AdSense Banner */}
-      <div className="w-full mb-6">
+      <div className="w-full mb-6" onClick={(e) => e.stopPropagation()}>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
         <ins
           className="adsbygoogle"
@@ -177,14 +188,14 @@ export default function BitcoinMetrics({ isDetailPage = false }: BitcoinMetricsP
         <MetricCard
           title="BTC Price"
           value={formatNumber(metrics?.price)}
-          change={metrics?.priceChange24h ? `${metrics.priceChange24h.toFixed(2)}%` : undefined}
-          isPositive={metrics?.priceChange24h ? metrics.priceChange24h >= 0 : undefined}
+          change={typeof metrics?.priceChange24h === 'number' ? `${metrics.priceChange24h.toFixed(2)}%` : undefined}
+          isPositive={typeof metrics?.priceChange24h === 'number' ? metrics.priceChange24h >= 0 : undefined}
         />
         <MetricCard
           title="Market Cap"
           value={formatNumber(metrics?.marketCap)}
-          change={metrics?.priceChange24h ? `${metrics.priceChange24h.toFixed(2)}%` : undefined}
-          isPositive={metrics?.priceChange24h ? metrics.priceChange24h >= 0 : undefined}
+          change={typeof metrics?.priceChange24h === 'number' ? `${metrics.priceChange24h.toFixed(2)}%` : undefined}
+          isPositive={typeof metrics?.priceChange24h === 'number' ? metrics.priceChange24h >= 0 : undefined}
         />
         <MetricCard
           title="Active Addresses"
