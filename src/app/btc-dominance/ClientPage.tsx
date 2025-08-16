@@ -153,18 +153,17 @@ export default function ClientPage() {
           <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 sm:py-16 lg:py-20">
             {/* Google AdSense Banner */}
             <div className="w-full mb-8">
-              {/* add banner for BTC dominance page */}
-              <ins
-                className="adsbygoogle"
-                style={{ display: 'block' }}
-                data-ad-client="ca-pub-1332831285527693"
-                data-ad-slot="5441357265"
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-              />
-              <script>
-                (adsbygoogle = window.adsbygoogle || []).push({ });
-              </script>
+              {(() => {
+                const AdUnit = require('../../components/AdUnit').default;
+                return (
+                  <AdUnit
+                    adClient="ca-pub-1332831285527693"
+                    adSlot="5441357265"
+                    format="auto"
+                    responsive
+                  />
+                );
+              })()}
             </div>
           </div>
         </div>
