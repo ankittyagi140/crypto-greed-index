@@ -11,48 +11,124 @@ interface HistoricalValuesProps {
 }
 
 const HistoricalValues: React.FC<HistoricalValuesProps> = ({ data }) => {
-  const getClassificationColor = (classification: string): { bg: string; text: string } => {
+  const getClassificationColor = (classification: string): { bg: string; text: string; border: string; progress: string } => {
     switch (classification.toLowerCase()) {
       case 'neutral':
-        return { bg: 'bg-yellow-500', text: 'text-yellow-500' };
+        return {
+          bg: 'bg-yellow-100',
+          text: 'text-yellow-700',
+          border: 'border-yellow-200',
+          progress: 'from-yellow-400 to-yellow-500'
+        };
       case 'fear':
-        return { bg: 'bg-orange-500', text: 'text-orange-500' };
+        return {
+          bg: 'bg-orange-100',
+          text: 'text-orange-700',
+          border: 'border-orange-200',
+          progress: 'from-orange-400 to-orange-500'
+        };
       case 'extreme fear':
-        return { bg: 'bg-red-500', text: 'text-red-500' };
+        return {
+          bg: 'bg-red-100',
+          text: 'text-red-700',
+          border: 'border-red-200',
+          progress: 'from-red-400 to-red-500'
+        };
       case 'greed':
-        return { bg: 'bg-green-500', text: 'text-green-500' };
+        return {
+          bg: 'bg-emerald-100',
+          text: 'text-emerald-700',
+          border: 'border-emerald-200',
+          progress: 'from-emerald-400 to-emerald-500'
+        };
       case 'extreme greed':
-        return { bg: 'bg-green-600', text: 'text-green-600' };
+        return {
+          bg: 'bg-purple-100',
+          text: 'text-purple-700',
+          border: 'border-purple-200',
+          progress: 'from-purple-400 to-purple-500'
+        };
       default:
-        return { bg: 'bg-gray-500', text: 'text-gray-500' };
+        return {
+          bg: 'bg-slate-100',
+          text: 'text-slate-700',
+          border: 'border-slate-200',
+          progress: 'from-slate-400 to-slate-500'
+        };
+    }
+  };
+
+  const getSentimentIcon = (classification: string) => {
+    switch (classification.toLowerCase()) {
+      case 'neutral':
+        return '😐';
+      case 'fear':
+        return '😰';
+      case 'extreme fear':
+        return '😱';
+      case 'greed':
+        return '😏';
+      case 'extreme greed':
+        return '🤪';
+      default:
+        return '📊';
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-        Historical Values
-      </h3>
-      <div className="space-y-4">
-        {data.map((item, index) => {
-          const colors = getClassificationColor(item.classification);
-          return (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm text-gray-600 dark:text-gray-300">
-                  {item.label}
-                </span>
-                <span className={`text-sm font-medium ${colors.text} dark:text-opacity-90`}>
-                  {item.classification}
-                </span>
+    <div className="space-y-3">
+      {data.map((item, index) => {
+        const colors = getClassificationColor(item.classification);
+        const sentimentIcon = getSentimentIcon(item.classification);
+        const value = parseInt(item.value);
+        const progressPercentage = (value / 100) * 100;
+
+        return (
+          <div
+            key={index}
+            className={`group relative p-3 rounded-lg border-2 ${colors.border} ${colors.bg} hover:shadow-md transition-all duration-300 hover:scale-102 cursor-pointer`}
+          >
+            {/* Progress Bar Background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/50 to-transparent rounded-lg"></div>
+
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="text-lg">{sentimentIcon}</div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium text-slate-700">
+                    {item.label}
+                  </span>
+                  <span className={`text-xs font-semibold ${colors.text}`}>
+                    {item.classification}
+                  </span>
+                </div>
               </div>
-              <div className={`w-12 h-12 rounded-full ${colors.bg} flex items-center justify-center text-white font-bold`}>
-                {item.value}
+
+              <div className="flex flex-col items-center gap-1">
+                {/* Circular Progress Indicator */}
+                <div className="relative w-12 h-12">
+                  <div className="absolute inset-0 w-12 h-12 rounded-full bg-slate-200"></div>
+                  <div
+                    className="absolute inset-0 w-12 h-12 rounded-full bg-gradient-to-r from-slate-400 to-slate-500"
+                    style={{
+                      background: `conic-gradient(from 0deg, ${colors.progress} ${progressPercentage * 3.6}deg, #e2e8f0 ${progressPercentage * 3.6}deg, #e2e8f0 360deg)`
+                    }}
+                  ></div>
+                  <div className="absolute inset-1 w-10 h-10 rounded-full bg-white flex items-center justify-center">
+                    <span className="text-sm font-bold text-slate-800">{item.value}</span>
+                  </div>
+                </div>
+
+                {/* Value Label */}
+                <span className="text-xs font-medium text-slate-600">Score</span>
               </div>
             </div>
-          );
-        })}
-      </div>
+
+            {/* Hover Effect Line */}
+            <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-transparent via-slate-300 to-transparent rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+          </div>
+        );
+      })}
     </div>
   );
 };
