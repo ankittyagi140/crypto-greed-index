@@ -5,7 +5,8 @@ const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 // Optional API key support (Pro or free demo if provided)
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY || process.env.NEXT_PUBLIC_COINGECKO_API_KEY;
 
-const defaultHeaders: HeadersInit = {
+// Strongly typed headers so we can add custom keys without casting to any
+const defaultHeaders: Record<string, string> = {
 	accept: 'application/json',
 	'content-type': 'application/json',
 	// Provide a UA to avoid some providers blocking requests without one
@@ -13,23 +14,25 @@ const defaultHeaders: HeadersInit = {
 };
 
 if (COINGECKO_API_KEY) {
-	(defaultHeaders as any)['x-cg-pro-api-key'] = COINGECKO_API_KEY;
+	defaultHeaders['x-cg-pro-api-key'] = COINGECKO_API_KEY as string;
 }
 
 function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchWithRetry(url: string, init: RequestInit = {}, retries = 3, backoffMs = 500): Promise<Response> {
+// Extend RequestInit to allow Next.js-specific options without ts-ignore
+type NextRequestInit = RequestInit & { next?: { revalidate?: number } };
+
+async function fetchWithRetry(url: string, init: NextRequestInit = {}, retries = 3, backoffMs = 500): Promise<Response> {
 	let attempt = 0;
 	while (true) {
 		try {
 			const res = await fetch(url, {
 				cache: 'no-store',
-				// @ts-ignore - Next.js runtime supports next option
 				next: { revalidate: 0 },
 				...init,
-				headers: { ...defaultHeaders, ...(init.headers || {}) }
+				headers: { ...defaultHeaders, ...(init.headers || {}) as Record<string, string> }
 			});
 
 			// Successful response
@@ -54,6 +57,25 @@ async function fetchWithRetry(url: string, init: RequestInit = {}, retries = 3, 
 	}
 }
 
+// Types for CoinGecko responses
+interface CoinGeckoSimplePriceResponse {
+	bitcoin?: {
+		usd?: number;
+		usd_market_cap?: number;
+		usd_24h_change?: number;
+	};
+}
+
+interface CoinGeckoBitcoinResponse {
+	community_data?: {
+		active_addresses?: number;
+	};
+	developer_data?: {
+		closed_issues?: number;
+		total_issues?: number;
+	};
+}
+
 export async function GET() {
 	try {
 		// Fetch Bitcoin data from CoinGecko with resiliency
@@ -62,14 +84,14 @@ export async function GET() {
 			fetchWithRetry(`${COINGECKO_API}/coins/bitcoin?localization=false&tickers=false&market_data=false&community_data=true&developer_data=true&sparkline=false`)
 		]);
 
-		let priceResult: any | null = null;
-		let networkResult: any | null = null;
+		let priceResult: CoinGeckoSimplePriceResponse | null = null;
+		let networkResult: CoinGeckoBitcoinResponse | null = null;
 
 		if (priceRes.ok) {
-			priceResult = await priceRes.json();
+			priceResult = (await priceRes.json()) as CoinGeckoSimplePriceResponse;
 		}
 		if (networkRes.ok) {
-			networkResult = await networkRes.json();
+			networkResult = (await networkRes.json()) as CoinGeckoBitcoinResponse;
 		}
 
 		// If both failed, return graceful error
