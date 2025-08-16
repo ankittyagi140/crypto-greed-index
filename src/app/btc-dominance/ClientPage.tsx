@@ -4,6 +4,7 @@ import BTCDominance from '../../components/BTCDominance';
 import BitcoinMetrics from '../../components/BitcoinMetrics';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import AdUnit from '../../components/AdUnit';
 
 interface DominanceData {
   date: string;
@@ -153,17 +154,7 @@ export default function ClientPage() {
           <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 sm:py-16 lg:py-20">
             {/* Google AdSense Banner */}
             <div className="w-full mb-8">
-              {(() => {
-                const AdUnit = require('../../components/AdUnit').default;
-                return (
-                  <AdUnit
-                    adClient="ca-pub-1332831285527693"
-                    adSlot="5441357265"
-                    format="auto"
-                    responsive
-                  />
-                );
-              })()}
+              <AdUnit adClient="ca-pub-1332831285527693" adSlot="5441357265" format="auto" responsive />
             </div>
           </div>
         </div>

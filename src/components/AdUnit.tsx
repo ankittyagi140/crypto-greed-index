@@ -1,86 +1,70 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
-type AdUnitProps = {
+interface AdUnitProps {
     adClient: string;
     adSlot: string;
     format?: 'auto' | 'fluid';
-    layoutKey?: string;
     responsive?: boolean;
+    layoutKey?: string; // for fluid ads
     className?: string;
     style?: React.CSSProperties;
-};
+}
 
-/**
- * Reliable Google AdSense unit that pushes after mount and retries
- * until the loader is ready. Avoids duplicate pushes on the same <ins>.
- */
-const AdUnit: React.FC<AdUnitProps> = ({
+declare global {
+    interface Window {
+        adsbygoogle: unknown[] | undefined;
+    }
+}
+
+export default function AdUnit({
     adClient,
     adSlot,
     format = 'auto',
-    layoutKey,
     responsive = true,
+    layoutKey,
     className,
     style,
-}) => {
-    const insRef = useRef<HTMLModElement>(null);
-
+}: AdUnitProps) {
     useEffect(() => {
-        let retriesRemaining = 10;
-        let retryTimer: number | undefined;
+        // Ensure script exists (in case global loader failed or on isolated page render)
+        const existing = document.querySelector(
+            'script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
+        ) as HTMLScriptElement | null;
+        if (!existing) {
+            const s = document.createElement('script');
+            s.async = true;
+            s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(
+                adClient
+            )}`;
+            s.crossOrigin = 'anonymous';
+            document.head.appendChild(s);
+        }
 
-        const tryPush = () => {
-            const node = insRef.current as unknown as HTMLElement | null;
-            if (!node) return;
-
-            // Prevent double initialization
-            if (node.getAttribute('data-adsbygoogle-status') === 'done') return;
-
-            // adsbygoogle queue is safe to push to even before script fully loads
-            // but in some environments it may be undefined briefly – so we retry.
-            // @ts-expect-error adsbygoogle is injected globally by AdSense script
-            if (typeof window !== 'undefined' && window.adsbygoogle) {
-                try {
-                    // @ts-expect-error see above
-                    (window.adsbygoogle = window.adsbygoogle || []).push({});
-                } catch (_) {
-                    // If push throws (e.g., not fully ready), retry a few times
-                    if (retriesRemaining > 0) {
-                        retriesRemaining -= 1;
-                        retryTimer = window.setTimeout(tryPush, 800);
-                    }
-                }
-            } else if (retriesRemaining > 0) {
-                retriesRemaining -= 1;
-                retryTimer = window.setTimeout(tryPush, 800);
+        // Queue an ad render. Slight delay improves reliability while script initializes
+        const timer = window.setTimeout(() => {
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (window.adsbygoogle = window.adsbygoogle || []) as any[];
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (window.adsbygoogle as any[]).push({});
+            } catch (err) {
+                // Intentionally noop; AdSense manages its own errors
             }
-        };
-
-        tryPush();
-
-        return () => {
-            if (retryTimer) {
-                window.clearTimeout(retryTimer);
-            }
-        };
-    }, []);
+        }, 300);
+        return () => window.clearTimeout(timer);
+    }, [adClient, adSlot, format, layoutKey, responsive]);
 
     return (
         <ins
-            ref={insRef as unknown as React.LegacyRef<HTMLModElement>}
-            className={`adsbygoogle ${className ?? ''}`.trim()}
+            className={`adsbygoogle${className ? ` ${className}` : ''}`}
             style={{ display: 'block', ...(style || {}) }}
             data-ad-client={adClient}
             data-ad-slot={adSlot}
-            data-ad-format={format}
-            data-full-width-responsive={responsive ? 'true' : 'false'}
-            {...(layoutKey ? { 'data-ad-layout-key': layoutKey } as any : {})}
+            {...(format ? { 'data-ad-format': format } : {})}
+            {...(responsive ? { 'data-full-width-responsive': 'true' } : {})}
+            {...(layoutKey ? { 'data-ad-layout-key': layoutKey } : {})}
         />
     );
-};
-
-export default AdUnit;
-
-
+}
