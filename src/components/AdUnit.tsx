@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 interface AdUnitProps {
     adClient: string;
@@ -27,6 +28,10 @@ export default function AdUnit({
     className,
     style,
 }: AdUnitProps) {
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const urlKey = `${pathname || ''}?${searchParams?.toString() || ''}`;
+
     useEffect(() => {
         // Ensure script exists (in case global loader failed or on isolated page render)
         const existing = document.querySelector(
@@ -55,10 +60,12 @@ export default function AdUnit({
             }
         }, 300);
         return () => window.clearTimeout(timer);
-    }, [adClient, adSlot, format, layoutKey, responsive]);
+        // Re-run when ad config or URL changes
+    }, [adClient, adSlot, format, layoutKey, responsive, urlKey]);
 
     return (
         <ins
+            key={`${adSlot}-${urlKey}`}
             className={`adsbygoogle${className ? ` ${className}` : ''}`}
             style={{ display: 'block', ...(style || {}) }}
             data-ad-client={adClient}
