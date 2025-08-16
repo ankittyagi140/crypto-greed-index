@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import AdUnit from './AdUnit';
 
 interface BitcoinMetricsProps {
   isDetailPage?: boolean;
@@ -156,18 +157,7 @@ export default function BitcoinMetrics({ isDetailPage = false }: BitcoinMetricsP
     >
       {/* Google AdSense Banner */}
       <div className="w-full mb-6" onClick={(e) => e.stopPropagation()}>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
-        <ins
-          className="adsbygoogle"
-          style={{ display: 'block' }}
-          data-ad-format="fluid"
-          data-ad-layout-key="-6t+ed+2i-1n-4w"
-          data-ad-client="ca-pub-1332831285527693"
-          data-ad-slot="5132599025"
-        />
-        <script>
-          (adsbygoogle = window.adsbygoogle || []).push({ });
-        </script>
+        <AdUnit adClient="ca-pub-1332831285527693" adSlot="5132599025" format="fluid" layoutKey="-6t+ed+2i-1n-4w" responsive />
       </div>
 
       <div className="mb-6 flex flex-col gap-2">

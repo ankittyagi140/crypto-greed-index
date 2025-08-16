@@ -30,6 +30,8 @@ import {
   WhatsappIcon,
 } from 'react-share';
 
+import AdUnit from '../components/AdUnit';
+
 // Lazy load components with custom loading states
 
 const FAQSection = dynamic(() => import('../components/FAQSection'), {
@@ -406,19 +408,7 @@ export default function Home() {
 
             {/* Google AdSense Banner */}
             <div className="w-full mb-8">
-              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
-              {/* add banner for home page */}
-              <ins
-                className="adsbygoogle"
-                style={{ display: 'block' }}
-                data-ad-client="ca-pub-1332831285527693"
-                data-ad-slot="5441357265"
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-              />
-              <script>
-                (adsbygoogle = window.adsbygoogle || []).push({ });
-              </script>
+              <AdUnit adClient="ca-pub-1332831285527693" adSlot="5441357265" format="auto" responsive />
             </div>
           </div>
         </div>
