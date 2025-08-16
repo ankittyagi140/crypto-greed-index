@@ -51,6 +51,7 @@ export default function AdUnit({
                 (window.adsbygoogle as any[]).push({});
             } catch (err) {
                 // Intentionally noop; AdSense manages its own errors
+                console.error(err);
             }
         }, 300);
         return () => window.clearTimeout(timer);
