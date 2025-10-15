@@ -35,7 +35,7 @@ export default function Header({
 
   return (
     <div className="sticky top-0 z-50">
-      <header className="bg-white/300 dark:bg-gray-900/30 backdrop-blur-lg shadow-lg">
+      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border-b border-white/20 dark:border-gray-700/30">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3">
             <div className="relative w-10 h-10">
@@ -48,7 +48,7 @@ export default function Header({
                 priority
               />
             </div>
-            <h1 className="text-l font-bold text-[#048f04] dark:text-white">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-400 dark:to-blue-500 bg-clip-text text-transparent">
               {title}
             </h1>
           </Link>
@@ -57,7 +57,7 @@ export default function Header({
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               href="/"
-              className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors"
+              className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -67,7 +67,7 @@ export default function Header({
             <div className="relative">
               <button
                 onClick={() => handleDropdownClick('analysis')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors cursor-pointer"
+                className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors cursor-pointer font-medium"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
@@ -77,45 +77,45 @@ export default function Header({
                   <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                 </svg>
               </button>
-              <div className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 transition-all duration-200 ${activeDropdown === 'analysis' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+              <div className={`absolute right-0 mt-2 w-48 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-white/20 dark:border-gray-700/30 py-2 transition-all duration-200 ${activeDropdown === 'analysis' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 <Link
                   href="/top-crypto"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   Top Cryptocurrencies
                 </Link>
                 <Link
                   href="/btc-dominance"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   BTC Dominance
                 </Link>
                 <Link
                   href="/eth-dominance"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   ETH Dominance
                 </Link>
                 <Link
                   href="/altcoin-dominance"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   Altcoin Dominance
                 </Link>
                 <Link
                   href="/fear-greed-vs-btc"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   Fear & Greed vs BTC
                 </Link>
                 <Link
                   href="/social-sentiments-btc"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   Social Sentiments & BTC
@@ -127,7 +127,7 @@ export default function Header({
             <div className="relative">
               <button
                 onClick={() => handleDropdownClick('markets')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white transition-colors cursor-pointer"
+                className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors cursor-pointer font-medium"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
@@ -140,14 +140,14 @@ export default function Header({
               <div className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 transition-all duration-200 ${activeDropdown === 'markets' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 <Link
                   href="/global-markets"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   Global Markets
                 </Link>
                 <Link
                   href="/us-markets"
-                  className="block px-4 py-2 text-gray-600 hover:text-[#048f04] dark:text-gray-300 dark:hover:text-white"
+                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors font-medium"
                   onClick={() => setActiveDropdown(null)}
                 >
                   US Markets

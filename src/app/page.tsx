@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import LazyChartSection from '../components/LazyChartSection';
 import Link from 'next/link';
 import CryptoRankings from '../components/CryptoRankings';
+import AdSenseBanner from '../components/AdSenseBanner';
 import {
   ChartBarIcon,
   GlobeAltIcon,
@@ -245,8 +246,11 @@ export default function Home() {
     // Set up interval for periodic updates - every 5 minutes
     const interval = setInterval(fetchAllData, 5 * 60 * 1000);
 
+
     // Cleanup
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [fetchAllData]);
 
   const formatHistoricalData = (data: FearGreedData | null, historical: HistoricalData | null) => {
@@ -261,13 +265,13 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-financial">
       {/* Market Stats Banner */}
-      <div className="w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-xl">
+      <div className="w-full bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 border-b border-blue-800/30 shadow-xl backdrop-blur-sm">
         <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
             <div className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm overflow-x-auto whitespace-nowrap">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-white/20">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-white/20 hover:bg-white/15 transition-all duration-200">
                 <ChartBarIcon className="h-4 w-4 text-emerald-300" />
                 <span className="text-slate-200 font-medium">Market Cap:</span>
                 <span className="text-white font-bold">{formatMarketCap(marketStats.marketCap.value)}</span>
@@ -281,7 +285,7 @@ export default function Home() {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-white/20">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-white/20 hover:bg-white/15 transition-all duration-200">
                 <CurrencyDollarIcon className="h-4 w-4 text-emerald-300" />
                 <span className="text-slate-200 font-medium">24h Vol:</span>
                 <span className="text-white font-bold">${marketStats.volume.value}B</span>
@@ -297,7 +301,7 @@ export default function Home() {
                   <span className="text-slate-300 text-xs">0%</span>
                 )}
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-white/20">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-white/20 hover:bg-white/15 transition-all duration-200">
                 <ChartPieIcon className="h-4 w-4 text-blue-300" />
                 <span className="text-slate-200 font-medium">Dominance:</span>
                 <Link
@@ -319,7 +323,7 @@ export default function Home() {
                   Alt: {marketStats.altcoinDominance.value}%
                 </Link>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-white/20">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-white/20 hover:bg-white/15 transition-all duration-200">
                 <GlobeAltIcon className="h-4 w-4 text-amber-300" />
                 <span className="text-slate-200 font-medium">Sentiment:</span>
                 <span className="text-white font-bold">{marketStats.fearGreedScore}/100</span>
@@ -395,30 +399,32 @@ export default function Home() {
       </div>
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        {/* Header Section - Optimized for LCP */}
+        {/* Hero Section - Professional Design */}
         <div className="text-center py-16 sm:py-20 lg:py-24 mb-12 relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"></div>
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+          {/* Enhanced Background Pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/30"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%233b82f6%22%20fill-opacity%3D%220.03%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+          
+          {/* Floating Elements */}
+          <div className="absolute top-10 left-10 w-20 h-20 bg-blue-200/20 rounded-full blur-xl animate-pulse-slow"></div>
+          <div className="absolute top-20 right-20 w-32 h-32 bg-indigo-200/20 rounded-full blur-2xl animate-pulse-slow"></div>
+          <div className="absolute bottom-20 left-20 w-24 h-24 bg-emerald-200/20 rounded-full blur-xl animate-pulse-slow"></div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4">
 
 
-            {/* Google AdSense Banner */}
+            {/* Google AdSense Banner - Professional Implementation */}
             <div className="w-full mb-8">
-              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693" crossOrigin="anonymous"></script>
-              {/* add banner for home page */}
-              <ins
-                className="adsbygoogle"
-                style={{ display: 'block' }}
-                data-ad-client="ca-pub-1332831285527693"
-                data-ad-slot="5441357265"
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-              />
-              <script>
-                (adsbygoogle = window.adsbygoogle || []).push({ });
-              </script>
+              <div className="flex justify-center">
+                <div className="w-full max-w-4xl">
+                  <AdSenseBanner
+                    adSlot="5441357265"
+                    adClient="ca-pub-1332831285527693"
+                    adFormat="auto"
+                    className="w-full"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -426,24 +432,24 @@ export default function Home() {
         <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6 lg:py-8">
           <div className="max-w-7xl mx-auto">
             <div className="space-y-6 sm:space-y-8 lg:space-y-12">
-              {/* Gauge Section - Optimized for LCP */}
-              <div className="bg-gradient-to-br from-white via-slate-50 to-blue-50 rounded-3xl shadow-2xl border border-slate-200 p-8 sm:p-10 lg:p-12 mb-8 sm:mb-12 lg:mb-16 min-h-[600px] relative overflow-hidden">
+              {/* Professional Gauge Section */}
+              <div className="card-premium mb-8 sm:mb-12 lg:mb-16 min-h-[600px] relative overflow-hidden">
                 {/* Enhanced Background Pattern */}
-                <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-emerald-100/40 to-blue-100/40 rounded-full -mr-40 -mt-40 blur-xl"></div>
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-purple-100/40 to-indigo-100/40 rounded-full -ml-40 -mb-40 blur-xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-slate-100/30 to-blue-100/30 rounded-full blur-3xl"></div>
+                <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-emerald-100/30 to-blue-100/30 rounded-full -mr-40 -mt-40 blur-xl"></div>
+                <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-purple-100/30 to-indigo-100/30 rounded-full -ml-40 -mb-40 blur-xl"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-100/20 to-indigo-100/20 rounded-full blur-3xl"></div>
 
                 <div className="relative z-10">
                   {/* Enhanced Section Heading */}
                   <div className="text-center mb-12">
-                    <div className="inline-flex items-center gap-3 bg-gradient-to-r from-slate-800 to-slate-700 text-white px-6 py-3 rounded-full mb-6 shadow-lg">
+                    <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-full mb-6 shadow-lg">
                       <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                       <span className="text-sm font-semibold">Live Market Sentiment</span>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-blue-600 bg-clip-text text-transparent mb-6 tracking-tight">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent mb-6 tracking-tight">
                       Fear & Greed Index
                     </h1>
-                    <p className="text-slate-600 text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-slate-600 text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed font-medium">
                       Professional sentiment analysis for cryptocurrency markets with real-time data and historical insights
                     </p>
                   </div>
@@ -464,9 +470,9 @@ export default function Home() {
 
                             {/* Enhanced Status Display */}
                             <div className="mt-8 text-center space-y-4">
-                              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-slate-100 to-slate-200 px-6 py-3 rounded-2xl shadow-lg border border-slate-300">
-                                <ClockIcon className="h-5 w-5 text-slate-600" />
-                                <span className="text-sm font-medium text-slate-700">
+                              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-3 rounded-2xl shadow-lg border border-blue-200">
+                                <ClockIcon className="h-5 w-5 text-blue-600" />
+                                <span className="text-sm font-medium text-blue-700">
                                   Last Updated: {new Date(currentIndex.timestamp * 1000).toLocaleString()}
                                 </span>
                               </div>
@@ -504,23 +510,29 @@ export default function Home() {
                     <div className="flex items-center justify-center">
                       <div className="w-full max-w-md">
                         {currentIndex && historicalData ? (
-                          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/50">
-                            <div className="text-center mb-4">
-                              <h3 className="text-lg font-bold text-slate-800 mb-1">Historical Sentiment</h3>
-                              <p className="text-slate-600 text-xs">Track market sentiment over time</p>
+                          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/60">
+                            <div className="text-center mb-6">
+                              <h3 className="text-xl font-bold text-slate-800 mb-2">Historical Sentiment</h3>
+                              <p className="text-slate-600 text-sm font-medium">Track market sentiment over time</p>
                             </div>
                             <HistoricalValues data={formatHistoricalData(currentIndex, historicalData)} />
                           </div>
                         ) : (
-                          <div className="animate-pulse space-y-3 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/50">
-                            <div className="text-center mb-4">
-                              <div className="h-5 bg-slate-200 rounded w-28 mx-auto mb-1"></div>
-                              <div className="h-3 bg-slate-200 rounded w-40 mx-auto"></div>
+                          <div className="animate-pulse space-y-3 bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/60">
+                            <div className="text-center mb-6">
+                              <div className="h-6 bg-slate-200 rounded w-32 mx-auto mb-2"></div>
+                              <div className="h-4 bg-slate-200 rounded w-48 mx-auto"></div>
                             </div>
                             {[...Array(4)].map((_, i) => (
-                              <div key={i} className="flex items-center justify-between">
-                                <div className="w-16 h-3 bg-slate-200 rounded"></div>
-                                <div className="w-10 h-10 bg-slate-200 rounded-full"></div>
+                              <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-slate-100">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 bg-slate-200 rounded-full"></div>
+                                  <div className="space-y-2">
+                                    <div className="w-16 h-4 bg-slate-200 rounded"></div>
+                                    <div className="w-12 h-3 bg-slate-200 rounded"></div>
+                                  </div>
+                                </div>
+                                <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
                               </div>
                             ))}
                           </div>
@@ -531,14 +543,14 @@ export default function Home() {
 
                   {/* Enhanced CTA Section */}
                   <div className="mt-16 text-center">
-                    <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-gradient-to-r from-slate-800 to-slate-700 text-white px-8 py-6 rounded-2xl shadow-2xl">
+                    <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-6 rounded-2xl shadow-2xl">
                       <div className="flex items-center gap-3">
-                        <ChartBarIcon className="h-6 w-6 text-emerald-400" />
+                        <ChartBarIcon className="h-6 w-6 text-blue-200" />
                         <span className="text-lg font-semibold">Ready for deeper analysis?</span>
                       </div>
                       <Link
                         href="/fear-greed-vs-btc"
-                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                        className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 border border-white/20"
                       >
                         View Historical Analysis & BTC Comparison
                         <span className="text-lg">→</span>
@@ -559,18 +571,20 @@ export default function Home() {
               <section className="w-full py-12">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-center mb-8">
-                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-50 to-emerald-100 px-4 py-2 rounded-full mb-4 border border-emerald-200">
-                      <CurrencyDollarIcon className="h-5 w-5 text-emerald-600" />
-                      <span className="text-sm font-semibold text-emerald-700">Live Crypto Rankings</span>
+                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-2 rounded-full mb-4 border border-blue-200">
+                      <CurrencyDollarIcon className="h-5 w-5 text-blue-600" />
+                      <span className="text-sm font-semibold text-blue-700">Live Crypto Rankings</span>
                     </div>
                     <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
                       Top Cryptocurrencies
                     </h2>
-                    <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+                    <p className="text-slate-600 text-lg max-w-2xl mx-auto font-medium">
                       Real-time rankings by market cap, price, and trading volume
                     </p>
                   </div>
-                  <CryptoRankings />
+                  <div className="card-financial">
+                    <CryptoRankings />
+                  </div>
                 </div>
               </section>
 
@@ -591,7 +605,7 @@ export default function Home() {
                         <h2 id="market-sections" className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
                           Market Intelligence Hub
                         </h2>
-                        <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+                        <p className="text-slate-600 text-lg max-w-2xl mx-auto font-medium">
                           Access professional-grade market data and analytics across multiple asset classes
                         </p>
                       </div>

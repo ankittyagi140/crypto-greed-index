@@ -27,7 +27,7 @@ const FALLBACK_NAMES = {
 };
 
 type Params = {
-  symbol: keyof typeof SYMBOL_MAP;
+  symbol: string;
 };
 
 interface HistoricalDataItem {
@@ -246,7 +246,7 @@ export async function GET(
   try {
     const resolvedParams = await params;
     const { symbol } = resolvedParams;
-    const yahooSymbol = SYMBOL_MAP[symbol];
+    const yahooSymbol = SYMBOL_MAP[symbol as keyof typeof SYMBOL_MAP];
     const timeRange = request.nextUrl.searchParams.get('timeRange') || '1Y';
 
     if (!yahooSymbol) {

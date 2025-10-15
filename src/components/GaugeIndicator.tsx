@@ -61,12 +61,12 @@ const GaugeIndicator: React.FC<GaugeIndicatorProps> = ({ value, classification }
   // Current color based on value
   // const currentColor = getColorForValue(gaugeValue);
 
-  // Get sentiment emoji
-  const getSentimentEmoji = (val: number) => {
-    if (val <= 24) return '😱';
-    if (val <= 49) return '😰';
-    if (val <= 74) return '😏';
-    return '🤪';
+  // Get sentiment icon (professional)
+  const getSentimentIcon = (val: number) => {
+    if (val <= 24) return '⚠️';
+    if (val <= 49) return '📉';
+    if (val <= 74) return '📈';
+    return '🚀';
   };
 
   return (
@@ -128,17 +128,18 @@ const GaugeIndicator: React.FC<GaugeIndicatorProps> = ({ value, classification }
 
       {/* Enhanced current value and classification display */}
       <div className="text-center mt-6">
-        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-slate-100 to-slate-200 px-6 py-4 rounded-2xl shadow-lg border border-slate-300">
-          <div className="text-3xl">{getSentimentEmoji(gaugeValue)}</div>
+        <div className="inline-flex items-center gap-4 bg-gradient-to-r from-white to-slate-50 px-8 py-6 rounded-2xl shadow-xl border border-slate-200/50">
           <div className="flex flex-col items-center">
-            <div className="font-bold text-2xl text-slate-800 mb-1">
+            <div className="text-4xl font-bold text-slate-800 mb-2">
               {isAnimating ? '...' : gaugeValue}
             </div>
-            <div className="text-sm text-slate-600 font-medium">
+            <div className="text-lg text-slate-600 font-semibold">
               {isAnimating ? 'Calculating...' : classification}
             </div>
           </div>
-          <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200">
+            <span className="text-2xl">{getSentimentIcon(gaugeValue)}</span>
+          </div>
         </div>
       </div>
 

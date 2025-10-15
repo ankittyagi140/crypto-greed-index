@@ -111,8 +111,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="google-site-verification" content="YX6CRwtUTPtaHWQ3WIVAoszHABTSc5kj_FxRGWK55jI" />
         <meta name="google-adsense-account" content="ca-pub-1332831285527693" />
-        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693"
-     crossOrigin="anonymous"></Script>
+        <Script 
+          async 
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1332831285527693"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <ThemeInitializer />
         {/* Google Analytics */}
         <Script
@@ -300,7 +304,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <body className="min-h-screen bg-gradient-financial dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
         <Providers>
           <div className="flex flex-col min-h-screen">
             <Header />

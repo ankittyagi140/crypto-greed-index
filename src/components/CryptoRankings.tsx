@@ -26,30 +26,82 @@ interface CryptoData {
 
 type RankingType = 'market-cap' | 'price' | 'volume';
 
-// Mini Line Chart Component
-const MiniLineChart = ({ data, color = '#3B82F6' }: { data: number[], color?: string, height?: number }) => {
+// Professional Mini Line Chart Component
+const MiniLineChart = ({ data, color = '#3B82F6' }: { data: number[], color?: string }) => {
   if (!data || data.length < 2) return null;
 
+  // Add padding to prevent edge clipping
+  const padding = 0.1; // 10% padding
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
+  const paddedRange = range * (1 + 2 * padding);
+  const paddedMin = min - range * padding;
 
+  // Generate smooth curve points with better scaling
   const points = data.map((value, index) => {
-    const x = (index / (data.length - 1)) * 100;
-    const y = 100 - ((value - min) / range) * 100;
+    const x = (index / (data.length - 1)) * 80 + 10; // Add horizontal padding
+    const y = 35 - ((value - paddedMin) / paddedRange) * 30; // Add vertical padding
     return `${x},${y}`;
-  }).join(' ');
+  });
+
+  // Create smooth path using quadratic curves
+  const createSmoothPath = (points: string[]) => {
+    if (points.length < 2) return '';
+    
+    let path = `M ${points[0]}`;
+    
+    for (let i = 1; i < points.length; i++) {
+      const [x, y] = points[i].split(',').map(Number);
+      const [prevX, prevY] = points[i - 1].split(',').map(Number);
+      
+      if (i === 1) {
+        // First curve
+        const cpX = prevX + (x - prevX) / 3;
+        path += ` Q ${cpX},${prevY} ${(prevX + x) / 2},${(prevY + y) / 2}`;
+      } else if (i === points.length - 1) {
+        // Last curve
+        const cpX = prevX + (x - prevX) * 2 / 3;
+        path += ` Q ${cpX},${y} ${x},${y}`;
+      } else {
+        // Middle curves
+        const [nextX] = points[i + 1].split(',').map(Number);
+        const cp1X = prevX + (x - prevX) / 3;
+        const cp2X = x - (nextX - x) / 3;
+        path += ` C ${cp1X},${prevY} ${cp2X},${y} ${x},${y}`;
+      }
+    }
+    
+    return path;
+  };
+
+  const smoothPath = createSmoothPath(points);
 
   return (
-    <div className="flex-shrink-0 w-24 h-12 flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg p-1">
+    <div className="flex-shrink-0 w-24 h-12 flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800 rounded-lg p-1 border border-slate-200/50 dark:border-slate-600/50">
       <svg width="96" height="48" viewBox="0 0 96 48" className="w-full h-full">
-        <polyline
+        {/* Background gradient for better visibility */}
+        <defs>
+          <linearGradient id={`gradient-${color.replace('#', '')}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={color} stopOpacity="0.2"/>
+            <stop offset="100%" stopColor={color} stopOpacity="0.05"/>
+          </linearGradient>
+        </defs>
+        
+        {/* Area under the curve for better visual appeal */}
+        <path
+          d={`${smoothPath} L 86,35 L 10,35 Z`}
+          fill={`url(#gradient-${color.replace('#', '')})`}
+        />
+        
+        {/* Smooth curve line */}
+        <path
+          d={smoothPath}
           fill="none"
           stroke={color}
-          strokeWidth="4"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          points={points}
           vectorEffect="non-scaling-stroke"
         />
       </svg>
@@ -151,13 +203,28 @@ export default function CryptoRankings() {
   const generateMockSparkline = (price: number, change: number | null) => {
     const points = [];
     const basePrice = price;
-    const volatility = 0.02; // 2% volatility
+    const volatility = 0.015; // Reduced volatility for smoother curves
+    const trend = change ? change / 100 : 0;
 
-    for (let i = 0; i < 7; i++) {
-      const randomChange = (Math.random() - 0.5) * volatility;
-      const trend = change ? (change / 100) * (i / 6) : 0;
-      const newPrice = basePrice * (1 + randomChange + trend);
-      points.push(newPrice);
+    // Generate more points for smoother curves (24 points for 7 days = ~3.4 hours per point)
+    const numPoints = 24;
+    
+    for (let i = 0; i < numPoints; i++) {
+      // Create a more realistic price movement with trend and noise
+      const timeProgress = i / (numPoints - 1);
+      
+      // Main trend component
+      const trendComponent = trend * timeProgress;
+      
+      // Add some realistic market noise with autocorrelation
+      const noise: number = i === 0 ? 0 : (points[i - 1] - basePrice) / basePrice * 0.3;
+      const randomNoise: number = (Math.random() - 0.5) * volatility;
+      
+      // Combine trend, noise, and random component
+      const totalChange = trendComponent + noise + randomNoise;
+      const newPrice = basePrice * (1 + totalChange);
+      
+      points.push(Math.max(newPrice, basePrice * 0.95)); // Prevent extreme drops
     }
 
     return points;
@@ -165,18 +232,19 @@ export default function CryptoRankings() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 dark:border-gray-700/50 p-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-6"></div>
+          <div className="h-8 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 rounded-xl w-48 mb-6"></div>
           <div className="space-y-4">
             {[...Array(10)].map((_, i) => (
-              <div key={i} className="flex items-center space-x-4">
-                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+              <div key={i} className="flex items-center space-x-4 p-3 rounded-lg bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800">
+                <div className="w-8 h-8 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 rounded-full"></div>
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                  <div className="h-4 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 rounded w-24"></div>
+                  <div className="h-3 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 rounded w-16"></div>
                 </div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                <div className="h-4 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 rounded w-20"></div>
+                <div className="w-24 h-12 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 rounded-lg"></div>
               </div>
             ))}
           </div>
@@ -186,7 +254,7 @@ export default function CryptoRankings() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 dark:border-gray-700/50 p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           Top Cryptocurrencies
@@ -199,15 +267,15 @@ export default function CryptoRankings() {
         </Link>
       </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-1 mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+      {/* Professional Tabs */}
+      <div className="flex space-x-1 mb-6 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-xl p-1 border border-slate-200/50 dark:border-slate-600/50">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id
-                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === tab.id
+                ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-lg border border-blue-200/50 dark:border-blue-400/50'
+                : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/50 dark:hover:bg-slate-600/50'
               }`}
           >
             <span>{tab.icon}</span>
@@ -216,8 +284,8 @@ export default function CryptoRankings() {
         ))}
       </div>
 
-      {/* Table Header */}
-      <div className="hidden sm:flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400">
+      {/* Professional Table Header */}
+      <div className="hidden sm:flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-600/50 text-sm font-semibold text-slate-600 dark:text-slate-400 bg-gradient-to-r from-slate-50/50 to-blue-50/30 dark:from-slate-700/50 dark:to-slate-800/50 rounded-t-lg">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-3">
             <span className="w-8 text-center">#</span>
@@ -246,7 +314,7 @@ export default function CryptoRankings() {
             <Link
               key={crypto.id}
               href={`/coins/${crypto.id}`}
-              className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group border-b border-gray-100 dark:border-gray-800 last:border-b-0"
+              className="flex items-center justify-between p-3 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/30 dark:hover:from-slate-700/50 dark:hover:to-slate-800/50 transition-all duration-200 group border-b border-slate-100/50 dark:border-slate-700/50 last:border-b-0 rounded-lg hover:shadow-sm"
             >
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-3">
@@ -315,11 +383,11 @@ export default function CryptoRankings() {
         })}
       </div>
 
-      {/* View More Button */}
+      {/* Professional View More Button */}
       <div className="mt-6 text-center">
         <Link
           href="/top-10-crypto"
-          className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+          className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
         >
           <CurrencyDollarIcon className="h-5 w-5" />
           <span>View All Cryptocurrencies</span>

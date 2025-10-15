@@ -408,7 +408,7 @@ export default function USMarkets() {
       });
     }
   // Removed the dependency on lastUpdateTime that was causing infinite loop
-  }, []);
+  }, [lastUpdateTime]);
 
   useEffect(() => {
     // Initial data fetch
@@ -422,8 +422,8 @@ export default function USMarkets() {
     }, getRefreshInterval());
     
     return () => clearInterval(intervalId);
-  // Using empty dependency array to ensure the effect runs only once on mount
-  }, []);
+  // Using fetchData dependency to ensure the effect runs when fetchData changes
+  }, [fetchData]);
 
   return (
     <>

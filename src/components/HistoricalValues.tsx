@@ -61,15 +61,15 @@ const HistoricalValues: React.FC<HistoricalValuesProps> = ({ data }) => {
   const getSentimentIcon = (classification: string) => {
     switch (classification.toLowerCase()) {
       case 'neutral':
-        return '😐';
+        return '📊';
       case 'fear':
-        return '😰';
+        return '📉';
       case 'extreme fear':
-        return '😱';
+        return '⚠️';
       case 'greed':
-        return '😏';
+        return '📈';
       case 'extreme greed':
-        return '🤪';
+        return '🚀';
       default:
         return '📊';
     }
@@ -86,19 +86,21 @@ const HistoricalValues: React.FC<HistoricalValuesProps> = ({ data }) => {
         return (
           <div
             key={index}
-            className={`group relative p-3 rounded-lg border-2 ${colors.border} ${colors.bg} hover:shadow-md transition-all duration-300 hover:scale-102 cursor-pointer`}
+            className={`group relative p-4 rounded-xl border ${colors.border} ${colors.bg} hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer backdrop-blur-sm`}
           >
             {/* Progress Bar Background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/50 to-transparent rounded-lg"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/60 to-transparent rounded-xl"></div>
 
             <div className="relative z-10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="text-lg">{sentimentIcon}</div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/80 border border-slate-200">
+                  <span className="text-lg">{sentimentIcon}</span>
+                </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-medium text-slate-700">
+                  <span className="text-sm font-semibold text-slate-800">
                     {item.label}
                   </span>
-                  <span className={`text-xs font-semibold ${colors.text}`}>
+                  <span className={`text-xs font-medium ${colors.text}`}>
                     {item.classification}
                   </span>
                 </div>

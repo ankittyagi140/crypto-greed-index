@@ -4,17 +4,45 @@
 @tailwind utilities;
 
 :root {
+  /* Professional Financial Theme Colors */
   --background: #ffffff;
-  --foreground: #1e293b;
-  --foreground-rgb: 30, 41, 59;
+  --foreground: #0f172a;
+  --foreground-rgb: 15, 23, 42;
   --background-start-rgb: 248, 250, 252;
   --background-end-rgb: 255, 255, 255;
-  --primary: #0f172a;
-  --primary-light: #334155;
+  
+  /* Primary Brand Colors - Professional Blue */
+  --primary: #1e40af;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e3a8a;
+  
+  /* Accent Colors - Financial Green */
   --accent: #059669;
   --accent-light: #10b981;
+  --accent-dark: #047857;
+  
+  /* Neutral Colors */
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+  
+  /* Financial Status Colors */
+  --success: #059669;
+  --warning: #d97706;
+  --error: #dc2626;
+  --info: #2563eb;
+  
+  /* Border Colors */
   --border: #e2e8f0;
   --border-light: #f1f5f9;
+  --border-dark: #cbd5e1;
 }
 
 @theme inline {
@@ -28,10 +56,14 @@
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, var(--neutral-50) 0%, #ffffff 100%);
   color: var(--foreground);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Add smooth transitions for theme changes */
@@ -62,7 +94,7 @@ body {
   }
 
   body {
-    @apply bg-slate-50 text-slate-800;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 text-slate-900;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
@@ -74,13 +106,40 @@ body {
   h4,
   h5,
   h6 {
-    @apply font-semibold text-slate-900;
+    @apply font-bold text-slate-900;
     line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  h1 {
+    @apply text-4xl sm:text-5xl lg:text-6xl;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  h2 {
+    @apply text-3xl sm:text-4xl lg:text-5xl;
+  }
+
+  h3 {
+    @apply text-2xl sm:text-3xl lg:text-4xl;
   }
 
   p {
-    @apply text-slate-600;
+    @apply text-slate-600 leading-relaxed;
     line-height: 1.7;
+  }
+
+  /* Professional link styles */
+  a {
+    @apply text-blue-600 hover:text-blue-700 transition-colors duration-200;
+  }
+
+  /* Professional button base styles */
+  button {
+    @apply font-medium transition-all duration-200;
   }
 }
 
@@ -107,19 +166,39 @@ body {
   }
 
   .btn-primary {
-    @apply bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 shadow-lg;
+    @apply bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105;
   }
 
   .btn-secondary {
-    @apply bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2 rounded-lg transition-colors duration-200 border border-slate-300;
+    @apply bg-white hover:bg-slate-50 text-slate-700 font-medium px-4 py-2 rounded-xl transition-all duration-200 border border-slate-300 hover:border-slate-400 shadow-sm hover:shadow-md;
   }
 
   .btn-accent {
-    @apply bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 shadow-lg;
+    @apply bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105;
+  }
+
+  .btn-success {
+    @apply bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-warning {
+    @apply bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-danger {
+    @apply bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl;
   }
 
   .card-financial {
-    @apply bg-white rounded-xl shadow-lg border border-slate-200 p-6 hover:shadow-xl transition-shadow duration-200;
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:border-blue-200/50;
+  }
+
+  .card-premium {
+    @apply bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 p-8 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 hover:border-blue-300/50;
+  }
+
+  .card-market {
+    @apply bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200/50 p-6 hover:shadow-xl hover:shadow-slate-500/10 transition-all duration-300 hover:border-slate-300/50 hover:bg-white;
   }
 
   .badge-success {

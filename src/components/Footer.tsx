@@ -6,7 +6,7 @@ import { FaTwitter, FaInstagram, FaLinkedin, FaCoffee } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-white">
+    <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       <div className="container mx-auto px-6 py-12">
         <div className="flex justify-center mb-8">
           <Link href="/" className="flex flex-col items-center">
@@ -19,16 +19,16 @@ export default function Footer() {
                 className="object-contain"
               />
             </div>
-            <span className="text-sm text-gray-300 hover:text-white transition-colors">CryptoGreedIndex.com</span>
+            <span className="text-sm text-slate-300 hover:text-blue-400 transition-colors font-medium">CryptoGreedIndex.com</span>
           </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-10">
           <div>
-            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">About</h3>
+            <h3 className="text-lg font-bold mb-4 border-b border-slate-600 pb-2 text-blue-300">About</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors text-sm">
+                <Link href="/about" className="text-slate-300 hover:text-blue-400 transition-colors text-sm font-medium">
                   About Us
                 </Link>
               </li>
@@ -177,7 +177,7 @@ export default function Footer() {
             </div>
             <Link
               href="/donate"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors duration-200 text-sm"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all duration-200 text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <FaCoffee className="w-4 h-4 mr-2" />
               <span>Support Us</span>
